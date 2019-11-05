@@ -3,11 +3,12 @@
 ## code doesn't break when using the non-default region.
 ###
 resource "aws_s3_bucket" "s3_east_bucket" {
+  provider = "aws.us-east-1"
   bucket = "monster-s3-us-east-1"
   region = "us-east-1"
 }
 resource "aws_s3_bucket" "s3_west_bucket" {
-  provider = "aws.west-2"
+  provider = "aws.us-west-2"
   bucket = "monster-s3-us-west-2"
   region = "us-west-2"
 }
@@ -16,9 +17,11 @@ resource "aws_s3_bucket" "s3_west_bucket" {
 ## Create a machine user, and stash its access secrets in Vault
 ###
 resource "aws_iam_user" "s3_transfer_user" {
+  provider = "aws.us-east-1"
   name = "monster-s3-tester"
 }
 resource "aws_iam_access_key" "s3_transfer_user_key" {
+  provider = "aws.us-east-1"
   user = aws_iam_user.s3_transfer_user.name
 }
 resource "vault_generic_secret" "s3_transfer_user_secret" {
@@ -54,6 +57,7 @@ data "aws_iam_policy_document" "s3_transfer_access_policy" {
 }
 
 resource "aws_iam_user_policy" "s3_transfer_access_policy" {
+  provider = "aws.us-east-1"
   name = "MonsterS3TransferAccessPolicy"
   policy = data.aws_iam_policy_document.s3_transfer_access_policy.json
   user = aws_iam_user.s3_transfer_user.name
