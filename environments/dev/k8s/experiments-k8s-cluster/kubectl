@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+gcloud container clusters get-credentials \
+  --project=broad-dsp-monster-dev \
+  --zone=us-central1-c \
+  experiments-k8s-cluster
+
+kubectl --context=gke_broad-dsp-monster-dev_us-central1-c_experiments-k8s-cluster "${@}"

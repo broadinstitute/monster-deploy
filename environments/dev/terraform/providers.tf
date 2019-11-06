@@ -24,8 +24,9 @@ provider "aws" {
 }
 
 ###
-## Init the Vault provider for consistency.
+## Init the Vault and local providers for consistency.
 ###
 provider "vault" {
   address = "https://clotho.broadinstitute.org:8200"
 }
+provider "local" {}
