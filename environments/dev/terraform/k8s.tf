@@ -24,7 +24,7 @@ module "experiment_k8s" {
   node_pool_machine_type = "n1-standard-2"
   node_pool_disk_size_gb = 10
 
-  # CIDRs of networks allowed to talk to the k8s master
+  # CIDRs of networks allowed to talk to the k8s master.
   master_authorized_network_cidrs = [
     "69.173.64.0/19",
     "69.173.96.0/20",
@@ -59,4 +59,16 @@ gcloud container clusters get-credentials \
 
 kubectl --context=gke_broad-dsp-monster-dev_us-central1-c_experiments-k8s-cluster "$${@}"
 SCRIPT
+}
+resource "null_resource" "experiment_k8s_psp" {
+  triggers = {
+    cluster_name = module.experiment_k8s.cluster_name,
+    cluster_endpoint = module.experiment_k8s.cluster_endpoint,
+    kubectl_script = local_file.experiment_k8s_kubectl.content
+  }
+
+  provisioner "local-exec" {
+    working_dir = "${dirname(abspath(path.module))}/k8s"
+    command = "./experiments-k8s-cluster/kubectl apply -f ./init-configs"
+  }
 }

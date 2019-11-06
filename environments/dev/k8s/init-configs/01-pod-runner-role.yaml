@@ -1,0 +1,13 @@
+###
+## Role which enables running pods in a namespace.
+###
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pod-runner
+rules:
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames:
+      - pod-running-policy
