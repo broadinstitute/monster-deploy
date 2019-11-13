@@ -21,7 +21,15 @@ resource "google_compute_subnetwork" "k8s_subnetwork" {
   network = google_compute_network.k8s_network.self_link
   ip_cidr_range = "10.0.0.0/22"
   private_ip_google_access = true
-  enable_flow_logs = false
+
+  dynamic "log_config" {
+    for_each = false ? ["If only TF supported if/else"] : []
+    content {
+      aggregation_interval = "INTERVAL_10_MIN"
+      flow_sampling        = 0.5
+      metadata             = "INCLUDE_ALL_METADATA"
+    }
+  }
 }
 resource "google_compute_router" "k8s_router" {
   provider = "google"
