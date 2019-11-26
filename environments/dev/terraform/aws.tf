@@ -29,7 +29,7 @@ resource "vault_generic_secret" "s3_transfer_user_secret" {
   data_json = <<DATA
 {
   "access_key_id": "${aws_iam_access_key.s3_transfer_user_key.id}",
-  "access_secret_access_key": "${aws_iam_access_key.s3_transfer_user_key.secret}"
+  "secret_access_key": "${aws_iam_access_key.s3_transfer_user_key.secret}"
 }
 DATA
 }
@@ -50,8 +50,8 @@ data "aws_iam_policy_document" "s3_transfer_access_policy" {
     sid = "ObjectActions"
     actions = ["s3:*Object"]
     resources = [
-      aws_s3_bucket.s3_east_bucket.arn,
-      aws_s3_bucket.s3_west_bucket.arn
+      "${aws_s3_bucket.s3_east_bucket.arn}/*",
+      "${aws_s3_bucket.s3_west_bucket.arn}/*"
     ]
   }
 }
