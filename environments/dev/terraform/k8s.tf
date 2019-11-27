@@ -7,7 +7,7 @@
 ## checked into source control to avoid noisy terraform diffs.
 ###
 module "experiment_k8s" {
-  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/k8s?ref=k8s-0.2.0-tf-0.12"
+  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/k8s?ref=k8s-0.4.0-tf-0.12"
   dependencies = [module.enable_services]
   providers = {
     google = "google-beta"
@@ -15,12 +15,12 @@ module "experiment_k8s" {
   location = "us-central1-c"
 
   cluster_name = "experiments-k8s-cluster"
-  k8s_version = "1.14.8-gke.2"
+  k8s_version = "1.14."
 
   cluster_network = google_compute_network.k8s_network.name
   cluster_subnetwork = google_compute_subnetwork.k8s_subnetwork.name
 
-  node_pool_count = 1
+  node_pool_count = 2
   node_pool_machine_type = "n1-standard-2"
   node_pool_disk_size_gb = 10
 
@@ -45,6 +45,8 @@ module "experiment_k8s" {
   enable_private_nodes = true
   enable_private_endpoint = false
   private_master_ipv4_cidr_block = "10.0.82.0/28"
+
+  enable_workload_identity = true
 }
 resource "local_file" "experiment_k8s_kubectl" {
   filename = "${dirname(abspath(path.module))}/k8s/experiments-k8s-cluster/kubectl"
