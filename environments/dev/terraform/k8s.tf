@@ -7,7 +7,7 @@
 ## checked into source control to avoid noisy terraform diffs.
 ###
 module "experiment_k8s" {
-  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/k8s?ref=dm-fix-k8s-versioning"
+  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/k8s?ref=k8s-0.4.0-tf-0.12"
   dependencies = [module.enable_services]
   providers = {
     google = "google-beta"
@@ -15,7 +15,7 @@ module "experiment_k8s" {
   location = "us-central1-c"
 
   cluster_name = "experiments-k8s-cluster"
-  k8s_version = "1.14.8-gke.2"
+  k8s_version = "1.14."
 
   cluster_network = google_compute_network.k8s_network.name
   cluster_subnetwork = google_compute_subnetwork.k8s_subnetwork.name
