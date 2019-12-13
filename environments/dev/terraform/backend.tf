@@ -5,6 +5,6 @@
 terraform {
   backend "gcs" {
     bucket = "broad-dsp-monster-dev-terraform-state"
-    path = "dev.tfstate.json"
+    path = "tfstate.json"
   }
 }

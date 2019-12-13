@@ -1,13 +1,13 @@
-module "enable_services" {
-  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/api-services?ref=services-0.2.0-tf-0.12"
+module enable_services {
+  source = "/templates/api-services"
   providers = {
-    google.target = "google-beta"
+    google.target = google.target
   }
-  project = "broad-dsp-monster-dev"
-  services = [
+  service_ids = [
     "compute.googleapis.com",
     "container.googleapis.com",
     "containerregistry.googleapis.com",
+    "dataflow.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "logging.googleapis.com",
@@ -16,8 +16,6 @@ module "enable_services" {
     "replicapoolupdater.googleapis.com",
     "resourceviews.googleapis.com",
     "runtimeconfig.googleapis.com",
-    "sqladmin.googleapis.com",
-    "sql-component.googleapis.com",
     "stackdriver.googleapis.com",
     "storage-api.googleapis.com",
     "storage-component.googleapis.com"
