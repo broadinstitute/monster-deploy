@@ -4,13 +4,13 @@ resource google_project_service service_usage {
   service = "serviceusage.googleapis.com"
   disable_on_destroy = false
 }
-
 resource google_project_service cloud_resource_manager {
   provider = google.target
   service = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
 
+# Enable user-requested APIs.
 resource google_project_service services {
   provider = google.target
   count = length(var.service_ids)

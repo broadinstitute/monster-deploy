@@ -68,7 +68,6 @@ data aws_iam_policy_document s3_transfer_access_policy {
     ]
   }
 }
-
 resource aws_iam_user_policy s3_transfer_access_policy {
   provider = aws.us-east-1
   name = "MonsterS3TransferAccessPolicy"

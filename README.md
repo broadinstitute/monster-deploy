@@ -1,8 +1,10 @@
-# dsp-monster-core-infrastructure
+# Monster Infrastructure
 Infrastructure-as-code for Monster team's "core" environments
 
-## Deploying an environment
-Run `environments/init.sh <env>`.
+## Technologies Used
+We use [Terraform](https://www.terraform.io/docs/index.html),
+[Argo CD](https://argoproj.github.io/argo-cd/), and
+[Helm](https://helm.sh/docs/) to manage our deployments.
 
-## Tearing down an environment
-Don't do this. If you need to change something, update the TF files and re-apply.
+## Deploying an Environment
+See the [README](environments/README.md).

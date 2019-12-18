@@ -1,6 +1,5 @@
-###
-## k8s cluster for ad-hoc processing during ingest.
-###
+# Create a GKE master for running ad-hoc processing.
+# Node pools will be spun up/down as part of the ingest workflow.
 module processing_k8s_master {
   source = "/templates/k8s-master"
   providers = {

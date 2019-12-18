@@ -11,6 +11,9 @@ data google_container_engine_versions cluster_versions {
   version_prefix = "1.14."
 }
 
+# Create the GKE master.
+# This master will have no nodes, so it won't be able to run any pods until
+# a node pool is provisioned for it.
 resource google_container_cluster master {
   provider = google.target
 

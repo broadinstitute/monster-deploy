@@ -1,3 +1,4 @@
+# Create a GKE node pool, attached to an existing master.
 resource google_container_node_pool pool {
   provider   = google.target
 

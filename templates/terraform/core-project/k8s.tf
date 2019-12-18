@@ -1,3 +1,5 @@
+# Provision a cluster for running "core" services.
+# For example, this cluster will run Airflow, Argo CD, and the Argo controllers.
 module core_k8s_master {
   source = "/templates/k8s-master"
   providers = {
