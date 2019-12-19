@@ -1,13 +1,10 @@
-# dsp-monster-core-infrastructure
+# Monster Infrastructure
 Infrastructure-as-code for Monster team's "core" environments
 
-## Deploying an environment
-We're keeping things simple for now.
+## Technologies Used
+We use [Terraform](https://www.terraform.io/docs/index.html),
+[Argo CD](https://argoproj.github.io/argo-cd/), and
+[Helm](https://helm.sh/docs/) to manage our deployments.
 
-1. Install Terraform with `brew install terraform`
-2. Navigate to the environment you want to deploy (i.e. `cd environments/dev/terraform`)
-3. Initialize Terraform with `terraform init`
-4. Run Terraform with `terraform apply`
-
-## Tearing down an environment
-Don't do this. If you need to change something, update the TF files and re-apply.
+## Deploying an Environment
+See the [README](environments/README.md).
