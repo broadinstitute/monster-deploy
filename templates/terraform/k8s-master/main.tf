@@ -17,11 +17,11 @@ data google_container_engine_versions cluster_versions {
 resource google_container_cluster master {
   provider = google.target
 
-  name       = var.name
-  location   = var.location
+  name = var.name
+  location = var.location
   depends_on = [var.dependencies]
 
-  network    = var.network
+  network = var.network
   subnetwork = var.subnetwork
 
   # CIS compliance: stackdriver logging
@@ -66,16 +66,11 @@ resource google_container_cluster master {
   }
 
   ip_allocation_policy {
-    # FIXME: Many of these are removed in TF-Google 3, because they want
-    # users to always create subnetworks themselves. See this PR for info
-    # about what got ripped out and what got left behind:
-    # https://github.com/terraform-providers/terraform-provider-google/issues/4638
-    #
     # According to trial and error, setting these values to null
     # lets Google derive values that actually work.
     # Otherwise you'll end up flipping a table trying to set things manually.
-    cluster_ipv4_cidr_block       = null
-    services_ipv4_cidr_block      = null
+    cluster_ipv4_cidr_block = null
+    services_ipv4_cidr_block = null
   }
 
   # CIS compliance: Enable PodSecurityPolicyController

@@ -16,6 +16,7 @@ resource google_storage_bucket temp_bucket {
       type = "Delete"
     }
 
+    # Delete files after they've been in the bucket for 7 days.
     condition {
       age = 7
     }
@@ -34,6 +35,7 @@ resource google_storage_bucket staging_storage {
       type = "Delete"
     }
 
+    # Delete files after they've been in the bucket for 30 days.
     condition {
       age = 30
     }

@@ -3,9 +3,9 @@ resource google_container_node_pool pool {
   provider   = google.target
 
   depends_on = [var.dependencies]
-  name       = var.name
-  location   = var.location
-  cluster    = var.master_name
+  name = var.name
+  location = var.location
+  cluster = var.master_name
   node_count = var.node_count
 
   management {
@@ -18,9 +18,9 @@ resource google_container_node_pool pool {
 
   node_config {
     # CIS compliance: COS image
-    image_type      = "COS"
-    machine_type    = var.machine_type
-    disk_size_gb    = var.disk_size_gb
+    image_type = "COS"
+    machine_type = var.machine_type
+    disk_size_gb = var.disk_size_gb
 
     workload_metadata_config {
       # Workload Identity only works when using the metadata server.

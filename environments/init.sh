@@ -42,7 +42,9 @@ function apply_terraform () {
 }
 
 function install_argocd () {
-  1>&2 echo foo
+  # The plan is to have a "bootstrap" Helm chart which installs
+  # Argo CD + a bunch of Argo CD apps.
+  1>&2 echo TODO
 }
 
 main () {
