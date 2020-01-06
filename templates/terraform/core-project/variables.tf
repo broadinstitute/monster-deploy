@@ -17,3 +17,8 @@ variable k8s_machine_type {
   type = string
   description = "Machine type to use in the core k8s cluster."
 }
+
+variable kubeconfig_path {
+  type = string
+  description = "Local path where kubeconfig for the core GKE cluster should be written."
+}
