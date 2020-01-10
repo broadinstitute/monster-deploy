@@ -6,7 +6,17 @@ resource google_container_node_pool pool {
   name = var.name
   location = var.location
   cluster = var.master_name
+  # node_count must be set to null if autoscaling is used
   node_count = var.node_count
+
+  # autoscaling must be set to null if node_count is used
+  dynamic "autoscaling" {
+    for_each = var.autoscaling
+    content {
+      min_node_count = var.autoscaling.min_node_count
+      max_node_count = var.autoscaling.max_node_count
+    }
+  }
 
   management {
     # CIS compliance: enable automatic repair
