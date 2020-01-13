@@ -8,7 +8,17 @@ declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 # The values don't matter as long as they're not empty.
 declare -rA ENVS=([dev]=valid)
 
-declare -ra NAMESPACES=(fluxcd)
+declare -ra COMMAND_CENTER_NAMESPACES=(
+  fluxcd
+  airflow
+  argo-ui
+  clinvar
+  encode
+  dog-aging
+)
+declare -ra PROCESSING_NAMESPACES=(
+  argo
+)
 
 declare -r TERRAFORM=hashicorp/terraform:0.12.17
 declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
@@ -16,6 +26,8 @@ declare -r HELM=lachlanevenson/k8s-helm:v3.0.2
 
 declare -r HELM_OPERATOR_VERSION=v1.0.0-rc5
 declare -r HELM_OPERATOR_CHART_VERSION=0.4.0
+
+declare -r KUBECONFIG_DIR_NAME=.kubeconfig
 
 
 #####
@@ -50,13 +62,13 @@ function apply_terraform () {
 
   rm -rf ${env_dir}/terraform/.terraform
   ${terraform[@]} init
-  ${terraform[@]} apply -var='kubeconfig_path=/env/.kubeconfig'
+  ${terraform[@]} apply -var="kubeconfig_dir_path=/env/${KUBECONFIG_DIR_NAME}"
 }
 
 
 #####
-## Initialize namespaces in the core GKE cluster so
-## we can deploy into them.
+## Initialize namespaces in a GKE cluster so we can
+## deploy into it.
 ##
 ## Helm used to create namespaces automatically but
 ## dropped the behavior in v3 to be consistent with
@@ -64,6 +76,8 @@ function apply_terraform () {
 #####
 function create_namespaces () {
   local -r kubeconfig=$1
+  shift
+  local -ra namespaces=${@}
 
   declare -ra kubectl=(
     docker run
@@ -73,13 +87,13 @@ function create_namespaces () {
     # Read from stdin so we can pipe in YAML.
     -a stdin -a stdout -a stderr
     # Configure the client to point at the cluster.
-    -v ${kubeconfig}:/root/.kube/config
+    -v ${kubeconfig}:/root/.kube/config:ro
     # Make sure it can auth with GKE.
     -v ${HOME}/.config:/root/.config
     ${KUBECTL}
   )
 
-  for ns in ${NAMESPACES[@]}; do
+  for ns in ${namespaces[@]}; do
     # kubectl apply a HEREDOC containing YAML for each namespace.
     #
     # It'd be simpler if we could just `kubectl create namespace ${ns}`.
@@ -107,8 +121,8 @@ function install_flux () {
   # the wrong way can result in all existing objects being deleted),
   # so they're easier to handle out-of-band.
   docker run --rm -it \
-    -v ${kubeconfig}:/root/.kube/config \
-    -v ${HOME}/.config:/root/.config \
+    -v ${kubeconfig}:/root/.kube/config:ro \
+    -v ${HOME}/.config:/root/.config:ro \
     ${KUBECTL} \
     apply -f \
     https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
@@ -118,9 +132,9 @@ function install_flux () {
     docker run
     --rm -it
     # Configure the client to point at the cluster.
-    -v ${kubeconfig}:/root/.kube/config
+    -v ${kubeconfig}:/root/.kube/config:ro
     # Make sure it can auth with GKE.
-    -v ${HOME}/.config:/root/.config
+    -v ${HOME}/.config:/root/.config:ro
     # Persist Helm config across container runs.
     -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
     -v ${env_dir}/.helm/config:/root/.config/helm
@@ -142,7 +156,7 @@ function install_flux () {
 
 #####
 ## Install Flux HelmRelease CRDs for all the software we want to
-## have running in the core GKE cluster.
+## have running in the command-center GKE cluster.
 ##
 ## The Helm Operator will monitor the git repo specified in each
 ## CRD and re-deploy whenever the target ref changes.
@@ -169,15 +183,23 @@ function main () {
   #
   # NOTE: Set the SKIP_TF env variable to any value to skip over this
   # step when testing changes to the k8s portiion.
-  local -r env_dir=${SCRIPT_DIR}/$1
+  local -r env_dir=${REPO_ROOT}/environments/$1
   if [ -z ${SKIP_TF:-""} ]; then
     apply_terraform ${env_dir}
   fi
 
-  # Set up services in GKE.
-  local -r kubeconfig=${env_dir}/.kubeconfig
-  create_namespaces ${kubeconfig}
-  install_flux ${kubeconfig} ${env_dir}
+  # Set up GKE namespaces.
+  local -r kubeconfig_dir=${env_dir}/${KUBECONFIG_DIR_NAME}
+  local -r command_center_config=${kubeconfig_dir}/command-center
+  local -r processing_configs_dir=${kubeconfig_dir}/processing
+
+  create_namespaces ${command_center_config} ${COMMAND_CENTER_NAMESPACES[@]}
+  for kubeconfig in ${processing_configs_dir}/*; do
+    create_namespaces ${kubeconfig} ${PROCESSING_NAMESPACES[@]}
+  done
+
+  # Install command-center services.
+  install_flux ${command_center_config} ${env_dir}
   install_charts
 }
 

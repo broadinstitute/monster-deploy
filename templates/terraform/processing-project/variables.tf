@@ -37,3 +37,8 @@ variable k8s_zone {
   type = string
   description = "Zone within `region` where GKE clusters should run"
 }
+
+variable kubeconfig_path {
+  type = string
+  description = "Local path where kubeconfig for the processing GKE cluster should be written."
+}

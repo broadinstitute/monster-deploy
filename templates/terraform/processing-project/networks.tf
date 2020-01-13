@@ -3,6 +3,7 @@ module k8s_network {
   providers = {
     google.target = google.target
   }
+  dependencies = [module.enable_services]
 
   name = "monster-processing-network"
   subnets = [{
