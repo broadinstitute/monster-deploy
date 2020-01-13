@@ -10,6 +10,7 @@ resource google_container_node_pool pool {
   node_count = var.node_count
 
   # autoscaling must be set to null if node_count is used
+  # TODO if setting something to null is an omission, then does this need to be dynamic?
   dynamic "autoscaling" {
     for_each = var.autoscaling
     content {

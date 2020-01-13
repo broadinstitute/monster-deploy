@@ -27,6 +27,8 @@ module processing_k8s_static_node_pool {
   node_count = var.k8s_static_cluster_size # TODO hard code this?
   machine_type = var.k8s_static_machine_type # TODO hard code this?
   disk_size_gb = 10 # TODO what should this be?
+
+  autoscaling = null
 }
 
 module processing_k8s_scaled_node_pool {
@@ -39,6 +41,8 @@ module processing_k8s_scaled_node_pool {
   name = "monster-processing-scaled-node-pool"
   master_name = module.processing_k8s_master.name
   location = "${var.region}-${var.k8s_zone}"
+
+  node_count = null
 
   autoscaling = {
     min_node_count = 0
