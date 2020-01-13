@@ -6,7 +6,17 @@ resource google_container_node_pool pool {
   name = var.name
   location = var.location
   cluster = var.master_name
+  # node_count must be set to null if autoscaling is used
   node_count = var.node_count
+
+  # autoscaling must be set to null if node_count is used
+  dynamic "autoscaling" {
+    for_each = var.autoscaling == null ? [] : [var.autoscaling]
+    content {
+      min_node_count = autoscaling.value["min_node_count"]
+      max_node_count = autoscaling.value["max_node_count"]
+    }
+  }
 
   management {
     # CIS compliance: enable automatic repair
@@ -21,6 +31,15 @@ resource google_container_node_pool pool {
     image_type = "COS"
     machine_type = var.machine_type
     disk_size_gb = var.disk_size_gb
+
+    dynamic "taint" {
+      for_each = var.taints == null ? [] : var.taints
+      content {
+        key = taint.value["key"]
+        value = taint.value["value"]
+        effect = taint.value["effect"]
+      }
+    }
 
     workload_metadata_config {
       # Workload Identity only works when using the metadata server.

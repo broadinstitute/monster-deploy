@@ -27,6 +27,9 @@ module node_pool {
   node_count = var.k8s_cluster_size
   machine_type = var.k8s_machine_type
   disk_size_gb = 10
+
+  autoscaling = null
+  taints = null
 }
 
 # Write a kubeconfig for the cluster to disk, for use downstream.
