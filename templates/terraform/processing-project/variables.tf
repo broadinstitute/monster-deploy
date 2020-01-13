@@ -18,11 +18,6 @@ variable k8s_static_cluster_size {
   description = "Number of nodes to run in the static processing k8s cluster."
 }
 
-variable k8s_static_machine_type {
-  type = string
-  description = "Machine type to use in the static processing k8s cluster."
-}
-
 variable k8s_scaled_cluster_max_size {
   type = number
   description = "Maximum number of nodes to run in the autoscaled processing k8s cluster."
