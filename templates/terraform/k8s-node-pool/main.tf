@@ -33,7 +33,7 @@ resource google_container_node_pool pool {
     disk_size_gb = var.disk_size_gb
 
     dynamic "taint" {
-      for_each = var.taint == null ? [] : var.taint
+      for_each = var.taints == null ? [] : var.taints
       content {
         key = taint.value["key"]
         value = taint.value["value"]

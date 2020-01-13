@@ -29,7 +29,7 @@ module node_pool {
   disk_size_gb = 10
 
   autoscaling = null
-  taint = null
+  taints = null
 }
 
 # Write a kubeconfig for the cluster to disk, for use downstream.
