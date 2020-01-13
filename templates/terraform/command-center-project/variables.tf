@@ -10,15 +10,15 @@ variable dns_zone_name {
 
 variable k8s_cluster_size {
   type = number
-  description = "Number of nodes to run in the core k8s cluster."
+  description = "Number of nodes to run in the GKE cluster."
 }
 
 variable k8s_machine_type {
   type = string
-  description = "Machine type to use in the core k8s cluster."
+  description = "Machine type to use in the GKE cluster."
 }
 
 variable kubeconfig_path {
   type = string
-  description = "Local path where kubeconfig for the core GKE cluster should be written."
+  description = "Local path where kubeconfig for the GKE cluster should be written."
 }

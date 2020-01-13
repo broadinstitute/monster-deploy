@@ -1,9 +1,3 @@
-provider google {
-  project = "broad-dsp-monster-clingen-dev"
-  region = "us-central1"
-  alias = "clinvar"
-}
-
 provider google-beta {
   project = "broad-dsp-monster-clingen-dev"
   region = "us-central1"
@@ -20,4 +14,5 @@ module clinvar {
   is_production = false
   region = "us-central1"
   k8s_zone = "a"
+  kubeconfig_path = "${local.processing_kubeconfig_dir}/clinvar"
 }

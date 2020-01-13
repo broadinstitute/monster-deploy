@@ -34,7 +34,7 @@ production data repository.
 
 ## Deploying an Environment
 
-Run `./init.sh <env>`. If anything new needs to be set up, you'll be prompted to
+Run `../hack/init-environment.sh <env>`. If anything new needs to be set up, you'll be prompted to
 confirm the Terraform plan.
 
 ## Destroying an Environment

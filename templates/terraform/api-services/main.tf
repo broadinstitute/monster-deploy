@@ -19,4 +19,5 @@ resource google_project_service services {
     google_project_service.service_usage,
     google_project_service.cloud_resource_manager
   ]
+  disable_on_destroy = false
 }

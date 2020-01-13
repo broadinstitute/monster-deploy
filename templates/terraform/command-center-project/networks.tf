@@ -3,8 +3,9 @@ module k8s_network {
   providers = {
     google.target = google.target
   }
+  dependencies = [module.enable_services]
 
-  name = "monster-core-network"
+  name = "command-center-network"
   subnets = [{
     region = "us-central1",
     cidr = "10.0.0.0/22"
