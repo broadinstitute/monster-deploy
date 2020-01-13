@@ -30,6 +30,7 @@ module processing_k8s_static_node_pool {
   disk_size_gb = 10
 
   autoscaling = null
+  taint = null
 }
 
 module processing_k8s_scaled_node_pool {
@@ -51,6 +52,12 @@ module processing_k8s_scaled_node_pool {
     min_node_count = 0
     max_node_count = var.k8s_scaled_cluster_max_size
   }
+
+  taint = [{
+    key = "pool_type"
+    value = "argo_autoscaling"
+    effect = "NO_EXECUTE"
+  }]
 }
 
 # Write a kubeconfig for the cluster to disk, for use downstream.

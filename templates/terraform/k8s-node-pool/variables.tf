@@ -19,6 +19,14 @@ variable autoscaling {
   description = "Autoscaling object to capture min and max number of nodes to provision."
 }
 
+variable taint {
+  type = list(object({
+    key = string
+    value = string
+    effect = string
+  }))
+}
+
 variable name {
   type = string
   description = "Name to assign to the node pool."
