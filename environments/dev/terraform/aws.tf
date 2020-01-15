@@ -38,7 +38,9 @@ resource aws_iam_access_key s3_transfer_user_key {
   user = aws_iam_user.s3_transfer_user.name
 }
 resource vault_generic_secret s3_transfer_user_secret {
-  path = "secret/dsde/monster/dev/aws/s3-transfer-user"
+  provider = vault.command-center
+
+  path = "${local.vault_prefix}/aws/s3-transfer-user"
   data_json = <<DATA
 {
   "access_key_id": "${aws_iam_access_key.s3_transfer_user_key.id}",

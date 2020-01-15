@@ -5,4 +5,5 @@ variable kubeconfig_dir_path {
 
 locals {
   processing_kubeconfig_dir = "${var.kubeconfig_dir_path}/processing"
+  vault_prefix = "secret/dsde/monster/dev"
 }
