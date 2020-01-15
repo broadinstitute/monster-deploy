@@ -22,7 +22,7 @@ resource google_service_account_key test_sa_key {
 
 # a vault secret containing the JSON key for the service account
 resource vault_generic_secret test_secret {
-  path = "secret/dsde/monster/dev/gcs/SOMETHINGSOMETHING"
+  path = "secret/dsde/monster/dev/ingest/core/transporter/gcs-writer-sa-key"
   data_json = base64decode(google_service_account_key.test_sa_key.private_key)
 }
 
