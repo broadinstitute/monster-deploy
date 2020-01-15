@@ -92,7 +92,7 @@ resource vault_generic_secret postgres_connection_name {
 {
   "name": "${google_sql_database_instance.postgres.name}",
   "connection_name": "${google_sql_database_instance.postgres.connection_name}",
-  "proxy_account_key": ${jsonencode(jsonencode(base64decode(google_service_account_key.cloudsql_proxy_account_key.private_key)))}
+  "proxy_account_key": ${jsonencode(base64decode(google_service_account_key.cloudsql_proxy_account_key.private_key))}
 }
 EOT
 }
