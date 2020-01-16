@@ -1,18 +1,14 @@
-provider google {
-  alias = "target"
-}
-
 # a gcs bucket
-resource google_storage_bucket test_bucket {
-  provider = google.target
-  name = "PLACEHOLDER"
+resource google_storage_bucket monster_test_bucket {
+  provider = google-beta.command-center
+  name = "monster-test-bucket"
   location = "US"
 }
 # a service account
 resource google_service_account test_sa {
+  provider = google-beta.command-center
   account_id = "monster-dev-test-sa"
   display_name = "test-sa"
-  depends_on = []
 }
 
 # a key associated with the service account
@@ -22,8 +18,12 @@ resource google_service_account_key test_sa_key {
 
 # a vault secret containing the JSON key for the service account
 resource vault_generic_secret test_secret {
-  path = "secret/dsde/monster/dev/ingest/core/transporter/gcs-writer-sa-key"
-  data_json = base64decode(google_service_account_key.test_sa_key.private_key)
+  path = "${local.vault_prefix}/gcs/gcs-transfer-user-key"
+  data_json = <<EOT
+{
+  "sa_key": ${jsonencode(base64decode(google_service_account_key.test_sa_key.private_key))}
+}
+EOT
 }
 
 # NOTE: SAs created through Terraform are eventually-consistent, so we need to inject
@@ -39,10 +39,13 @@ resource null_resource test-proxy-delay {
   }
 }
 
-# iam bindings to allow service account to read/write on bucket
-resource google_project_iam_member test_iam {
-  project = "PLACEHOLDER"
-  role = "PLACEHOLDER"
-  member = "PLACEHOLDER"
+resource google_storage_bucket_iam_member test_iam {
+  provider = google-beta.command-center
+  bucket = google_storage_bucket.monster_test_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.test_sa.email}"
   depends_on = [null_resource.test-proxy-delay]
 }
