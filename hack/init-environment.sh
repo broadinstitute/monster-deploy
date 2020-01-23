@@ -15,6 +15,7 @@ declare -ra COMMAND_CENTER_NAMESPACES=(
   clinvar
   encode
   dog-aging
+  cloudsql-proxy
 )
 declare -ra PROCESSING_NAMESPACES=(
   argo
