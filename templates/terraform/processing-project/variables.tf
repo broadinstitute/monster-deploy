@@ -40,5 +40,5 @@ variable kubeconfig_path {
 
 variable access_emails {
   type = list(string)
-  description = "Extra emails to share bucket access with."
+  description = "Emails to share bucket read access with."
 }
