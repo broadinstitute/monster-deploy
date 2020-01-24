@@ -42,7 +42,7 @@ resource google_storage_bucket staging_storage {
 }
 
 resource google_storage_bucket_iam_member test_iam {
-
+  # for_each doesn't like lists, so we convert it to a set
   for_each = toset(var.access_emails)
 
   provider = google.target
