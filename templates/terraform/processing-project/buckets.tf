@@ -29,14 +29,15 @@ resource google_storage_bucket staging_storage {
   name = "${var.project_name}-staging-storage"
   location = "US"
 
-  lifecycle_rule {
-    action {
-      type = "Delete"
-    }
-
-    # Delete files after they've been in the bucket for 30 days.
-    condition {
-      age = 30
+  dynamic "lifecycle_rule" {
+    for_each = var.deletion_age == null ? [] : [var.deletion_age]
+    content {
+      action {
+        type = "Delete"
+      }
+      condition {
+        age = lifecycle_rule.value
+      }
     }
   }
 }

@@ -42,3 +42,8 @@ variable access_emails {
   type = list(string)
   description = "Emails to share bucket read access with."
 }
+
+variable deletion_age {
+  type = number
+  description = "The number of days to wait before deleting files in the staging bucket."
+}
