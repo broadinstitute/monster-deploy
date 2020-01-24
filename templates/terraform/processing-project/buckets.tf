@@ -24,7 +24,6 @@ resource google_storage_bucket temp_bucket {
 }
 
 # Bucket for temporary data storage.
-# TODO: Add an IAM resource which allows the repo to read from this.
 resource google_storage_bucket staging_storage {
   provider = google.target
   name = "${var.project_name}-staging-storage"
@@ -40,4 +39,17 @@ resource google_storage_bucket staging_storage {
       age = 30
     }
   }
+}
+
+resource google_storage_bucket_iam_member test_iam {
+
+  for_each = toset(var.access_emails)
+
+  provider = google.target
+  bucket = google_storage_bucket.staging_storage.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.legacyBucketReader"
+  member = "user:${each.value}"
 }

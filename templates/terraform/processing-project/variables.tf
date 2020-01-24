@@ -37,3 +37,8 @@ variable kubeconfig_path {
   type = string
   description = "Local path where kubeconfig for the processing GKE cluster should be written."
 }
+
+variable access_emails {
+  type = list(string)
+  description = "Extra emails to share bucket access with."
+}
