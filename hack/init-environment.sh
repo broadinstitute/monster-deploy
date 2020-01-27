@@ -160,16 +160,16 @@ function install_flux () {
   # a coherent story for handling these yet (since updating them
   # the wrong way can result in all existing objects being deleted),
   # so they're easier to handle out-of-band.
-  declare -ra kubernetes=$(configure_kubernetes ${kubeconfig})
-  $kubernetes apply -f \
+  declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
+  ${kubernetes[@]} apply -f \
     https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
 
   # Install the Operator using Helm.
-  declare -ra helm=$(configure_helm ${command_center_config} ${env_dir})
+  declare -ra helm=($(configure_helm ${command_center_config} ${env_dir}))
 
   rm -rf ${env_dir}/.helm
-  $helm repo add fluxcd https://charts.fluxcd.io
-  $helm upgrade helm-operator fluxcd/helm-operator \
+  ${helm[@]} repo add fluxcd https://charts.fluxcd.io
+  ${helm[@]} upgrade helm-operator fluxcd/helm-operator \
     --install \
     --wait \
     --namespace=fluxcd \
