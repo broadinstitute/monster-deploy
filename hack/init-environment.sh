@@ -112,25 +112,27 @@ EOF
   done
 }
 
+#####
+## Configure Kubernetes in Docker
+####
+function configure_kubernetes () {
+  local -r kubeconfig=$1
+
+  declare -ra kubernetes=(
+      docker run --rm -it \
+      -v ${kubeconfig}:/root/.kube/config:ro \
+      -v ${HOME}/.config:/root/.config:ro \
+      ${KUBECTL}
+    )
+    echo ${kubernetes[@]}
+}
 
 #####
-## Set up Flux CD's Helm Operator to manage deployments in GKE.
+## Configure Helm in Docker
 #####
-function install_flux () {
+function configure_helm () {
   local -r kubeconfig=$1 env_dir=$2
 
-  # Install the CRD definitions separately. Helm doesn't have
-  # a coherent story for handling these yet (since updating them
-  # the wrong way can result in all existing objects being deleted),
-  # so they're easier to handle out-of-band.
-  docker run --rm -it \
-    -v ${kubeconfig}:/root/.kube/config:ro \
-    -v ${HOME}/.config:/root/.config:ro \
-    ${KUBECTL} \
-    apply -f \
-    https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
-
-  # Install the Operator using Helm.
   declare -ra helm=(
     docker run
     --rm -it
@@ -144,10 +146,30 @@ function install_flux () {
     -v ${env_dir}/.helm/cache:/root/.cache/helm
     ${HELM}
   )
+    echo ${helm[@]}
+}
+
+
+#####
+## Set up Flux CD's Helm Operator to manage deployments in GKE.
+#####
+function install_flux () {
+  local -r kubeconfig=$1 env_dir=$2
+
+  # Install the CRD definitions separately. Helm doesn't have
+  # a coherent story for handling these yet (since updating them
+  # the wrong way can result in all existing objects being deleted),
+  # so they're easier to handle out-of-band.
+  declare -ra kubernetes=$(configure_kubernetes ${kubeconfig})
+  $kubernetes apply -f \
+    https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
+
+  # Install the Operator using Helm.
+  declare -ra helm=$(configure_helm ${command_center_config} ${env_dir})
 
   rm -rf ${env_dir}/.helm
-  ${helm[@]} repo add fluxcd https://charts.fluxcd.io
-  ${helm[@]} upgrade helm-operator fluxcd/helm-operator \
+  $helm repo add fluxcd https://charts.fluxcd.io
+  $helm upgrade helm-operator fluxcd/helm-operator \
     --install \
     --wait \
     --namespace=fluxcd \
