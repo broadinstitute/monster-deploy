@@ -165,7 +165,7 @@ function install_flux () {
     https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
 
   # Install the Operator using Helm.
-  declare -ra helm=($(configure_helm ${command_center_config} ${env_dir}))
+  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
 
   rm -rf ${env_dir}/.helm
   ${helm[@]} repo add fluxcd https://charts.fluxcd.io
