@@ -156,6 +156,57 @@ function install_flux () {
     --set='rbac.pspEnabled=true'
 }
 
+#####
+## Set up and install the Vault secret manager in the command center GKE cluster.
+#####
+function install_secret_manager () {
+  local -r kubeconfig=$1 env_dir=$2
+
+  # Install the CRD definitions separately. Helm doesn't have
+  # a coherent story for handling these yet (since updating them
+  # the wrong way can result in all existing objects being deleted),
+  # so they're easier to handle out-of-band.
+  docker run --rm -it \
+    -v ${kubeconfig}:/root/.kube/config:ro \
+    -v ${HOME}/.config:/root/.config:ro \
+    ${KUBECTL} \
+    # kubectl applys the secret-manager’s CRDs
+    apply -f \
+    https://raw.githubusercontent.com/tuenti/secrets-manager/master/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
+
+  # Install the Operator using Helm.
+  declare -ra helm=(
+    docker run
+    --rm -it
+    # Configure the client to point at the cluster.
+    -v ${kubeconfig}:/root/.kube/config:ro
+    # Make sure it can auth with GKE.
+    -v ${HOME}/.config:/root/.config:ro
+    # Persist Helm config across container runs.
+    -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
+    -v ${env_dir}/.helm/config:/root/.config/helm
+    -v ${env_dir}/.helm/cache:/root/.cache/helm
+    ${HELM}
+  )
+
+  rm -rf ${env_dir}/.helm
+  # helm repo adds Jade’s Helm repository
+  ${helm[@]} repo add add datarepo-helm https://broadinstitute.github.io/datarepo-helm
+  # helm repo upgrade --installs the secret manager chart, setting appropriate values
+  ${helm[@]} upgrade install-secrets-manager datarepo-helm/install-secrets-manager \
+    --install \
+    --wait \
+    --namespace=install-secrets-manager \
+    --version=${HELM_OPERATOR_CHART_VERSION} \
+    --set='installcrd.install=false' \
+    --set='vaultLocation=https://clotho.broadinstitute.org:8200' \
+    --set='vaultVersion=kv2' \
+    --set='serviceAccount.create=false' \
+    --set='rbac.create=true' \
+    --set='secretsgeneric.roleId=63823ad9-95ec-6e85-870c-1df562cc78da' \
+    --set='secretsgeneric.secretId=b8211d47-1df2-a33c-e9eb-2a4736457c2f'
+}
+
 
 #####
 ## Install Flux HelmRelease CRDs for all the software we want to
@@ -203,6 +254,8 @@ function main () {
 
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
+  # A call to the new function in main, passing the environment and command-center kubeconfig path as arguments
+  install_secret_manager ${command_center_config} ${env_dir}
   install_charts
 }
 
