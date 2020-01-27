@@ -16,9 +16,11 @@ declare -ra COMMAND_CENTER_NAMESPACES=(
   encode
   dog-aging
   cloudsql-proxy
+  secret-manager
 )
 declare -ra PROCESSING_NAMESPACES=(
   argo
+  secret-manager
 )
 
 declare -r TERRAFORM=hashicorp/terraform:0.12.17
