@@ -188,28 +188,12 @@ function install_secret_manager () {
   # a coherent story for handling these yet (since updating them
   # the wrong way can result in all existing objects being deleted),
   # so they're easier to handle out-of-band.
-  docker run --rm -it \
-    -v ${kubeconfig}:/root/.kube/config:ro \
-    -v ${HOME}/.config:/root/.config:ro \
-    ${KUBECTL} \
-    # kubectl applys the secret-manager’s CRDs
-    apply -f \
+  declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
+  ${kubernetes[@]} apply -f \
     https://raw.githubusercontent.com/tuenti/secrets-manager/master/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
 
   # Install the Operator using Helm.
-  declare -ra helm=(
-    docker run
-    --rm -it
-    # Configure the client to point at the cluster.
-    -v ${kubeconfig}:/root/.kube/config:ro
-    # Make sure it can auth with GKE.
-    -v ${HOME}/.config:/root/.config:ro
-    # Persist Helm config across container runs.
-    -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
-    -v ${env_dir}/.helm/config:/root/.config/helm
-    -v ${env_dir}/.helm/cache:/root/.cache/helm
-    ${HELM}
-  )
+  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
 
   rm -rf ${env_dir}/.helm
   # helm repo adds Jade’s Helm repository
