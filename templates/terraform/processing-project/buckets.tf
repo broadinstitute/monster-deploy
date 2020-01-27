@@ -44,7 +44,7 @@ resource google_storage_bucket staging_storage {
 
 resource google_storage_bucket_iam_member staging_iam_reader {
   # for_each doesn't like lists, so we convert it to a set
-  for_each = toset(var.access_groups)
+  for_each = toset(var.reader_groups)
 
   provider = google.target
   bucket = google_storage_bucket.staging_storage.name

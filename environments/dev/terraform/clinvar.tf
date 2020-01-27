@@ -18,6 +18,6 @@ module clinvar {
   k8s_scaled_cluster_max_size = 3
   k8s_scaled_machine_type = "n1-standard-1"
   k8s_static_cluster_size = 2
-  access_groups = ["clingendevs@broadinstitute.org"]
+  reader_groups = ["clingendevs@broadinstitute.org"]
   deletion_age_days = 30
 }

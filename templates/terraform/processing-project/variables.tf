@@ -38,7 +38,7 @@ variable kubeconfig_path {
   description = "Local path where kubeconfig for the processing GKE cluster should be written."
 }
 
-variable access_groups {
+variable reader_groups {
   type = list(string)
   description = "Email addresses that represent google groups to share bucket read access with."
 }
