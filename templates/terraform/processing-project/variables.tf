@@ -38,12 +38,12 @@ variable kubeconfig_path {
   description = "Local path where kubeconfig for the processing GKE cluster should be written."
 }
 
-variable access_emails {
+variable access_groups {
   type = list(string)
-  description = "Emails to share bucket read access with."
+  description = "Email addresses that represent google groups to share bucket read access with."
 }
 
-variable deletion_age {
+variable deletion_age_days {
   type = number
   description = "The number of days to wait before deleting files in the staging bucket."
 }

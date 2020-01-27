@@ -30,7 +30,7 @@ resource google_storage_bucket staging_storage {
   location = "US"
 
   dynamic "lifecycle_rule" {
-    for_each = var.deletion_age == null ? [] : [var.deletion_age]
+    for_each = var.deletion_age_days == null ? [] : [var.deletion_age_days]
     content {
       action {
         type = "Delete"
@@ -42,14 +42,14 @@ resource google_storage_bucket staging_storage {
   }
 }
 
-resource google_storage_bucket_iam_member test_iam {
+resource google_storage_bucket_iam_member staging_iam_reader {
   # for_each doesn't like lists, so we convert it to a set
-  for_each = toset(var.access_emails)
+  for_each = toset(var.access_groups)
 
   provider = google.target
   bucket = google_storage_bucket.staging_storage.name
   # The legacyBucketReader policy seems to be the correct role to have the equivalent of a "Bucket Reader" ACL,
   # as noted here https://cloud.google.com/storage/docs/access-control/iam
   role = "roles/storage.legacyBucketReader"
-  member = "user:${each.value}"
+  member = "group:${each.value}"
 }
