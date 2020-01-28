@@ -121,7 +121,7 @@ function configure_kubernetes () {
   declare -ra kubernetes=(
       docker run --rm -it \
       -v ${kubeconfig}:/root/.kube/config:ro \
-      -v ${HOME}/.config:/root/.config:ro \
+      -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro \
       ${KUBECTL}
     )
     echo ${kubernetes[@]}
@@ -139,7 +139,7 @@ function configure_helm () {
     # Configure the client to point at the cluster.
     -v ${kubeconfig}:/root/.kube/config:ro
     # Make sure it can auth with GKE.
-    -v ${HOME}/.config:/root/.config:ro
+    -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro
     # Persist Helm config across container runs.
     -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
     -v ${env_dir}/.helm/config:/root/.config/helm
@@ -184,12 +184,6 @@ function install_flux () {
 function install-cloudsql-proxy () {
   local -r kubeconfig=$1 env_dir=$2
 
-  # Comfigure Kubernetes and apply the helm chart?
-  # correct file??
-  declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
-  ${kubernetes[@]} apply -f \
-  https://raw.githubusercontent.com/broadinstitute/datarepo-helm/master/charts/gcloud-sqlproxy/Chart.yaml
-
   # Configure helm
   declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
 
@@ -200,9 +194,11 @@ function install-cloudsql-proxy () {
   local -r project=(vault read -field=project $vault_location)
   local -r key=(vault read -field=proxy_account_key $vault_location) # field not yet created
 
+  # add helm repo
+  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
+
   # Install and upgrade CloudSQL Proxy
-  # ${helm[@]} install pg-sqlproxy rimusz/gcloud-sqlproxy --namespace cloudsql-proxy # needed?
-  ${helm[@]} upgrade pg-sqlproxy datarepo-helm/charts/gcloud-sqlproxy --namespace cloudsql-proxy \
+  ${helm[@]} upgrade pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
     --set serviceAccountKey="$(cat service-account.json | base64 | tr -d '\n')" \
     --set cloudsql.instances[0].instance=$instance_name \
     --set cloudsql.instances[0].project=$project \
