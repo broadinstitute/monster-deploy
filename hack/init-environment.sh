@@ -178,6 +178,38 @@ function install_flux () {
     --set='rbac.pspEnabled=true'
 }
 
+#####
+## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
+#####
+function install-cloudsql-proxy () {
+  local -r kubeconfig=$1 env_dir=$2
+
+  # Comfigure Kubernetes and apply the helm chart?
+  # correct file??
+  declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
+  ${kubernetes[@]} apply -f \
+  https://raw.githubusercontent.com/broadinstitute/datarepo-helm/master/charts/gcloud-sqlproxy/Chart.yaml
+
+  # Configure helm
+  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
+
+  # Read cloudsql configuration info from vault
+  local -r vault_location=secret/dsde/monster/dev/command-center/cloudsql/instance
+  local -r instance_name=(vault read -field=name $vault_location)
+  local -r region=(vault read -field=region $vault_location)
+  local -r project=(vault read -field=project $vault_location)
+  local -r key=(vault read -field=proxy_account_key $vault_location) # field not yet created
+
+  # Install and upgrade CloudSQL Proxy
+  # ${helm[@]} install pg-sqlproxy rimusz/gcloud-sqlproxy --namespace cloudsql-proxy # needed?
+  ${helm[@]} upgrade pg-sqlproxy datarepo-helm/charts/gcloud-sqlproxy --namespace cloudsql-proxy \
+    --set serviceAccountKey="$(cat service-account.json | base64 | tr -d '\n')" \
+    --set cloudsql.instances[0].instance=$instance_name \
+    --set cloudsql.instances[0].project=$project \
+    --set cloudsql.instances[0].region=$region \
+    --set cloudsql.instances[0].port=5432 -i
+}
+
 
 #####
 ## Install Flux HelmRelease CRDs for all the software we want to
@@ -225,6 +257,7 @@ function main () {
 
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
+  install-cloudsql-proxy ${command_center_config} ${env_dir}
   install_charts
 }
 
