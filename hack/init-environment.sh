@@ -32,6 +32,8 @@ declare -r HELM_OPERATOR_CHART_VERSION=0.4.0
 
 declare -r KUBECONFIG_DIR_NAME=.kubeconfig
 
+declare -r SECRET_MANAGER_VERSION=release-1.0.2
+declare -r SECRET_MANAGER_CHART_VERSION=0.0.4
 
 #####
 ## Run Terraform to initialize "always on" infrastructure
@@ -182,7 +184,7 @@ function install_flux () {
 ## Set up and install the Vault secret manager in the command center GKE cluster.
 #####
 function install_secret_manager () {
-  local -r kubeconfig=$1 env_dir=$2
+  local -r kubeconfig=$1 env_dir=$2 env=$3
 
   # Install the CRD definitions separately. Helm doesn't have
   # a coherent story for handling these yet (since updating them
@@ -190,8 +192,7 @@ function install_secret_manager () {
   # so they're easier to handle out-of-band.
   declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
   ${kubernetes[@]} apply -f \
-    https://raw.githubusercontent.com/tuenti/secrets-manager/master/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
-
+    https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRET_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
   # Install the Operator using Helm.
   declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
 
@@ -202,15 +203,15 @@ function install_secret_manager () {
   ${helm[@]} upgrade install-secrets-manager datarepo-helm/install-secrets-manager \
     --install \
     --wait \
-    --namespace=install-secrets-manager \
-    --version=${HELM_OPERATOR_CHART_VERSION} \
+    --namespace=secrets-manager \
+    --version=${SECRET_MANAGER_CHART_VERSION} \
     --set='installcrd.install=false' \
     --set='vaultLocation=https://clotho.broadinstitute.org:8200' \
     --set='vaultVersion=kv2' \
-    --set='serviceAccount.create=false' \
+    --set='serviceAccount.create=true' \
     --set='rbac.create=true' \
-    --set='secretsgeneric.roleId=63823ad9-95ec-6e85-870c-1df562cc78da' \
-    --set='secretsgeneric.secretId=b8211d47-1df2-a33c-e9eb-2a4736457c2f'
+    --set='secretsgeneric.roleId=$(vault read -field=role_id secret/dsde/monster/${env}/approle-monster-${env})' \
+    --set='secretsgeneric.secretId=$(vault read -field=secret_id secret/dsde/monster/${env}/approle-monster-${env})'
 }
 
 
@@ -261,7 +262,7 @@ function main () {
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
   # A call to the new function in main, passing the environment and command-center kubeconfig path as arguments
-  install_secret_manager ${command_center_config} ${env_dir}
+  install_secret_manager ${command_center_config} ${env_dir} $1
   install_charts
 }
 
