@@ -16,11 +16,11 @@ declare -ra COMMAND_CENTER_NAMESPACES=(
   encode
   dog-aging
   cloudsql-proxy
-  secret-manager
+  secrets-manager
 )
 declare -ra PROCESSING_NAMESPACES=(
   argo
-  secret-manager
+  secrets-manager
 )
 
 declare -r TERRAFORM=hashicorp/terraform:0.12.17
@@ -29,9 +29,10 @@ declare -r HELM=lachlanevenson/k8s-helm:v3.0.2
 
 declare -r HELM_OPERATOR_VERSION=v1.0.0-rc5
 declare -r HELM_OPERATOR_CHART_VERSION=0.4.0
+declare -r SECRETS_MANAGER_VERSION=release-1.0.2
+declare -r SECRETS_MANAGER_CHART_VERSION=0.0.4
 
 declare -r KUBECONFIG_DIR_NAME=.kubeconfig
-
 
 #####
 ## Run Terraform to initialize "always on" infrastructure
@@ -121,7 +122,7 @@ function configure_kubernetes () {
   declare -ra kubernetes=(
       docker run --rm -it \
       -v ${kubeconfig}:/root/.kube/config:ro \
-      -v ${HOME}/.config:/root/.config:ro \
+      -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro \
       ${KUBECTL}
     )
     echo ${kubernetes[@]}
@@ -139,14 +140,14 @@ function configure_helm () {
     # Configure the client to point at the cluster.
     -v ${kubeconfig}:/root/.kube/config:ro
     # Make sure it can auth with GKE.
-    -v ${HOME}/.config:/root/.config:ro
+    -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro
     # Persist Helm config across container runs.
     -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
     -v ${env_dir}/.helm/config:/root/.config/helm
     -v ${env_dir}/.helm/cache:/root/.cache/helm
     ${HELM}
   )
-    echo ${helm[@]}
+  echo ${helm[@]}
 }
 
 
@@ -176,6 +177,39 @@ function install_flux () {
     --version=${HELM_OPERATOR_CHART_VERSION} \
     --set='helm.versions=v3' \
     --set='rbac.pspEnabled=true'
+}
+
+#####
+## Set up and install the Vault secret manager in the command center GKE cluster.
+#####
+function install_secrets_manager () {
+  local -r kubeconfig=$1 env_dir=$2 env=$3
+
+  # Install the CRD definitions separately. Helm doesn't have
+  # a coherent story for handling these yet (since updating them
+  # the wrong way can result in all existing objects being deleted),
+  # so they're easier to handle out-of-band.
+  declare -ra kubernetes=($(configure_kubernetes ${kubeconfig}))
+  ${kubernetes[@]} apply -f \
+    https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
+  # Install the Operator using Helm.
+  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
+  rm -rf ${env_dir}/.helm
+  # helm repo adds Jade’s Helm repository
+  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
+  # helm repo upgrade --installs the secret manager chart, setting appropriate values
+  ${helm[@]} upgrade install-secrets-manager datarepo-helm/install-secrets-manager \
+    --install \
+    --wait \
+    --namespace=secrets-manager \
+    --version=${SECRETS_MANAGER_CHART_VERSION} \
+    --set='installcrd.install=false' \
+    --set='vaultLocation=https://clotho.broadinstitute.org:8200' \
+    --set='vaultVersion=kv2' \
+    --set='serviceAccount.create=true' \
+    --set='rbac.create=true' \
+    --set="secretsgeneric.roleId=$(vault read -field=role_id secret/dsde/monster/${env}/approle-monster-${env})" \
+    --set="secretsgeneric.secretId=$(vault read -field=secret_id secret/dsde/monster/${env}/approle-monster-${env})"
 }
 
 
@@ -208,7 +242,8 @@ function main () {
   #
   # NOTE: Set the SKIP_TF env variable to any value to skip over this
   # step when testing changes to the k8s portiion.
-  local -r env_dir=${REPO_ROOT}/environments/$1
+  local -r env=$1
+  local -r env_dir=${REPO_ROOT}/environments/${env}
   if [ -z ${SKIP_TF:-""} ]; then
     apply_terraform ${env_dir}
   fi
@@ -225,6 +260,8 @@ function main () {
 
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
+  # A call to the new function in main, passing the environment and command-center kubeconfig path as arguments
+  install_secrets_manager ${command_center_config} ${env_dir} ${env}
   install_charts
 }
 
