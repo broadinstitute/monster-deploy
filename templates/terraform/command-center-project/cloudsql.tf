@@ -66,8 +66,7 @@ resource vault_generic_secret postgres_connection_name {
   data_json = <<EOT
 {
   "name": "${google_sql_database_instance.postgres.name}",
-  "connection_name": "${google_sql_database_instance.postgres.connection_name}",
-  "proxy_account_key": ${jsonencode(base64decode(module.test_sa.private_key))}
+  "connection_name": "${google_sql_database_instance.postgres.connection_name}"
 }
 EOT
 }
