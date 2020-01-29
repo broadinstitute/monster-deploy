@@ -49,16 +49,11 @@ module test_sa {
 
   account_id = "cloudsql-proxy-account"
   display_name = "CloudSQL proxy account"
-  vault_path = "${var.vault_prefix}/gcs/gcs-transfer-user-key"
+  vault_path = "${var.vault_prefix}/gcs/sa-key"
   roles = ["roles/cloudsql.client"]
 }
 
-
-# TODO does the secret below need the proxy_account_key too, or is it fine to store
-# it where we have already stored it in the service account module? If it is needed
-# below, we have to expose the private_key as an output for the above module
-
-# Store all the info needed to connect to the DB instance in Vault.
+# Store info needed to connect to the DB instance in Vault.
 resource vault_generic_secret postgres_connection_name {
   provider = vault.target
 
@@ -69,7 +64,6 @@ resource vault_generic_secret postgres_connection_name {
   "region": "${google_sql_database_instance.postgres.region}",
   "project": "${google_sql_database_instance.postgres.project}",
   "connection_name": "${google_sql_database_instance.postgres.connection_name}",
-  "proxy_account_key": ${jsonencode(base64decode(google_service_account_key.cloudsql_proxy_account_key.private_key))}
 }
 EOT
 }
