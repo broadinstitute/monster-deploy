@@ -185,6 +185,9 @@ function install_flux () {
 function install_secrets_manager () {
   local -r kubeconfig=$1 env_dir=$2 env=$3
 
+  # vault location
+  local -r vault_location=secret/dsde/monster/${env}/approle-monster-${env}
+  
   # Install the CRD definitions separately. Helm doesn't have
   # a coherent story for handling these yet (since updating them
   # the wrong way can result in all existing objects being deleted),
@@ -208,8 +211,8 @@ function install_secrets_manager () {
     --set='vaultVersion=kv2' \
     --set='serviceAccount.create=true' \
     --set='rbac.create=true' \
-    --set="secretsgeneric.roleId=$(vault read -field=role_id secret/dsde/monster/${env}/approle-monster-${env})" \
-    --set="secretsgeneric.secretId=$(vault read -field=secret_id secret/dsde/monster/${env}/approle-monster-${env})"
+    --set="secretsgeneric.roleId=$(vault read -field=role_id $vault_location)" \
+    --set="secretsgeneric.secretId=$(vault read -field=secret_id $vault_location)"
 }
 
 
@@ -287,21 +290,23 @@ function main () {
     apply_terraform ${env_dir}
   fi
 
-  # Set up GKE namespaces.
+  # Initialize GKE Configurations.
   local -r kubeconfig_dir=${env_dir}/${KUBECONFIG_DIR_NAME}
   local -r command_center_config=${kubeconfig_dir}/command-center
   local -r processing_configs_dir=${kubeconfig_dir}/processing
 
+  # Initialize command-center GKE and services.
   create_namespaces ${command_center_config} ${COMMAND_CENTER_NAMESPACES[@]}
-  for kubeconfig in ${processing_configs_dir}/*; do
-    create_namespaces ${kubeconfig} ${PROCESSING_NAMESPACES[@]}
-  done
-
-  # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
   install_secrets_manager ${command_center_config} ${env_dir} ${env}
   install_cloudsql_proxy ${command_center_config} ${env_dir} ${env}
   install_charts
+
+  # Initialize processing GKEs and services.
+  for kubeconfig in ${processing_configs_dir}/*; do
+    create_namespaces ${kubeconfig} ${PROCESSING_NAMESPACES[@]}
+    install_secrets_manager ${kubeconfig} ${env_dir} ${env}
+  done
 }
 
 main ${@}
