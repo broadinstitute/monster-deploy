@@ -179,32 +179,6 @@ function install_flux () {
     --set='rbac.pspEnabled=true'
 }
 
-#####
-## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
-#####
-function install-cloudsql-proxy () {
-  local -r kubeconfig=$1 env_dir=$2
-
-  # Configure helm
-  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
-
-  # Read cloudsql configuration info from vault
-  local -r vault_location=secret/dsde/monster/dev/command-center/cloudsql/instance
-  local -r instance_name=(vault read -field=name $vault_location)
-  local -r region=(vault read -field=region $vault_location)
-  local -r project=(vault read -field=project $vault_location)
-  local -r key=(vault read -field=proxy_account_key $vault_location) # field not yet created
-
-  # add helm repo
-  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
-
-  # Install and upgrade CloudSQL Proxy
-  ${helm[@]} upgrade pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
-    --set serviceAccountKey="$(cat service-account.json | base64 | tr -d '\n')" \
-    --set cloudsql.instances[0].instance=$instance_name \
-    --set cloudsql.instances[0].project=$project \
-    --set cloudsql.instances[0].region=$region \
-    --set cloudsql.instances[0].port=5432 -i
 
 #####
 ## Set up and install the Vault secret manager in the command center GKE cluster.
@@ -237,6 +211,45 @@ function install_secrets_manager () {
     --set='rbac.create=true' \
     --set="secretsgeneric.roleId=$(vault read -field=role_id secret/dsde/monster/${env}/approle-monster-${env})" \
     --set="secretsgeneric.secretId=$(vault read -field=secret_id secret/dsde/monster/${env}/approle-monster-${env})"
+}
+
+
+#####
+## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
+#####
+function install-cloudsql-proxy () {
+  local -r kubeconfig=$1 env_dir=$2
+
+  # Configure helm
+  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
+
+  # Read cloudsql configuration info from vault
+  local -r vault_location=secret/dsde/monster/dev/command-center/cloudsql/instance
+  local -r instance_name=(vault read -field=name $vault_location)
+  local -r region=(vault read -field=region $vault_location)
+  local -r project=(vault read -field=project $vault_location)
+
+  # Add helm repo
+  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
+
+  # Write CloudSQL connection secrets to GKE
+  ${helm[@]} upgrade --install sqlproxy-secret datarepo-helm/create-secret-manager-secret --namespace cloudsql-proxy \
+    --version=0.0.5 \
+    --set secrets[0].secretName=cloudsqlkey \
+    --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
+    --set secrets[0].vals[0].path=$vault_location \
+    --set secrets[0].vals[0].vaultKey=proxy_account_key
+
+  # Install and upgrade CloudSQL Proxy
+  ${helm[@]} upgrade --install pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
+    --set cloudsql.instances[0].instance=$instance_name \
+    --set cloudsql.instances[0].project=$project \
+    --set cloudsql.instances[0].region=$region \
+    --set cloudsql.instances[0].port=5432 -i \
+    --set rbac.create=true \
+    --set existingSecret=cloudsqlkey \
+    --set existingSecretKey=cloudsqlkey.json
+
 }
 
 
@@ -287,9 +300,8 @@ function main () {
 
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
-  install-cloudsql-proxy ${command_center_config} ${env_dir}
-  # A call to the new function in main, passing the environment and command-center kubeconfig path as arguments
   install_secrets_manager ${command_center_config} ${env_dir} ${env}
+  install-cloudsql-proxy ${command_center_config} ${env_dir}
   install_charts
 }
 
