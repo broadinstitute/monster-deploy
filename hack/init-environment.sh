@@ -214,6 +214,45 @@ function install_secrets_manager () {
 
 
 #####
+## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
+#####
+function install_cloudsql_proxy () {
+  local -r kubeconfig=$1 env_dir=$2 env=$3
+
+  # Configure helm
+  local -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
+
+  # Read cloudsql configuration info from vault
+  local -r vault_location=secret/dsde/monster/${env}/command-center/cloudsql/instance
+  local -r name=$(vault read -field=name $vault_location)
+  local -r region=$(vault read -field=region $vault_location)
+  local -r project=$(vault read -field=project $vault_location)
+
+  # Add helm repo
+  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
+
+  # Write CloudSQL connection secrets to GKE
+  ${helm[@]} upgrade --install sqlproxy-secret datarepo-helm/create-secret-manager-secret --namespace cloudsql-proxy \
+    --version=0.0.5 \
+    --set secrets[0].secretName=cloudsqlkey \
+    --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
+    --set secrets[0].vals[0].path=$vault_location \
+    --set secrets[0].vals[0].vaultKey=proxy_account_key
+
+  # Install and upgrade CloudSQL Proxy
+  ${helm[@]} upgrade --install pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
+    --version=0.19.4 \
+    --set cloudsql.instances[0].instance=$name \
+    --set cloudsql.instances[0].project=$project \
+    --set cloudsql.instances[0].region=$region \
+    --set cloudsql.instances[0].port=5432 -i \
+    --set rbac.create=true \
+    --set existingSecret=cloudsqlkey \
+    --set existingSecretKey=cloudsqlkey.json
+}
+
+
+#####
 ## Install Flux HelmRelease CRDs for all the software we want to
 ## have running in the command-center GKE cluster.
 ##
@@ -260,8 +299,8 @@ function main () {
 
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
-  # A call to the new function in main, passing the environment and command-center kubeconfig path as arguments
   install_secrets_manager ${command_center_config} ${env_dir} ${env}
+  install_cloudsql_proxy ${command_center_config} ${env_dir} ${env}
   install_charts
 }
 
