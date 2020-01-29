@@ -216,7 +216,7 @@ function install_secrets_manager () {
 #####
 ## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
 #####
-function install-cloudsql-proxy () {
+function install_cloudsql_proxy () {
   local -r kubeconfig=$1 env_dir=$2 env=$3
 
   # Configure helm
@@ -300,7 +300,7 @@ function main () {
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
   install_secrets_manager ${command_center_config} ${env_dir} ${env}
-  install-cloudsql-proxy ${command_center_config} ${env_dir} ${env}
+  install_cloudsql_proxy ${command_center_config} ${env_dir} ${env}
   install_charts
 }
 
