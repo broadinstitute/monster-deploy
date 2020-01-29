@@ -217,13 +217,13 @@ function install_secrets_manager () {
 ## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
 #####
 function install-cloudsql-proxy () {
-  local -r kubeconfig=$1 env_dir=$2
+  local -r kubeconfig=$1 env_dir=$2 env=$3
 
   # Configure helm
   local -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
 
   # Read cloudsql configuration info from vault
-  local -r vault_location=secret/dsde/monster/dev/command-center/cloudsql/instance
+  local -r vault_location=secret/dsde/monster/${env}/command-center/cloudsql/instance
   local -r name=$(vault read -field=name $vault_location)
   local -r region=$(vault read -field=region $vault_location)
   local -r project=$(vault read -field=project $vault_location)
@@ -300,7 +300,7 @@ function main () {
   # Install command-center services.
   install_flux ${command_center_config} ${env_dir}
   install_secrets_manager ${command_center_config} ${env_dir} ${env}
-  install-cloudsql-proxy ${command_center_config} ${env_dir}
+  install-cloudsql-proxy ${command_center_config} ${env_dir} ${env}
   install_charts
 }
 
