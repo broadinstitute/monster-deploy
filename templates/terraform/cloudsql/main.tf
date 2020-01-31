@@ -10,7 +10,7 @@ resource random_id cloudsql_random_id {
 # much resource contention sharing a single instance.
 resource google_sql_database_instance postgres {
   provider = google.target
-  depends_on = [module.enable_services]
+//  depends_on = [module.enable_services]
 
   name = "${var.name_prefix}-${random_id.cloudsql_random_id.hex}"
   database_version = var.postgres_version
@@ -44,15 +44,19 @@ resource random_id db-password {
 }
 
 resource google_sql_user db-user {
-  name = "${var.name_prefix}-manager"
+  for_each = toset(var.user_names)
+
+  name = "${var.name_prefix}-${each.value}"
   password = random_id.db-password.hex
-  project = var.google_project
+//  project = var.google_project
   instance = google_sql_database_instance.postgres.name
 }
 
 resource google_sql_database db {
-  name = "${var.name_prefix}-db"
-  project = var.google_project
+  for_each = toset(var.db_names)
+
+  name = "${var.name_prefix}-${each.value}"
+//  project = var.google_project
   instance = google_sql_database_instance.postgres.name
   charset = "UTF8"
   collation = "en_US.UTF8"
