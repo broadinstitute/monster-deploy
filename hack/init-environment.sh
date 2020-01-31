@@ -241,7 +241,7 @@ function install_cloudsql_proxy () {
     --version=0.0.5 \
     --set secrets[0].secretName=cloudsqlkey \
     --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
-    --set secrets[0].vals[0].path=vault_sa_location \
+    --set secrets[0].vals[0].path=$vault_sa_location \
     --set secrets[0].vals[0].vaultKey=sa_key
 
   # Install and upgrade CloudSQL Proxy
