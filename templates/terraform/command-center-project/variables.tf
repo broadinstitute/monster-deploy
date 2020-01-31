@@ -32,3 +32,8 @@ variable vault_prefix {
   type = string
   description = "Path prefix for secrets written to Vault."
 }
+
+variable service_account_name {
+  type = string
+  description = "Name for the google service account"
+}
