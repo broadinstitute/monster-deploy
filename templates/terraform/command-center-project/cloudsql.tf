@@ -44,46 +44,19 @@ resource google_sql_database_instance postgres {
   }
 }
 
-# Create an admin account for connecting to the DB using Google's cloudsql-proxy,
-# and give it the IAM role it needs to actually connect.
-#
-# NOTE: The way GCP IAM works, this account can be used for any CloudSQL instance
-# in the command-center project. We don't need an account per DB if we end up
-# needing multiple DBs.
-resource google_service_account cloudsql_proxy_account {
-  provider = google.target
-  depends_on = [module.enable_services]
+module cloudsql_sa {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google.target
+  }
 
   account_id = "cloudsql-proxy-account"
   display_name = "CloudSQL proxy account"
-}
-# NOTE: SAs created through Terraform are eventually-consistent, so we need to inject
-# an arbitrary delay between creating the account and applying IAM rules.
-# See: https://www.terraform.io/docs/providers/google/r/google_service_account.html
-# And: https://github.com/hashicorp/terraform/issues/17726#issuecomment-377357866
-resource null_resource cloudsql_proxy_account_delay {
-  provisioner local-exec {
-    command = "sleep 10"
-  }
-  triggers = {
-    before = google_service_account.cloudsql_proxy_account.unique_id
-  }
-}
-resource google_project_iam_member cloudsql_proxy_account_iam {
-  provider = google.target
-  depends_on = [null_resource.cloudsql_proxy_account_delay]
-
-  role = "roles/cloudsql.client"
-  member = "serviceAccount:${google_service_account.cloudsql_proxy_account.email}"
+  vault_path = "${var.vault_prefix}/gcs/sa-key"
+  roles = ["roles/cloudsql.client"]
 }
 
-# Create an access key for the account.
-resource google_service_account_key cloudsql_proxy_account_key {
-  provider = google.target
-  service_account_id = google_service_account.cloudsql_proxy_account.name
-}
-
-# Store all the info needed to connect to the DB instance in Vault.
+# Store info needed to connect to the DB instance in Vault.
 resource vault_generic_secret postgres_connection_name {
   provider = vault.target
 
@@ -93,8 +66,7 @@ resource vault_generic_secret postgres_connection_name {
   "name": "${google_sql_database_instance.postgres.name}",
   "region": "${google_sql_database_instance.postgres.region}",
   "project": "${google_sql_database_instance.postgres.project}",
-  "connection_name": "${google_sql_database_instance.postgres.connection_name}",
-  "proxy_account_key": ${jsonencode(base64decode(google_service_account_key.cloudsql_proxy_account_key.private_key))}
+  "connection_name": "${google_sql_database_instance.postgres.connection_name}"
 }
 EOT
 }
