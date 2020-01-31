@@ -1,17 +1,17 @@
 variable account_id {
   type = string
-  description = "Service account name."
+  description = "Name to assign to the new account."
 }
 
 variable display_name {
   type = string
-  description = "The display name shown in the cloud console for the service account."
+  description = "Display name to assign to the new account."
   default = null
 }
 
 variable vault_path {
   type = string
-  description = "Vault path to the relevant GCS key."
+  description = "Vault path where the new account's GCS key should be stored."
 }
 
 variable roles {
