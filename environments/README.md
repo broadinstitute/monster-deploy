@@ -4,7 +4,7 @@ This directory contains concrete definitions of the "always-on" infrastructure
 that runs within Monster's environments. These definitions are expected to be
 relatively stable, and not run all that often.
 
-## Environment Components
+## Environment components
 
 Environment definitions consist of:
 1. A single Terraform module
@@ -32,12 +32,12 @@ be less powerful in general.
 Our prod environment will run the software required to deliver data into the
 production data repository.
 
-## Deploying an Environment
+## Deploying an environment
 
 Run `../hack/init-environment.sh <env>`. If anything new needs to be set up, you'll be prompted to
 confirm the Terraform plan.
 
-## Destroying an Environment
+## Destroying an environment
 
 DON'T DO THIS. Some pieces of our environment require manual intervention from external
 teams (i.e. BITS). Instead, update/delete pieces of the environment definition that
