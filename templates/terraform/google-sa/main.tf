@@ -15,7 +15,7 @@ resource vault_generic_secret sa_secret {
   path = var.vault_path
   data_json = <<EOT
 {
-  "sa_key": ${jsonencode(base64decode(google_service_account_key.sa_key.private_key))}
+  "key": ${jsonencode(base64decode(google_service_account_key.sa_key.private_key))}
 }
 EOT
 }
