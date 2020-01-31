@@ -44,8 +44,11 @@ resource google_sql_database_instance postgres {
   }
 }
 
-module test_sa {
+module cloudsql_sa {
   source = "/templates/google-sa"
+  providers = {
+    google.target = google.target
+  }
 
   account_id = "cloudsql-proxy-account"
   display_name = "CloudSQL proxy account"
@@ -63,7 +66,7 @@ resource vault_generic_secret postgres_connection_name {
   "name": "${google_sql_database_instance.postgres.name}",
   "region": "${google_sql_database_instance.postgres.region}",
   "project": "${google_sql_database_instance.postgres.project}",
-  "connection_name": "${google_sql_database_instance.postgres.connection_name}",
+  "connection_name": "${google_sql_database_instance.postgres.connection_name}"
 }
 EOT
 }

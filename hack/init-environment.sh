@@ -23,7 +23,7 @@ declare -ra PROCESSING_NAMESPACES=(
   secrets-manager
 )
 
-declare -r TERRAFORM=hashicorp/terraform:0.12.17
+declare -r TERRAFORM=hashicorp/terraform:0.12.20
 declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
 declare -r HELM=lachlanevenson/k8s-helm:v3.0.2
 
@@ -231,6 +231,8 @@ function install_cloudsql_proxy () {
   local -r region=$(vault read -field=region $vault_location)
   local -r project=$(vault read -field=project $vault_location)
 
+  local -r vault_sa_location=secret/dsde/monster/${env}/command-conter/gcs/sa-key
+
   # Add helm repo
   ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
 
@@ -239,8 +241,8 @@ function install_cloudsql_proxy () {
     --version=0.0.5 \
     --set secrets[0].secretName=cloudsqlkey \
     --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
-    --set secrets[0].vals[0].path=$vault_location \
-    --set secrets[0].vals[0].vaultKey=proxy_account_key
+    --set secrets[0].vals[0].path=vault_sa_location \
+    --set secrets[0].vals[0].vaultKey=sa_key
 
   # Install and upgrade CloudSQL Proxy
   ${helm[@]} upgrade --install pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \

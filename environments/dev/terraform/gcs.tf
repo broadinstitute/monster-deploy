@@ -7,6 +7,9 @@ resource google_storage_bucket monster_test_bucket {
 
 module test_sa {
   source = "/templates/google-sa"
+  providers = {
+    google.target = google-beta.command-center
+  }
 
   account_id = "monster-dev-test-sa"
   display_name = "test-sa"
