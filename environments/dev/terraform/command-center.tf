@@ -26,5 +26,5 @@ module command_center {
   # 4 CPU, 15 GiB of RAM.
   db_tier = "db-custom-4-15360"
   vault_prefix = "${local.vault_prefix}/command-center"
-  service_account_name =  "command-center-service-account"
+  service_account_id =  "command-center-service-account"
 }
