@@ -62,3 +62,19 @@ resource google_sql_database db {
   collation = "en_US.UTF8"
   depends_on = [google_sql_user.db-user]
 }
+
+# Store info needed to connect to the DB instance in Vault.
+resource vault_generic_secret postgres_connection_name {
+  provider = vault.target
+
+  path = "${var.vault_prefix}/cloudsql/instance"
+  data_json = <<EOT
+{
+  "name": "${google_sql_database_instance.postgres.name}",
+  "region": "${google_sql_database_instance.postgres.region}",
+  "project": "${google_sql_database_instance.postgres.project}",
+  "connection_name": "${google_sql_database_instance.postgres.connection_name}"
+}
+EOT
+}
+
