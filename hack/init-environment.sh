@@ -231,7 +231,7 @@ function install_cloudsql_proxy () {
   local -r region=$(vault read -field=region $vault_location)
   local -r project=$(vault read -field=project $vault_location)
 
-  local -r vault_sa_location=secret/dsde/monster/${env}/command-conter/gcs/sa-key
+  local -r vault_sa_location=secret/dsde/monster/${env}/command-center/gcs/sa-key
 
   # Add helm repo
   ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
