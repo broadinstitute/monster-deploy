@@ -23,7 +23,6 @@ declare -ra PROCESSING_NAMESPACES=(
   secrets-manager
 )
 
-declare -r TERRAFORM=hashicorp/terraform:0.12.20
 declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
 declare -r HELM=lachlanevenson/k8s-helm:v3.0.2
 
@@ -33,41 +32,6 @@ declare -r SECRETS_MANAGER_VERSION=release-1.0.2
 declare -r SECRETS_MANAGER_CHART_VERSION=0.0.4
 
 declare -r KUBECONFIG_DIR_NAME=.kubeconfig
-
-#####
-## Run Terraform to initialize "always on" infrastructure
-## for a given environment.
-#####
-function apply_terraform () {
-  local -r env_dir=$1
-  local -r tf_template_path=${REPO_ROOT}/templates/terraform
-
-  declare -ra terraform=(
-    docker run
-    --rm -it
-    # Local ssh configs for GitHub
-    -v ${HOME}/.ssh:/root/.ssh
-    # Local gcloud configs
-    -v ${HOME}/.config:/root/.config
-    # Local AWS configs
-    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-    -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-    -e AWS_REGION=${AWS_REGION}
-    # Local vault configs
-    -e VAULT_ADDR=${VAULT_ADDR}
-    -v ${HOME}/.vault-token:/root/.vault-token
-    # Terraform template paths
-    -v ${tf_template_path}:/templates
-    # Terraform source paths
-    -v ${env_dir}:/env
-    -w /env/terraform
-    ${TERRAFORM}
-  )
-
-  rm -rf ${env_dir}/terraform/.terraform
-  ${terraform[@]} init
-  ${terraform[@]} apply -var="kubeconfig_dir_path=/env/${KUBECONFIG_DIR_NAME}"
-}
 
 
 #####
@@ -187,7 +151,7 @@ function install_secrets_manager () {
 
   # vault location
   local -r vault_location=secret/dsde/monster/${env}/approle-monster-${env}
-  
+
   # Install the CRD definitions separately. Helm doesn't have
   # a coherent story for handling these yet (since updating them
   # the wrong way can result in all existing objects being deleted),
@@ -288,9 +252,6 @@ function main () {
   # step when testing changes to the k8s portiion.
   local -r env=$1
   local -r env_dir=${REPO_ROOT}/environments/${env}
-  if [ -z ${SKIP_TF:-""} ]; then
-    apply_terraform ${env_dir}
-  fi
 
   # Initialize GKE Configurations.
   local -r kubeconfig_dir=${env_dir}/${KUBECONFIG_DIR_NAME}

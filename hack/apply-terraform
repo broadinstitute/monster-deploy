@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
+declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
+declare -r TF_TEMPLATES_PATH=${REPO_ROOT}/templates/terraform
+
+declare -r TERRAFORM=hashicorp/terraform:0.12.20
+
+function main () {
+  # Check args.
+  if [ $# -ne 1 ]; then
+    1>&2 echo Usage: ${0} '<env>'
+    exit 1
+  fi
+
+  # Make sure config exists.
+  local -r env_dir=${REPO_ROOT}/environments/$1
+  if [ ! -d ${env_dir} ]; then
+    1>&2 echo Error: Invalid environment "'$1'"
+    exit 1
+  fi
+
+  # Apply the environment's Terraform module.
+  declare -ra terraform=(
+    docker run
+    --rm -it
+    # Local ssh configs for GitHub
+    -v ${HOME}/.ssh:/root/.ssh
+    # Local gcloud configs
+    -v ${HOME}/.config:/root/.config
+    # Local AWS configs
+    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    -e AWS_REGION=${AWS_REGION}
+    # Local vault configs
+    -e VAULT_ADDR=${VAULT_ADDR}
+    -v ${HOME}/.vault-token:/root/.vault-token
+    # Terraform template paths
+    -v ${TF_TEMPLATES_PATH}:/templates
+    # Terraform source paths
+    -v ${env_dir}:/env
+    -w /env/terraform
+    ${TERRAFORM}
+  )
+  rm -rf ${env_dir}/terraform/.terraform
+  ${terraform[@]} init
+  # Hard-coding kubeconfig path for now because there's a ticket to
+  # stop writing it to local disk at all.
+  ${terraform[@]} apply -var="kubeconfig_dir_path=/env/.kubeconfig"
+}
+
+main ${@}
