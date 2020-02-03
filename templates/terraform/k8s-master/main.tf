@@ -3,14 +3,6 @@ data google_project project {
   provider = google.target
 }
 
-# Needed for getting the latest valid master version in the target location.
-# This lets us do fuzzy version specs (i.e. '1.14.' instead of '1.14.5-gke.10')
-data google_container_engine_versions cluster_versions {
-  provider = google.target
-  location = var.location
-  version_prefix = "1.14."
-}
-
 # Create the GKE master.
 # This master will have no nodes, so it won't be able to run any pods until
 # a node pool is provisioned for it.
@@ -30,7 +22,10 @@ resource google_container_cluster master {
   # CIS compliance: stackdriver monitoring
   monitoring_service = "monitoring.googleapis.com/kubernetes"
 
-  min_master_version = data.google_container_engine_versions.cluster_versions.latest_master_version
+  # Rate-limit automatic upgrades to a few per month.
+  release_channel {
+    channel = "REGULAR"
+  }
 
   lifecycle {
     ignore_changes = [
