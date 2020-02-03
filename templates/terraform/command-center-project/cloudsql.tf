@@ -7,9 +7,8 @@ module cloudsql_sa {
   account_id = "cloudsql-proxy-account"
   display_name = "CloudSQL proxy account"
   vault_path = "${var.vault_prefix}/gcs/sa-key"
-  roles = ["roles/cloudsql.client"]
-  dependencies = module.enable_services
   roles = ["cloudsql.client"]
+  dependencies = module.enable_services
 }
 
 module cloudsql {
