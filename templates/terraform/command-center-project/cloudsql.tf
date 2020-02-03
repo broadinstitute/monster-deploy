@@ -8,6 +8,7 @@ module cloudsql_sa {
   display_name = "CloudSQL proxy account"
   vault_path = "${var.vault_prefix}/gcs/sa-key"
   roles = ["roles/cloudsql.client"]
+  dependencies = module.enable_services
 }
 
 module cloudsql {
@@ -18,7 +19,6 @@ module cloudsql {
   }
 
   name_prefix = "command-center"
-  postgres_version = ""
   cpu = 4
   ram = 15360
   labels = {
@@ -29,4 +29,5 @@ module cloudsql {
   db_names = []
   user_names = []
   vault_prefix = var.vault_prefix
+  dependencies = module.enable_services
 }
