@@ -39,19 +39,31 @@ resource google_sql_database_instance postgres {
   }
 }
 
-resource random_id db-password {
+resource random_id db_password {
   for_each = toset(var.user_names)
 
   byte_length = 16
 }
 
-resource google_sql_user db-user {
+resource google_sql_user db_user {
   for_each = toset(var.user_names)
 
   provider = google.target
   name = "${var.name_prefix}-${each.value}"
-  password = random_id.db-password[each.value].hex
+  password = random_id.db_password[each.value].hex
   instance = google_sql_database_instance.postgres.name
+}
+
+resource vault_generic_secret postgres_user {
+  for_each = toset(var.user_names)
+
+  provider = vault.target
+  path = "${var.vault_prefix}/cloudsql/users/${each.value}"
+  data_json = <<EOT
+{
+  "password": "${random_id.db_password[each.value].hex}"
+}
+EOT
 }
 
 resource google_sql_database db {
@@ -62,7 +74,7 @@ resource google_sql_database db {
   instance = google_sql_database_instance.postgres.name
   charset = "UTF8"
   collation = "en_US.UTF8"
-  depends_on = [google_sql_user.db-user]
+  depends_on = [google_sql_user.db_user]
 }
 
 # Store info needed to connect to the DB instance in Vault.
@@ -79,4 +91,3 @@ resource vault_generic_secret postgres_connection_name {
 }
 EOT
 }
-
