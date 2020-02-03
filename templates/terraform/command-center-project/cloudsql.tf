@@ -53,7 +53,7 @@ module cloudsql_sa {
   account_id = "cloudsql-proxy-account"
   display_name = "CloudSQL proxy account"
   vault_path = "${var.vault_prefix}/gcs/sa-key"
-  roles = ["roles/cloudsql.client"]
+  roles = ["cloudsql.client"]
 }
 
 # Store info needed to connect to the DB instance in Vault.
