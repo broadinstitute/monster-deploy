@@ -1,4 +1,4 @@
-module command_center_service_account {
+module command_center_gke_runner_account {
   source = "/templates/google-sa"
   providers = {
     google.target = google.target
@@ -6,6 +6,6 @@ module command_center_service_account {
 
   account_id = var.service_account_id
   display_name = "Service account to run GKE system pods"
-  vault_path = "${var.vault_prefix}/gcs/sa-key"
+  vault_path = "${var.vault_prefix}/service-accounts/gke-runner"
   roles = ["logging.logWriter", "monitoring.metricWriter", "monitoring.viewer"]
 }
