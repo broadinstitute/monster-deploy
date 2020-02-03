@@ -42,6 +42,6 @@ resource google_project_iam_member sa_iam {
   provider = google.target
   depends_on = [null_resource.sa_delay]
 
-  role = each.value
+  role = "roles/${each.value}"
   member = "serviceAccount:${google_service_account.sa.email}"
 }

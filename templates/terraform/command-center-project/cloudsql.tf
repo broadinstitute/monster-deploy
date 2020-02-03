@@ -9,6 +9,7 @@ module cloudsql_sa {
   vault_path = "${var.vault_prefix}/gcs/sa-key"
   roles = ["roles/cloudsql.client"]
   dependencies = module.enable_services
+  roles = ["cloudsql.client"]
 }
 
 module cloudsql {
