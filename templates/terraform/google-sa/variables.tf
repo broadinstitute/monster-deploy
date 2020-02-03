@@ -19,3 +19,9 @@ variable roles {
   description = "A list of roles for the service account to have."
   default = []
 }
+
+variable dependencies {
+  type = any
+  default = []
+  description = "Work-around for Terraform 0.12's lack of support for 'depends_on' in custom modules."
+}
