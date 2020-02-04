@@ -21,3 +21,8 @@ variable network {
 variable subnetwork {
   type = string
 }
+
+variable vault_path {
+  type = string
+  description = "Path in Vault where secrets for the master should be stored."
+}

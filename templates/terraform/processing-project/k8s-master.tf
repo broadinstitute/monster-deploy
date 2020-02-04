@@ -12,6 +12,8 @@ module processing_k8s_master {
 
   network = module.k8s_network.network_link
   subnetwork = module.k8s_network.subnet_links[0]
+
+  vault_path = "${var.vault_prefix}/gke"
 }
 
 module processing_k8s_static_node_pool {
@@ -58,11 +60,4 @@ module processing_k8s_scaled_node_pool {
     value = "argo_autoscaling"
     effect = "NO_EXECUTE"
   }]
-}
-
-# Write a kubeconfig for the cluster to disk, for use downstream.
-# Inspired by https://ahmet.im/blog/authenticating-to-gke-without-gcloud/
-resource local_file processing_kubeconfig {
-  filename = var.kubeconfig_path
-  content = module.processing_k8s_master.kubeconfig
 }
