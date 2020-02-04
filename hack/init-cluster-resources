@@ -4,7 +4,7 @@ set -euo pipefail
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
-declare -r KUBECTL=achlanevenson/k8s-kubectl:v1.14.10
+declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
 
 declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
 declare -r SECRETS_MANAGER_VERSION=release-1.0.2
