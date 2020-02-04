@@ -99,3 +99,39 @@ resource google_container_cluster master {
     }
   }
 }
+
+locals {
+  # Inspired by https://ahmet.im/blog/authenticating-to-gke-without-gcloud/
+  kubeconfig = {
+    apiVersion = "v1",
+    kind = "Config",
+    current-context = "context",
+    contexts = [{
+      name = "context",
+      context = {
+        cluster = google_container_cluster.master.name,
+        user = "local-user"
+      }
+    }],
+    users = [{
+      name = "local-user",
+      user = {auth-provider = {name = "gcp"}}
+    }],
+    clusters = [{
+      name = google_container_cluster.master.name,
+      cluster = {
+        server = "https://${google_container_cluster.master.endpoint}",
+        certificate-authority-data = google_container_cluster.master.master_auth[0].cluster_ca_certificate
+      }
+    }]
+  }
+}
+
+resource vault_generic_secret master_secrets {
+  path = var.vault_path
+  data_json = <<EOT
+{
+  "kubeconfig": ${jsonencode(jsonencode(local.kubeconfig))}
+}
+EOT
+}

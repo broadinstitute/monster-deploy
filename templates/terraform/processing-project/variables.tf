@@ -33,11 +33,6 @@ variable k8s_zone {
   description = "Zone within `region` where GKE clusters should run"
 }
 
-variable kubeconfig_path {
-  type = string
-  description = "Local path where kubeconfig for the processing GKE cluster should be written."
-}
-
 variable reader_groups {
   type = list(string)
   description = "Email addresses that represent google groups to share bucket read access with."
@@ -46,4 +41,9 @@ variable reader_groups {
 variable deletion_age_days {
   type = number
   description = "The number of days to wait before deleting files in the staging bucket."
+}
+
+variable vault_prefix {
+  type = string
+  description = "Path prefix for secrets written to Vault."
 }

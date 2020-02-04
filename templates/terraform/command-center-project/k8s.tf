@@ -12,7 +12,10 @@ module master {
 
   network = module.k8s_network.network_link
   subnetwork = module.k8s_network.subnet_links[0]
+
+  vault_path = "${var.vault_prefix}/gke"
 }
+
 module node_pool {
   source = "/templates/k8s-node-pool"
   providers = {
@@ -30,11 +33,4 @@ module node_pool {
 
   autoscaling = null
   taints = null
-}
-
-# Write a kubeconfig for the cluster to disk, for use downstream.
-# Inspired by https://ahmet.im/blog/authenticating-to-gke-without-gcloud/
-resource local_file kubeconfig {
-  filename = var.kubeconfig_path
-  content = module.master.kubeconfig
 }

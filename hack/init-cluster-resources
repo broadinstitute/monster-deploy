@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
+declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
+
+declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
+
+declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
+declare -r SECRETS_MANAGER_VERSION=release-1.0.2
+
+declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
+  fluxcd
+  secrets-manager
+  cloudsql-proxy
+  argo-ui
+  airflow
+)
+declare -ra PROCESSING_NAMESPACES=(
+  fluxcd
+  secrets-manager
+  argo
+)
+declare -ra CRDS=(
+  https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
+  https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
+)
+
+#####
+## Get names for the processing projects registered in the environment.
+##
+## Functions like this are why the directory is named 'hack'. Assumes that
+## all processing-project clusters in the environment have information stored
+## in Vault under a common prefix, and that the names of the directories found
+## immediately under that prefix are meant to represent project names.
+#####
+function get_processing_names () {
+  local -r env=$1
+  local -r vault_prefix=secret/dsde/monster/${env}/processing-projects/
+
+  declare -ra project_names=($(vault list ${vault_prefix} | grep '/' | sed 's#/##g'))
+  echo ${project_names[@]}
+}
+
+#####
+## Read the kubeconfig for a command-center GKE cluster from its expected
+## Vault path for the target environment.
+#####
+function get_command_center_config () {
+  local -r env=$1 config_target=$2
+
+  vault read -field=kubeconfig secret/dsde/monster/${env}/command-center/gke > ${config_target}
+}
+
+#####
+## Read the kubeconfig for a processing GKE cluster from its expected
+## Vault path for the target environment.
+#####
+function get_processing_config () {
+  local -r env=$1 project=$2 config_target=$3
+
+  vault read -field=kubeconfig secret/dsde/monster/${env}/processing-projects/${project}/gke > ${config_target}
+}
+
+#####
+## Initialize namespaces in a GKE cluster so we can
+## deploy into it.
+##
+## Helm used to create namespaces automatically but
+## dropped the behavior in v3 to be consistent with
+## kubectl. It's probably better to be explicit anyway.
+#####
+function install_namespaces () {
+  local -r kubeconfig=$1
+  shift
+  local -ra namespaces=${@}
+
+  declare -ra kubectl=(
+    docker run
+    # NOTE: `-t` omitted here on purpose because it's incompatible
+    # with `-a stdin`.
+    --rm -i
+    # Read from stdin so we can pipe in YAML.
+    -a stdin -a stdout -a stderr
+    # Configure the client to point at the cluster.
+    -v ${kubeconfig}:/root/.kube/config:ro
+    # Make sure it can auth with GKE.
+    -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro
+    ${KUBECTL}
+  )
+
+  for ns in ${namespaces[@]}; do
+    # kubectl apply a HEREDOC containing YAML for each namespace.
+    #
+    # It'd be simpler if we could just `kubectl create namespace ${ns}`.
+    # We can't do that because `create` fails when there's already a
+    # namespace with the given name. `apply` is idempotent, but it
+    # only accepts YAML / JSON as input -_-
+    ${kubectl[@]} apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${ns}
+EOF
+  done
+}
+
+#####
+## Initialize CRD APIs in a GKE cluster so we can push custom
+## resources into it.
+##
+## Helm used to allow deploying CRD APIs like any other resource,
+## but it changed the behavior in v3 to 1) remove templating of
+## CRDs and 2) only install CRDs, and never update them. Explicit
+## control of the APIs is probably better anyways, since updating
+## them in the wrong way can cause all existing objects of the kind
+## to be wiped out.
+#####
+function install_crds () {
+  local -r kubeconfig=$1
+  shift
+  local -ra crd_urls=${@}
+
+  declare -ra kubectl=(
+    docker run
+    --rm -it
+    # Configure the client to point at the cluster.
+    -v ${kubeconfig}:/root/.kube/config:ro
+    # Make sure it can auth with GKE.
+    -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro
+    ${KUBECTL}
+  )
+
+  for crd_url in ${crd_urls[@]}; do
+    ${kubectl[@]} apply -f ${crd_url}
+  done
+}
+
+#####
+## Entrypoint to the script.
+##
+## Ensures expected namespaces and CRDs are registered in the
+## command-center and processing clusters within a core Monster
+## environment.
+#####
+function main () {
+  # Check args.
+  if [ $# -ne 1 ]; then
+    1>&2 echo Usage: ${0} '<env>'
+    exit 1
+  fi
+
+  # Make sure config exists.
+  local -r env=$1
+  local -r env_dir=${REPO_ROOT}/environments/$env
+  if [ ! -d ${env_dir} ]; then
+    1>&2 echo Error: Invalid environment "'$1'"
+    exit 1
+  fi
+
+  local -r config_dir=${env_dir}/.kubeconfig
+  local -r processing_config_dir=${config_dir}/processing
+  rm -rf ${config_dir}
+  mkdir -p ${processing_config_dir}
+
+  # Pull the names of expected processing projects from Vault.
+  local -ra project_names=($(get_processing_names ${env}))
+
+  # Set up the command center for the environment.
+  local -ra all_command_center_namespaces=(${COMMAND_CENTER_BASE_NAMESPACES[@]} ${project_names[@]})
+  local -r center_config=${config_dir}/command-center
+
+  get_command_center_config ${env} ${center_config}
+  install_namespaces ${center_config} ${all_command_center_namespaces[@]}
+  install_crds ${center_config} ${CRDS[@]}
+
+  # Set up each processing project.
+  for project in ${project_names[@]}; do
+    local -r project_config=${processing_config_dir}/${project}
+
+    get_processing_config ${env} ${project} ${project_config}
+    install_namespaces ${project_config} ${PROCESSING_NAMESPACES[@]}
+    install_crds ${project_config} ${CRDS[@]}
+  done
+}
+
+main ${@}
