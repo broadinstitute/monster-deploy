@@ -16,7 +16,7 @@ module dataflow_runner_account {
     google.target = google.target
   }
 
-  account_id = "dataflow_runner"
+  account_id = "dataflow-runner"
   display_name = " Service account to run Dataflow jobs"
   vault_path = "${var.vault_prefix}/service-accounts/dataflow-runner"
   roles = ["dataflow.worker"]
