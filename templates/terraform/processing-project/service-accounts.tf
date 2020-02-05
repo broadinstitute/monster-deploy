@@ -21,3 +21,15 @@ module dataflow_runner_account {
   vault_path = "${var.vault_prefix}/service-accounts/dataflow-runner"
   roles = ["dataflow.worker"]
 }
+
+module dataflow_launcher_account {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google.target
+  }
+
+  account_id = "dataflow-launcher"
+  display_name = " Service account to launch Dataflow jobs"
+  vault_path = "${var.vault_prefix}/service-accounts/dataflow-launcher"
+  roles = ["dataflow.developer", "compute.viewer"]
+}
