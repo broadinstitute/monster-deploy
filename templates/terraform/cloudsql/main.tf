@@ -77,6 +77,21 @@ resource google_sql_database db {
   depends_on = [google_sql_user.db_user]
 }
 
+# Create a service account for accessing the instance.
+module proxy_sa {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google.target,
+    vault.target = vault.target
+  }
+
+  account_id = "${var.name_prefix}-proxy-runner"
+  display_name = "CloudSQL proxy account"
+  vault_path = "${var.vault_prefix}/service-accounts/${var.name_prefix}-proxy-runner"
+  roles = ["cloudsql.client"]
+  dependencies = var.dependencies
+}
+
 # Store info needed to connect to the DB instance in Vault.
 resource vault_generic_secret postgres_connection_name {
   provider = vault.target

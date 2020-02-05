@@ -122,7 +122,6 @@ function main () {
 
   local -r config_dir=${env_dir}/.kubeconfig
   local -r processing_config_dir=${config_dir}/processing
-  rm -rf ${config_dir}
   mkdir -p ${processing_config_dir}
 
   # Pull the names of expected processing projects from Vault.
