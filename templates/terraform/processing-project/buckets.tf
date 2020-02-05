@@ -11,7 +11,7 @@ resource google_storage_bucket_iam_member artifact_bucket_uploader_iam {
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role = "roles/storage.legacyBucketWriter"
   member = "serviceAccount:${module.dataflow_runner_account.email}"
   depends_on = [module.dataflow_runner_account.delay]
 }
