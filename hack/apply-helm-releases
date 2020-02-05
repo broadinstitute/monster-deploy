@@ -4,16 +4,10 @@ set -euo pipefail
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
-# Associative array so we can look things up by string key.
-# The values don't matter as long as they're not empty.
-declare -rA ENVS=([dev]=valid)
-
-declare -r HELM=lachlanevenson/k8s-helm:v3.0.2
+source ${SCRIPT_DIR}/common.sh
 
 declare -r HELM_OPERATOR_CHART_VERSION=0.4.0
 declare -r SECRETS_MANAGER_CHART_VERSION=0.0.4
-
-declare -r KUBECONFIG_DIR_NAME=.kubeconfig
 
 #####
 ## Configure Helm in Docker
@@ -50,7 +44,6 @@ function install_flux () {
   ${helm[@]} repo add fluxcd https://charts.fluxcd.io
   ${helm[@]} upgrade helm-operator fluxcd/helm-operator \
     --install \
-    --wait \
     --namespace=fluxcd \
     --version=${HELM_OPERATOR_CHART_VERSION} \
     --set='helm.versions=v3' \
@@ -74,12 +67,11 @@ function install_secrets_manager () {
   # helm repo upgrade --installs the secret manager chart, setting appropriate values
   ${helm[@]} upgrade install-secrets-manager datarepo-helm/install-secrets-manager \
     --install \
-    --wait \
     --namespace=secrets-manager \
     --version=${SECRETS_MANAGER_CHART_VERSION} \
     --set='installcrd.install=false' \
     --set='vaultLocation=https://clotho.broadinstitute.org:8200' \
-    --set='vaultVersion=kv2' \
+    --set='vaultVersion=kv1' \
     --set='serviceAccount.create=true' \
     --set='rbac.create=true' \
     --set="secretsgeneric.roleId=$(vault read -field=role_id $vault_location)" \
@@ -101,7 +93,7 @@ function install_cloudsql_proxy () {
   local -r region=$(vault read -field=region $vault_location)
   local -r project=$(vault read -field=project $vault_location)
 
-  local -r vault_sa_location=secret/dsde/monster/${env}/command-center/gcs/sa-key
+  local -r vault_sa_location=secret/dsde/monster/${env}/command-center/service-accounts/command-center-proxy-runner
 
   # Add helm repo
   ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
@@ -127,38 +119,46 @@ function install_cloudsql_proxy () {
 }
 
 #####
-## Script entrypoint.
+## Entrypoint to the script.
+##
+## Ensures all expected Helm charts are released to the
+## command-center and processing clusters within a core
+## Monster environment.
 #####
 function main () {
+  # Check args.
   if [ $# -ne 1 ]; then
     1>&2 echo Usage: ${0} '<env>'
     exit 1
-  elif [ -z ${ENVS[$1]:-""} ]; then
+  fi
+
+  # Make sure config exists.
+  local -r env=$1
+  local -r env_dir=${REPO_ROOT}/environments/${env}
+  if [ ! -d ${env_dir} ]; then
     1>&2 echo Error: Invalid environment "'$1'"
     exit 1
   fi
 
-  # Start by running Terraform. This will set up infrastructure and
-  # generate configs needed for creating Helm releases.
-  #
-  # NOTE: Set the SKIP_TF env variable to any value to skip over this
-  # step when testing changes to the k8s portiion.
-  local -r env=$1
-  local -r env_dir=${REPO_ROOT}/environments/${env}
+  local -r config_dir=${env_dir}/.kubeconfig
+  local -r processing_config_dir=${config_dir}/processing
+  mkdir -p ${processing_config_dir}
 
-  # Initialize GKE Configurations.
-  local -r kubeconfig_dir=${env_dir}/${KUBECONFIG_DIR_NAME}
-  local -r command_center_config=${kubeconfig_dir}/command-center
-  local -r processing_configs_dir=${kubeconfig_dir}/processing
+  # Pull the names of expected processing projects from Vault.
+  local -ra project_names=($(get_processing_names ${env}))
 
-  # Initialize command-center GKE and services.
-  install_flux ${command_center_config} ${env_dir}
-  install_secrets_manager ${command_center_config} ${env_dir} ${env}
-  install_cloudsql_proxy ${command_center_config} ${env_dir} ${env}
+  # Push releases to the command center.
+  local -r center_config=${config_dir}/command-center
+  get_command_center_config ${env} ${center_config}
+  install_flux ${center_config} ${env_dir}
+  install_secrets_manager ${center_config} ${env_dir} ${env}
+  install_cloudsql_proxy ${center_config} ${env_dir} ${env}
 
-  # Initialize processing GKEs and services.
-  for kubeconfig in ${processing_configs_dir}/*; do
-    install_secrets_manager ${kubeconfig} ${env_dir} ${env}
+  # Push releases to processing projects.
+  for project in ${project_names[@]}; do
+    local -r project_config=${processing_config_dir}/${project}
+    get_processing_config ${env} ${project} ${project_config}
+    install_secrets_manager ${project_config} ${env_dir} ${env}
   done
 }
 

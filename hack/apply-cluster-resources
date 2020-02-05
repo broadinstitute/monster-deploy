@@ -4,10 +4,8 @@ set -euo pipefail
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
-declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
-
-declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
-declare -r SECRETS_MANAGER_VERSION=release-1.0.2
+# Pull in common definitions.
+source ${SCRIPT_DIR}/common.sh
 
 declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
   fluxcd
@@ -25,42 +23,6 @@ declare -ra CRDS=(
   https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
   https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
 )
-
-#####
-## Get names for the processing projects registered in the environment.
-##
-## Functions like this are why the directory is named 'hack'. Assumes that
-## all processing-project clusters in the environment have information stored
-## in Vault under a common prefix, and that the names of the directories found
-## immediately under that prefix are meant to represent project names.
-#####
-function get_processing_names () {
-  local -r env=$1
-  local -r vault_prefix=secret/dsde/monster/${env}/processing-projects/
-
-  declare -ra project_names=($(vault list ${vault_prefix} | grep '/' | sed 's#/##g'))
-  echo ${project_names[@]}
-}
-
-#####
-## Read the kubeconfig for a command-center GKE cluster from its expected
-## Vault path for the target environment.
-#####
-function get_command_center_config () {
-  local -r env=$1 config_target=$2
-
-  vault read -field=kubeconfig secret/dsde/monster/${env}/command-center/gke > ${config_target}
-}
-
-#####
-## Read the kubeconfig for a processing GKE cluster from its expected
-## Vault path for the target environment.
-#####
-function get_processing_config () {
-  local -r env=$1 project=$2 config_target=$3
-
-  vault read -field=kubeconfig secret/dsde/monster/${env}/processing-projects/${project}/gke > ${config_target}
-}
 
 #####
 ## Initialize namespaces in a GKE cluster so we can
@@ -160,7 +122,6 @@ function main () {
 
   local -r config_dir=${env_dir}/.kubeconfig
   local -r processing_config_dir=${config_dir}/processing
-  rm -rf ${config_dir}
   mkdir -p ${processing_config_dir}
 
   # Pull the names of expected processing projects from Vault.

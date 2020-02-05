@@ -43,7 +43,6 @@ function main () {
     -w /env/terraform
     ${TERRAFORM}
   )
-  rm -rf ${env_dir}/terraform/.terraform
   ${terraform[@]} init
   # Hard-coding kubeconfig path for now because there's a ticket to
   # stop writing it to local disk at all.
