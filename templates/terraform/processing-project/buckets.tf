@@ -5,6 +5,17 @@ resource google_storage_bucket artifact_bucket {
   location = "US"
 }
 
+resource google_storage_bucket_iam_member artifact_bucket_uploader_iam {
+  provider = google.target
+  bucket = google_storage_bucket.artifact_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.dataflow_runner_account.email}"
+  depends_on = [module.dataflow_runner_account.delay]
+}
+
 # Bucket for temp files used by processing programs.
 resource google_storage_bucket temp_bucket {
   provider = google.target
