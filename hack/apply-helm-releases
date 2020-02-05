@@ -156,7 +156,7 @@ function main () {
   install_cloudsql_proxy ${center_config} ${env_dir} ${env}
 
   # Push releases to processing projects.
-  for project in ${project_names[@}]}; do
+  for project in ${project_names[@]}; do
     local -r project_config=${processing_config_dir}/${project}
     get_processing_config ${env} ${project} ${project_config}
     install_secrets_manager ${project_config} ${env_dir} ${env}
