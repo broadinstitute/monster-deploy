@@ -34,14 +34,14 @@ module dataflow_launcher_account {
   roles = ["dataflow.developer", "compute.viewer"]
 }
 
-module dataflow_uploader_account {
+module artifact_uploader_account {
   source = "/templates/google-sa"
   providers = {
     google.target = google.target
   }
 
-  account_id = "dataflow-uploader"
-  display_name = " Service account to upload Dataflow artifacts to GCS"
-  vault_path = "${var.vault_prefix}/service-accounts/dataflow-uploader"
+  account_id = "artifact-uploader"
+  display_name = " Service account to upload artifacts to GCS"
+  vault_path = "${var.vault_prefix}/service-accounts/artifact-uploader"
   roles = []
 }
