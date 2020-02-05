@@ -1,0 +1,9 @@
+apiVersion: v2
+name: command-center
+description: HelmRelease definitions for services running in the "command center".
+version: 0.0.0
+dependencies:
+  - name: secret-manager
+    version: 0.0.0
+    repository: file:///charts/secret-manager
+    alias: secretManager

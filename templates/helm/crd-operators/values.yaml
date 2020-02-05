@@ -1,0 +1,5 @@
+helm-operator:
+  helm:
+    versions: "v3"
+  rbac:
+    pspEnabled: true

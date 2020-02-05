@@ -1,0 +1,47 @@
+---
+{{- $secretName := "cloudsql-proxy-key" }}
+{{- $keyName := "key.json" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cloudsql-proxy-secrets
+spec:
+  releaseName: cloudsql-proxy-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: cloudsql-proxy
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: {{ .Values.secretPrefix }}/command-center/cloudsql/instance
+            vaultKey: proxy_account_key
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cloudsql-proxy
+spec:
+  releaseName: cloudsql-proxy
+  targetNamespace: cloudsql-proxy
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: gcloud-sqlproxy
+    version: 0.19.4
+  values:
+    cloudsql:
+      instances:
+        - instance: {{ .Values.cloudsql.name }}
+          project: {{ .Values.cloudsql.project }}
+          region: {{ .Values.cloudsql.region }}
+          port: 5432
+    rbac:
+      create: true
+    existingSecret: {{ $secretName }}
+    existingSecretKey: {{ $keyName }}
