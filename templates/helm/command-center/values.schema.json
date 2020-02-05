@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "env": { "type": "string", "enum": ["dev"] },
+    "cloudsql": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "project": { "type": "string" },
+        "region": { "type": "string" }
+      }
+    }
+  },
+  "required": ["env"]
+}

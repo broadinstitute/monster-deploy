@@ -19,8 +19,8 @@ spec:
         nameSpace: cloudsql-proxy
         vals:
           - kubeSecretKey: {{ $keyName }}
-            path: {{ .Values.secretPrefix }}/command-center/cloudsql/instance
-            vaultKey: proxy_account_key
+            path: secret/dsde/monster/{{ .Values.env }}/command-center/service-accounts/command-center-proxy-runner
+            vaultKey: key
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease

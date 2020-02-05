@@ -3,7 +3,6 @@ name: command-center
 description: HelmRelease definitions for services running in the "command center".
 version: 0.0.0
 dependencies:
-  - name: secret-manager
+  - name: crd-operators
     version: 0.0.0
-    repository: file:///charts/secret-manager
-    alias: secretManager
+    repository: file:///charts/crd-operators

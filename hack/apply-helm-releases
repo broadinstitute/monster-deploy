@@ -33,50 +33,26 @@ function configure_helm () {
 }
 
 #####
-## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
-#####
-function install_cloudsql_proxy () {
-  local -r kubeconfig=$1 env_dir=$2 env=$3
-
-  # Configure helm
-  local -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
-
-  # Read cloudsql configuration info from vault
-  local -r vault_location=secret/dsde/monster/${env}/command-center/cloudsql/instance
-  local -r name=$(vault read -field=name $vault_location)
-  local -r region=$(vault read -field=region $vault_location)
-  local -r project=$(vault read -field=project $vault_location)
-
-  local -r vault_sa_location=secret/dsde/monster/${env}/command-center/service-accounts/command-center-proxy-runner
-
-  # Add helm repo
-  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
-
-  # Write CloudSQL connection secrets to GKE
-  ${helm[@]} upgrade --install sqlproxy-secret datarepo-helm/create-secret-manager-secret --namespace cloudsql-proxy \
-    --version=0.0.5 \
-    --set secrets[0].secretName=cloudsqlkey \
-    --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
-    --set secrets[0].vals[0].path=$vault_sa_location \
-    --set secrets[0].vals[0].vaultKey=key
-
-  # Install and upgrade CloudSQL Proxy
-  ${helm[@]} upgrade --install pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
-    --version=0.19.4 \
-    --set cloudsql.instances[0].instance=$name \
-    --set cloudsql.instances[0].project=$project \
-    --set cloudsql.instances[0].region=$region \
-    --set cloudsql.instances[0].port=5432 -i \
-    --set rbac.create=true \
-    --set existingSecret=cloudsqlkey \
-    --set existingSecretKey=cloudsqlkey.json
-}
-
-#####
 ## TODO
 #####
 function run_command_center_release () {
-  echo TODO
+  local -r kubeconfig=$1 env=$2 helm_dir=$3
+
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
+  local -r sql_instance_secret=secret/dsde/monster/${env}/command-center/cloudsql/instance
+
+  ${helm[@]} dependency update /charts/command-center
+  ${helm[@]} upgrade command-center /charts/command-center \
+   --namespace fluxcd \
+   --install \
+   --set "env=${env}" \
+   --set "cloudsql.name=$(vault read -field=name ${sql_instance_secret})" \
+   --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
+   --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
+   --set "crd-operators.secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
+   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})" \
+   --set "crd-operators.secretManager.namespace=secrets-manager"
 }
 
 #####
@@ -86,14 +62,14 @@ function run_processing_release () {
   local -r kubeconfig=$1 env=$2 helm_dir=$3
 
   local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
-  local -r bootstrap_secret_name=secret/dsde/monster/${env}/approle-monster-${env}
+  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
 
   ${helm[@]} dependency update /charts/crd-operators
   ${helm[@]} upgrade crd-operators /charts/crd-operators \
    --namespace fluxcd \
    --install \
-   --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret_name})" \
-   --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret_name})" \
+   --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
+   --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})" \
    --set "secretManager.namespace=secrets-manager"
 }
 
