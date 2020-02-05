@@ -1,8 +1,8 @@
 apiVersion: v2
 name: command-center
-description: HelmRelease definitions for services running in the "command center".
-version: 0.0.0
+description: Services used to run the "command center" in a Monster environment.
+version: 0.1.0
 dependencies:
   - name: crd-operators
-    version: 0.0.0
+    version: 0.1.0
     repository: file:///charts/crd-operators

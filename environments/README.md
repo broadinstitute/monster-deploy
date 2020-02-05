@@ -8,8 +8,8 @@ relatively stable, and not run all that often.
 
 Environment definitions consist of:
 1. A single Terraform module
-2. A deployment of Flux CD's Helm Operator
-2. (TODO) A single Helm chart to push HelmRelease specs to the operator
+2. A set of k8s namespaces and API extensions
+3. A Helm chart per cluster type (command-center or processing)
 
 Most of the "business logic" for these two pieces is tracked elsewhere, either in
 the [templates](../templates) directory or in entirely separate git repositories.
