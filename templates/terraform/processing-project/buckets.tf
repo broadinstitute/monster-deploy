@@ -55,7 +55,7 @@ resource google_storage_bucket staging_storage {
 
 resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   provider = google.target
-  bucket = google_storage_bucket.temp_bucket.name
+  bucket = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
