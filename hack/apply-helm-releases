@@ -52,8 +52,7 @@ function run_command_center_release () {
    --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
    --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
    --set "crd-operators.secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
-   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})" \
-   --set "crd-operators.secretManager.namespace=secrets-manager"
+   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
 }
 
 #####
@@ -71,8 +70,7 @@ function run_processing_release () {
    --namespace fluxcd \
    --install \
    --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
-   --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})" \
-   --set "secretManager.namespace=secrets-manager"
+   --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
 }
 
 #####

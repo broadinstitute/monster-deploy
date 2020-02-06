@@ -5,11 +5,10 @@
     "secretManager": {
       "type": "object",
       "properties": {
-        "namespace": { "type": "string" },
         "roleId": { "type": "string" },
         "secretId": { "type": "string" }
       },
-      "required": ["namespace", "roleId", "secretId"]
+      "required": ["roleId", "secretId"]
     }
   },
   "required": ["secretManager"]
