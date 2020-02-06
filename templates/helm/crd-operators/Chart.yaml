@@ -1,0 +1,8 @@
+apiVersion: v2
+name: crd-operators
+description: Services required for handling our standard API extensions.
+version: 0.1.0
+dependencies:
+  - name: helm-operator
+    repository: https://charts.fluxcd.io
+    version: 0.6.0

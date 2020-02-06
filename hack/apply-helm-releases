@@ -6,14 +6,13 @@ declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
 source ${SCRIPT_DIR}/common.sh
 
-declare -r HELM_OPERATOR_CHART_VERSION=0.4.0
-declare -r SECRETS_MANAGER_CHART_VERSION=0.0.4
+declare -r HELM_CHARTS_DIR=${REPO_ROOT}/templates/helm
 
 #####
 ## Configure Helm in Docker
 #####
 function configure_helm () {
-  local -r kubeconfig=$1 env_dir=$2
+  local -r kubeconfig=$1 helm_dir=$2
 
   declare -ra helm=(
     docker run
@@ -23,99 +22,55 @@ function configure_helm () {
     # Make sure it can auth with GKE.
     -v ${HOME}/.config/gcloud:/root/.config/gcloud:ro
     # Persist Helm config across container runs.
-    -v ${env_dir}/.helm/plugins:/root/.local/share/helm/plugins
-    -v ${env_dir}/.helm/config:/root/.config/helm
-    -v ${env_dir}/.helm/cache:/root/.cache/helm
+    -v ${helm_dir}/plugins:/root/.local/share/helm/plugins
+    -v ${helm_dir}/config:/root/.config/helm
+    -v ${helm_dir}/cache:/root/.cache/helm
+    # Make our local charts available.
+    -v ${HELM_CHARTS_DIR}:/charts
     ${HELM}
   )
   echo ${helm[@]}
 }
 
 #####
-## Set up Flux CD's Helm Operator to manage deployments in GKE.
+## Deploy the helm-operator and a bundle of release definitions into
+## the command-center cluster for an environment.
 #####
-function install_flux () {
-  local -r kubeconfig=$1 env_dir=$2
+function run_command_center_release () {
+  local -r kubeconfig=$1 env=$2 helm_dir=$3
 
-  # Install the Operator using Helm.
-  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
+  local -r sql_instance_secret=secret/dsde/monster/${env}/command-center/cloudsql/instance
 
-  rm -rf ${env_dir}/.helm
-  ${helm[@]} repo add fluxcd https://charts.fluxcd.io
-  ${helm[@]} upgrade helm-operator fluxcd/helm-operator \
-    --install \
-    --namespace=fluxcd \
-    --version=${HELM_OPERATOR_CHART_VERSION} \
-    --set='helm.versions=v3' \
-    --set='rbac.pspEnabled=true'
+  ${helm[@]} dependency update /charts/command-center
+  ${helm[@]} upgrade command-center /charts/command-center \
+   --namespace fluxcd \
+   --install \
+   --set "env=${env}" \
+   --set "cloudsql.name=$(vault read -field=name ${sql_instance_secret})" \
+   --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
+   --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
+   --set "crd-operators.secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
+   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
 }
 
 #####
-## Set up and install the Vault secret manager in the command center GKE cluster.
+## Deploy the helm-operator and a bundle of release definitions into
+## a processing-project cluster in an environment.
 #####
-function install_secrets_manager () {
-  local -r kubeconfig=$1 env_dir=$2 env=$3
+function run_processing_release () {
+  local -r kubeconfig=$1 env=$2 helm_dir=$3
 
-  # vault location
-  local -r vault_location=secret/dsde/monster/${env}/approle-monster-${env}
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
 
-  # Install the Operator using Helm.
-  declare -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
-  rm -rf ${env_dir}/.helm
-  # helm repo adds Jade’s Helm repository
-  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
-  # helm repo upgrade --installs the secret manager chart, setting appropriate values
-  ${helm[@]} upgrade install-secrets-manager datarepo-helm/install-secrets-manager \
-    --install \
-    --namespace=secrets-manager \
-    --version=${SECRETS_MANAGER_CHART_VERSION} \
-    --set='installcrd.install=false' \
-    --set='vaultLocation=https://clotho.broadinstitute.org:8200' \
-    --set='vaultVersion=kv1' \
-    --set='serviceAccount.create=true' \
-    --set='rbac.create=true' \
-    --set="secretsgeneric.roleId=$(vault read -field=role_id $vault_location)" \
-    --set="secretsgeneric.secretId=$(vault read -field=secret_id $vault_location)"
-}
-
-#####
-## Set up Google's CloudSQL Proxy to communicate with the CloudSQL database.
-#####
-function install_cloudsql_proxy () {
-  local -r kubeconfig=$1 env_dir=$2 env=$3
-
-  # Configure helm
-  local -ra helm=($(configure_helm ${kubeconfig} ${env_dir}))
-
-  # Read cloudsql configuration info from vault
-  local -r vault_location=secret/dsde/monster/${env}/command-center/cloudsql/instance
-  local -r name=$(vault read -field=name $vault_location)
-  local -r region=$(vault read -field=region $vault_location)
-  local -r project=$(vault read -field=project $vault_location)
-
-  local -r vault_sa_location=secret/dsde/monster/${env}/command-center/service-accounts/command-center-proxy-runner
-
-  # Add helm repo
-  ${helm[@]} repo add datarepo-helm https://broadinstitute.github.io/datarepo-helm
-
-  # Write CloudSQL connection secrets to GKE
-  ${helm[@]} upgrade --install sqlproxy-secret datarepo-helm/create-secret-manager-secret --namespace cloudsql-proxy \
-    --version=0.0.5 \
-    --set secrets[0].secretName=cloudsqlkey \
-    --set secrets[0].vals[0].kubeSecretKey=cloudsqlkey.json \
-    --set secrets[0].vals[0].path=$vault_sa_location \
-    --set secrets[0].vals[0].vaultKey=key
-
-  # Install and upgrade CloudSQL Proxy
-  ${helm[@]} upgrade --install pg-sqlproxy datarepo-helm/gcloud-sqlproxy --namespace cloudsql-proxy \
-    --version=0.19.4 \
-    --set cloudsql.instances[0].instance=$name \
-    --set cloudsql.instances[0].project=$project \
-    --set cloudsql.instances[0].region=$region \
-    --set cloudsql.instances[0].port=5432 -i \
-    --set rbac.create=true \
-    --set existingSecret=cloudsqlkey \
-    --set existingSecretKey=cloudsqlkey.json
+  ${helm[@]} dependency update /charts/crd-operators
+  ${helm[@]} upgrade crd-operators /charts/crd-operators \
+   --namespace fluxcd \
+   --install \
+   --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
+   --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
 }
 
 #####
@@ -144,21 +99,22 @@ function main () {
   local -r processing_config_dir=${config_dir}/processing
   mkdir -p ${processing_config_dir}
 
+  local -r helm_dir=${env_dir}/.helm
+  mkdir -p ${helm_dir}
+
   # Pull the names of expected processing projects from Vault.
   local -ra project_names=($(get_processing_names ${env}))
 
   # Push releases to the command center.
   local -r center_config=${config_dir}/command-center
   get_command_center_config ${env} ${center_config}
-  install_flux ${center_config} ${env_dir}
-  install_secrets_manager ${center_config} ${env_dir} ${env}
-  install_cloudsql_proxy ${center_config} ${env_dir} ${env}
+  run_command_center_release ${center_config} ${env} ${helm_dir}
 
   # Push releases to processing projects.
   for project in ${project_names[@]}; do
     local -r project_config=${processing_config_dir}/${project}
     get_processing_config ${env} ${project} ${project_config}
-    install_secrets_manager ${project_config} ${env_dir} ${env}
+    run_processing_release ${project_config} ${env} ${helm_dir}
   done
 }
 

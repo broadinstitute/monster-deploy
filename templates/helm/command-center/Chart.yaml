@@ -1,0 +1,8 @@
+apiVersion: v2
+name: command-center
+description: Services used to run the "command center" in a Monster environment.
+version: 0.1.0
+dependencies:
+  - name: crd-operators
+    version: 0.1.0
+    repository: file:///charts/crd-operators

@@ -2,3 +2,5 @@
 .helm
 .kubeconfig
 .idea
+charts/
+Chart.lock

@@ -3,9 +3,10 @@ set -euo pipefail
 
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
-declare -r TF_TEMPLATES_PATH=${REPO_ROOT}/templates/terraform
 
-declare -r TERRAFORM=hashicorp/terraform:0.12.20
+source ${SCRIPT_DIR}/common.sh
+
+declare -r TF_TEMPLATES_PATH=${REPO_ROOT}/templates/terraform
 
 function main () {
   # Check args.
@@ -43,10 +44,12 @@ function main () {
     -w /env/terraform
     ${TERRAFORM}
   )
+
+  # Clear out any cached local module state.
+  rm -rf ${env_dir}/terraform/.terraform/modules
+
   ${terraform[@]} init
-  # Hard-coding kubeconfig path for now because there's a ticket to
-  # stop writing it to local disk at all.
-  ${terraform[@]} apply -var="kubeconfig_dir_path=/env/.kubeconfig"
+  ${terraform[@]} apply
 }
 
 main ${@}
