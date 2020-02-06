@@ -8,7 +8,7 @@ resource google_storage_bucket monster_test_bucket {
 module test_sa {
   source = "/templates/google-sa"
   providers = {
-    google.target = google-beta.command-center
+    google.target = google-beta.command-center,
     vault.target = vault.command-center
   }
 
