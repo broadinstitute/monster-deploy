@@ -9,6 +9,7 @@ module test_sa {
   source = "/templates/google-sa"
   providers = {
     google.target = google-beta.command-center
+    vault.target = vault.command-center
   }
 
   account_id = "monster-dev-test-sa"
