@@ -7,7 +7,8 @@ provider google-beta {
 module clinvar {
   source = "/templates/processing-project"
   providers = {
-    google.target = google-beta.clinvar
+    google.target = google-beta.clinvar,
+    vault.target = vault.command-center
   }
 
   project_name = "broad-dsp-monster-clingen-dev"

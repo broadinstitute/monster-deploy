@@ -5,6 +5,17 @@ resource google_storage_bucket artifact_bucket {
   location = "US"
 }
 
+resource google_storage_bucket_iam_member artifact_bucket_uploader_iam {
+  provider = google.target
+  bucket = google_storage_bucket.artifact_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.artifact_uploader_account.email}"
+  depends_on = [module.artifact_uploader_account.delay]
+}
+
 # Bucket for temp files used by processing programs.
 resource google_storage_bucket temp_bucket {
   provider = google.target
@@ -21,6 +32,28 @@ resource google_storage_bucket temp_bucket {
       age = 7
     }
   }
+}
+
+resource google_storage_bucket_iam_member temp_bucket_runner_iam {
+  provider = google.target
+  bucket = google_storage_bucket.temp_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.dataflow_runner_account.email}"
+  depends_on = [module.dataflow_runner_account.delay]
+}
+
+resource google_storage_bucket_iam_member temp_bucket_launcher_iam {
+  provider = google.target
+  bucket = google_storage_bucket.temp_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.dataflow_launcher_account.email}"
+  depends_on = [module.dataflow_launcher_account.delay]
 }
 
 # Bucket for temporary data storage.
@@ -40,6 +73,17 @@ resource google_storage_bucket staging_storage {
       }
     }
   }
+}
+
+resource google_storage_bucket_iam_member staging_bucket_runner_iam {
+  provider = google.target
+  bucket = google_storage_bucket.staging_storage.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.dataflow_runner_account.email}"
+  depends_on = [module.dataflow_runner_account.delay]
 }
 
 resource google_storage_bucket_iam_member staging_iam_reader {
