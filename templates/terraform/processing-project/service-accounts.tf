@@ -49,3 +49,16 @@ module artifact_uploader_account {
   vault_path = "${var.vault_prefix}/service-accounts/artifact-uploader"
   roles = []
 }
+
+module argo_runner_account {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google.target,
+    vault.target = vault.target
+  }
+
+  account_id = "argo-runner"
+  display_name = "Service account to run Argo pods"
+  vault_path = "${var.vault_prefix}/service-accounts/argo-runner"
+  roles = ["container.developer"]
+}
