@@ -14,6 +14,7 @@ module processing_k8s_master {
   subnetwork = module.k8s_network.subnet_links[0]
 
   vault_path = "${var.vault_prefix}/gke"
+  service_account_email = module.processing_gke_runner_account.email
 }
 
 module processing_k8s_static_node_pool {
@@ -33,6 +34,7 @@ module processing_k8s_static_node_pool {
 
   autoscaling = null
   taints = null
+  service_account_email = module.processing_gke_runner_account.email
 }
 
 module processing_k8s_scaled_node_pool {
@@ -60,4 +62,5 @@ module processing_k8s_scaled_node_pool {
     value = "argo_autoscaling"
     effect = "NO_EXECUTE"
   }]
+  service_account_email = module.processing_gke_runner_account.email
 }

@@ -31,6 +31,7 @@ resource google_container_node_pool pool {
     image_type = "COS"
     machine_type = var.machine_type
     disk_size_gb = var.disk_size_gb
+    service_account = var.service_account_email
 
     dynamic "taint" {
       for_each = var.taints == null ? [] : var.taints

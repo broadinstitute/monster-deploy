@@ -57,3 +57,8 @@ variable disk_size_gb {
   type = number
   description = "Size of disk to allocate for each node in the pool."
 }
+
+variable service_account_email {
+  type = string
+  description = "The email address of the service account."
+}
