@@ -33,4 +33,5 @@ module node_pool {
 
   autoscaling = null
   taints = null
+  service_account_email = module.command_center_gke_runner_account.email
 }
