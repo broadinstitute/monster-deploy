@@ -60,5 +60,5 @@ variable disk_size_gb {
 
 variable service_account_email {
   type = string
-  description = "The email address of the service account."
+  description = "The email address of the IAM service account that will run system pods."
 }
