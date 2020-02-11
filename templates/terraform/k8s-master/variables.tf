@@ -26,8 +26,3 @@ variable vault_path {
   type = string
   description = "Path in Vault where secrets for the master should be stored."
 }
-
-variable service_account_email {
-  type = string
-  description = "The email address of the service account."
-}

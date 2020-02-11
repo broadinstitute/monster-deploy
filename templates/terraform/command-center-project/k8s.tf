@@ -14,7 +14,6 @@ module master {
   subnetwork = module.k8s_network.subnet_links[0]
 
   vault_path = "${var.vault_prefix}/gke"
-  service_account_email = module.command_center_gke_runner_account.email
 }
 
 module node_pool {
