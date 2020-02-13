@@ -1,5 +1,5 @@
 provider google-beta {
-  project = "broad-dsp-monster-prod"
+  project = "broad-dsp-monster-v2f-prod"
   region = "us-central1"
   alias = "v2f"
 }
