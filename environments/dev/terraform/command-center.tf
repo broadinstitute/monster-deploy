@@ -25,4 +25,6 @@ module command_center {
   # 4 CPU, 15 GiB of RAM.
   db_tier = "db-custom-4-15360"
   vault_prefix = "${local.vault_prefix}/command-center"
+  cloudsql_db_names = ["argo", "airflow", "datarepo", "stairway"]
+  cloudsql_user_names = ["argo", "airflow", "datarepo"]
 }

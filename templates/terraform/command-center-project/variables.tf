@@ -27,3 +27,13 @@ variable vault_prefix {
   type = string
   description = "Path prefix for secrets written to Vault."
 }
+
+variable cloudsql_db_names {
+  type = list(string)
+  description = "List of names of databases which should be added to CloudSQL."
+}
+
+variable cloudsql_user_names {
+  type = list(string)
+  description = "List of user names which should be added to CloudSQL."
+}
