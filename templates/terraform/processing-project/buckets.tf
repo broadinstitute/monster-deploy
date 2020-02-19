@@ -97,3 +97,24 @@ resource google_storage_bucket_iam_member staging_iam_reader {
   role = "roles/storage.legacyBucketReader"
   member = "group:${each.value}"
 }
+
+
+resource google_storage_bucket_iam_member command_center_argo_staging_bucket_iam {
+  provider = google.target
+  bucket =  google_storage_bucket.staging_storage.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${var.command_center_argo_account_email}"
+}
+
+resource google_storage_bucket_iam_member command_center_argo_temp_bucket_iam {
+  provider = google.target
+  bucket =  google_storage_bucket.temp_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${var.command_center_argo_account_email}"
+}

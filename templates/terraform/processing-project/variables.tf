@@ -47,3 +47,8 @@ variable vault_prefix {
   type = string
   description = "Path prefix for secrets written to Vault."
 }
+
+variable command_center_argo_account_email {
+  type = string
+  description = "Email which is tied to the command-center Argo service account."
+}
