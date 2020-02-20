@@ -3,6 +3,10 @@
   "type": "object",
   "properties": {
     "env": { "type": "string", "enum": ["dev"] },
+    "argoNamespaces": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "cloudsql": {
       "type": "object",
       "properties": {
@@ -13,5 +17,5 @@
       "required": ["name", "project", "region"]
     }
   },
-  "required": ["env", "cloudsql"]
+  "required": ["env", "cloudsql", "argoNamespaces"]
 }
