@@ -52,7 +52,8 @@ function run_command_center_release () {
    --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
    --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
    --set "crd-operators.secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
-   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
+   --set "crd-operators.secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})" \
+   --set "argoNamespaces[0]=clinvar"
 }
 
 #####

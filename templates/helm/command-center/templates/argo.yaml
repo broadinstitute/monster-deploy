@@ -1,0 +1,78 @@
+---
+{{- $secretName := "db-password" }}
+{{- $keyName := "password" }}
+{{- $env := .Values.env }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: db-login-secrets
+spec:
+  releaseName: db-login-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      {{- range $ns := (append .Values.argoNamespaces "argo-ui") }}
+      - secretName: {{ $secretName }}
+        nameSpace: {{ $ns }}
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: secret/dsde/monster/{{ $env }}/command-center/cloudsql/users/argo
+            vaultKey: password
+      {{- end }}
+{{- /*
+  Generate a HelmRelease object per target namespace.
+
+  The leading '---' is needed to properly separate the objects from
+  one another within the rendered file.
+*/ -}}
+{{- range $ns := .Values.argoNamespaces }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: {{.}}-argo-controller
+spec:
+  releaseName: argo-controller
+  targetNamespace: {{ $ns }}
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-controller
+    version: 0.1.0
+  values:
+    persistence:
+      host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
+      port: 5432
+      database: argo
+      username: argo
+      password:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
+{{- end }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: argo-server
+spec:
+  releaseName: argo-server
+  targetNamespace: argo-ui
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-server
+    version: 0.1.0
+  values:
+    persistence:
+      host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
+      port: 5432
+      database: argo
+      username: argo
+      password:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
