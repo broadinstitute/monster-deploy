@@ -42,8 +42,8 @@ spec:
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
       port: 5432
-      database: command-center-argo
-      username: command-center-argo
+      database: argo
+      username: argo
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
