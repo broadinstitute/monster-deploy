@@ -16,7 +16,7 @@ spec:
     version: 0.0.5
   values:
     secrets:
-      {{- range .Values.argoNamespaces }}
+      {{- range (append .Values.argoNamespaces "argo-ui") }}
       - secretName: {{ $secretName }}
         nameSpace: {{.}}
         vals:
@@ -48,3 +48,25 @@ spec:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
 {{- end }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: argo-server
+spec:
+  releaseName: argo-server
+  targetNamespace: argo-ui
+  resetValues: true
+  chart:
+    git: git://github.com/broadinstitute/monster-helm.git
+    ref: dm-argo-server-DSPDC-672
+    path: charts/argo-server
+  values:
+    persistence:
+      host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
+      port: 5432
+      database: argo
+      username: argo
+      password:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
