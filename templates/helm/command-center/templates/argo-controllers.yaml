@@ -35,9 +35,9 @@ spec:
   targetNamespace: {{.}}
   resetValues: true
   chart:
-    git: git://github.com/broadinstitute/monster-helm.git
-    ref: dm-argo-controller-DSPDC-671
-    path: charts/argo-controller
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-controller
+    version: 0.1.0
   values:
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
