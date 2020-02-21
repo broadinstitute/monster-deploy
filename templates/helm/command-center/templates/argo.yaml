@@ -16,15 +16,21 @@ spec:
     version: 0.0.5
   values:
     secrets:
-      {{- range (append .Values.argoNamespaces "argo-ui") }}
+      {{- range $ns := (append .Values.argoNamespaces "argo-ui") }}
       - secretName: {{ $secretName }}
-        nameSpace: {{.}}
+        nameSpace: {{ $ns }}
         vals:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/{{ $env }}/command-center/cloudsql/users/argo
             vaultKey: password
       {{- end }}
-{{- range .Values.argoNamespaces }}
+{{- /*
+  Generate a HelmRelease object per target namespace.
+
+  The leading '---' is needed to properly separate the objects from
+  one another within the rendered file.
+*/ -}}
+{{- range $ns := .Values.argoNamespaces }}
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -32,7 +38,7 @@ metadata:
   name: {{.}}-argo-controller
 spec:
   releaseName: argo-controller
-  targetNamespace: {{.}}
+  targetNamespace: {{ $ns }}
   resetValues: true
   chart:
     repository: https://broadinstitute.github.io/monster-helm
