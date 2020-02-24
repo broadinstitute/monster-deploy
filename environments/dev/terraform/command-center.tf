@@ -19,12 +19,8 @@ module command_center {
   }
 
   is_production = false
-  dns_zone_name = "monster-dev"
   k8s_cluster_size = 2
   k8s_machine_type = "n1-standard-2"
   # 4 CPU, 15 GiB of RAM.
   db_tier = "db-custom-4-15360"
-  vault_prefix = "${local.vault_prefix}/command-center"
-  cloudsql_db_names = ["argo", "airflow", "datarepo", "stairway"]
-  cloudsql_user_names = ["argo", "airflow", "datarepo"]
 }

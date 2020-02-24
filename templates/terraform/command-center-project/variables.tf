@@ -3,11 +3,6 @@ variable is_production {
   description = "If true, production-level logging etc. will be enabled"
 }
 
-variable dns_zone_name {
-  type = string
-  description = "Subdomain to use for DNS in the project."
-}
-
 variable k8s_cluster_size {
   type = number
   description = "Number of nodes to run in the GKE cluster."
@@ -23,17 +18,7 @@ variable db_tier {
   description = "Machine tier for the Cloud SQL proxy instance backing command-center services."
 }
 
-variable vault_prefix {
-  type = string
-  description = "Path prefix for secrets written to Vault."
-}
-
-variable cloudsql_db_names {
-  type = list(string)
-  description = "List of names of databases which should be added to CloudSQL."
-}
-
-variable cloudsql_user_names {
-  type = list(string)
-  description = "List of user names which should be added to CloudSQL."
+locals {
+  vault_prefix = "secret/dsde/monster/${var.is_production ? "prod" : "dev"}/command-center"
+  dns_zone_name = "monster-${var.is_production ? "prod" : "dev"}"
 }
