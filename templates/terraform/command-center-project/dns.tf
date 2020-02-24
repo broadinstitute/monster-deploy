@@ -6,6 +6,13 @@
 ###
 resource google_dns_managed_zone dns_zone {
   provider = google.target
-  name = var.dns_zone_name
-  dns_name = "${var.dns_zone_name}.broadinstitute.org."
+  name = local.dns_zone_name
+  dns_name = "${local.dns_zone_name}.broadinstitute.org."
+}
+
+module dns_names {
+  source = "/templates/dns"
+  dependencies = [module.enable_services]
+  zone_name = google_dns_managed_zone.dns_zone.dns_name
+  dns_names = ["argo"]
 }

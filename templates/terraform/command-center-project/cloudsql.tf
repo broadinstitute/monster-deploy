@@ -13,8 +13,8 @@ module cloudsql {
     role = "database"
     state = "active"
   }
-  db_names = var.cloudsql_db_names
-  user_names = var.cloudsql_user_names
-  vault_prefix = var.vault_prefix
+  db_names = ["argo"]
+  user_names = ["argo"]
+  vault_prefix = local.vault_prefix
   dependencies = module.enable_services
 }
