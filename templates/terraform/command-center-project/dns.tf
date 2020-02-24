@@ -12,7 +12,11 @@ resource google_dns_managed_zone dns_zone {
 
 module dns_names {
   source = "/templates/dns"
+  providers = {
+    google.target = google.target
+  }
   dependencies = [module.enable_services]
-  zone_name = google_dns_managed_zone.dns_zone.dns_name
+  zone_gcp_name = google_dns_managed_zone.dns_zone.name
+  zone_dns_name = google_dns_managed_zone.dns_zone.dns_name
   dns_names = ["argo"]
 }
