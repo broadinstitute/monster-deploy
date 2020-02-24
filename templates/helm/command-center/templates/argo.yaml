@@ -64,12 +64,9 @@ spec:
   targetNamespace: argo-ui
   resetValues: true
   chart:
-    #repository: https://broadinstitute.github.io/monster-helm
-    #name: argo-server
-    #version: 0.2.0
-    git: git://github.com/broadinstitute/monster-helm.git
-    ref: dm-argo-ingress-DSPDC-809
-    path: charts/argo-server
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-server
+    version: 0.2.0
   values:
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
@@ -83,4 +80,4 @@ spec:
       ingress:
         create: true
         ipName: argo-ip
-        domainName: argo.monster-dev.broadinstitute.org
+        domainName: argo.monster-{{ .Values.env }}.broadinstitute.org
