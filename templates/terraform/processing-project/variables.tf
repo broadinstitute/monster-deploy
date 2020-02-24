@@ -47,3 +47,8 @@ variable vault_prefix {
   type = string
   description = "Path prefix for secrets written to Vault."
 }
+
+variable jade_repo_email {
+  type = string
+  description = "Email for the service account running the Jade Repo."
+}
