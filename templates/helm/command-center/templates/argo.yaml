@@ -35,9 +35,9 @@ spec:
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: {{.}}-argo-controller
+  name: {{$ns}}-argo-controller
 spec:
-  releaseName: argo-controller
+  releaseName: {{$ns}}-argo-controller
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
