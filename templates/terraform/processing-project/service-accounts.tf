@@ -62,3 +62,11 @@ module argo_runner_account {
   vault_path = "${var.vault_prefix}/service-accounts/argo-runner"
   roles = ["container.developer"]
 }
+
+resource google_project_iam_member command_center_argo_account_iam {
+  for_each = toset(["dataflow.developer", "compute.viewer"])
+
+  provider = google.target
+  role = "roles/${each.value}"
+  member = "serviceAccount:${var.command_center_argo_account_email}"
+}
