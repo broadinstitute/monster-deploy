@@ -52,3 +52,8 @@ variable command_center_argo_account_email {
   type = string
   description = "Email which is tied to the command-center Argo service account."
 }
+
+variable jade_repo_email {
+  type = string
+  description = "Email for the service account running the Jade Repo."
+}

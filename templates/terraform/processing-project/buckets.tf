@@ -98,7 +98,6 @@ resource google_storage_bucket_iam_member staging_iam_reader {
   member = "group:${each.value}"
 }
 
-
 resource google_storage_bucket_iam_member command_center_argo_staging_bucket_iam {
   provider = google.target
   bucket =  google_storage_bucket.staging_storage.name
@@ -117,4 +116,13 @@ resource google_storage_bucket_iam_member command_center_argo_temp_bucket_iam {
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
   role = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
+}
+
+resource google_storage_bucket_iam_member staging_account_iam_reader {
+  provider = google.target
+  bucket = google_storage_bucket.staging_storage.name
+  # The legacyBucketReader policy seems to be the correct role to have the equivalent of a "Bucket Reader" ACL,
+  # as noted here https://cloud.google.com/storage/docs/access-control/iam
+  role = "roles/storage.legacyBucketReader"
+  member = "serviceAccount:${var.jade_repo_email}"
 }

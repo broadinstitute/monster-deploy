@@ -7,6 +7,6 @@ module command_center_gke_runner_account {
 
   account_id = "command-center-gke-runner"
   display_name = "Service account to run GKE system pods"
-  vault_path = "${var.vault_prefix}/service-accounts/gke-runner"
+  vault_path = "${local.vault_prefix}/service-accounts/gke-runner"
   roles = ["logging.logWriter", "monitoring.metricWriter", "monitoring.viewer"]
 }

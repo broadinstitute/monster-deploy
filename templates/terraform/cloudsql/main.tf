@@ -49,7 +49,7 @@ resource google_sql_user db_user {
   for_each = toset(var.user_names)
 
   provider = google.target
-  name = "${var.name_prefix}-${each.value}"
+  name = each.value
   password = random_id.db_password[each.value].hex
   instance = google_sql_database_instance.postgres.name
 }
@@ -70,7 +70,7 @@ resource google_sql_database db {
   for_each = toset(var.db_names)
 
   provider = google.target
-  name = "${var.name_prefix}-${each.value}"
+  name = each.value
   instance = google_sql_database_instance.postgres.name
   charset = "UTF8"
   collation = "en_US.UTF8"

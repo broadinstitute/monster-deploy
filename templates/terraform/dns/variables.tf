@@ -9,7 +9,12 @@ variable dependencies {
   description = "Work-around for Terraform 0.12's lack of support for 'depends_on' in custom modules."
 }
 
-variable zone_name {
+variable zone_gcp_name {
   type = string
-  description = "DNS zone name for any new DNS resources."
+  description = "GCP name for the managed DNS zone to generate records within."
+}
+
+variable zone_dns_name {
+  type = string
+  description = "DNS name of the zone to generate records within."
 }

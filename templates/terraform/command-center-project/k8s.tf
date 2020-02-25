@@ -13,7 +13,7 @@ module master {
   network = module.k8s_network.network_link
   subnetwork = module.k8s_network.subnet_links[0]
 
-  vault_path = "${var.vault_prefix}/gke"
+  vault_path = "${local.vault_prefix}/gke"
 }
 
 module node_pool {

@@ -22,6 +22,7 @@ declare -ra PROCESSING_NAMESPACES=(
 declare -ra CRDS=(
   https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
   https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
+  https://raw.githubusercontent.com/argoproj/argo/${ARGO_VERSION}/manifests/base/crds/workflow-crd.yaml
 )
 
 #####

@@ -11,7 +11,11 @@
         "region": { "type": "string" }
       },
       "required": ["name", "project", "region"]
+    },
+    "argoNamespaces": {
+      "type": "array",
+      "items": { "type": "string" }
     }
   },
-  "required": ["env", "cloudsql"]
+  "required": ["env", "cloudsql", "argoNamespaces"]
 }
