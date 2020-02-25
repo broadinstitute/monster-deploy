@@ -12,7 +12,7 @@ declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
   secrets-manager
   cloudsql-proxy
   argo-ui
-  airflow
+  v2f
 )
 declare -ra PROCESSING_NAMESPACES=(
   fluxcd
