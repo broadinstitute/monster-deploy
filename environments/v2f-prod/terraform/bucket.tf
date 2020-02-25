@@ -4,6 +4,12 @@ provider google-beta {
   alias = "v2f"
 }
 
+provider google-beta {
+  project = "broad-dsp-monster-dev"
+  region = "us-central1"
+  alias = "command-center"
+}
+
 provider vault {
   alias = "v2f"
 }
@@ -27,8 +33,8 @@ module v2f_writer {
   roles = []
 }
 
-data google_project v2f_project {
-  provider = google-beta.v2f
+data google_project command_center {
+  provider = google-beta.command-center
 }
 
 resource google_storage_bucket_iam_member v2f_iam {
@@ -40,8 +46,9 @@ resource google_storage_bucket_iam_member v2f_iam {
 }
 
 resource google_service_account_iam_binding v2f_binding_iam {
-  service_account_id = module.v2f_writer.email
+  provider = google-beta.command-center
+  service_account_id = module.v2f_writer.id
   role = "roles/iam.workloadIdentityUser"
 
-  members = ["serviceAccount:${data.google_project.v2f_project.name}.svc.id.goog[v2f/argo-runner]"]
+  members = ["serviceAccount:${data.google_project.command_center.name}.svc.id.goog[v2f/argo-runner]"]
 }
