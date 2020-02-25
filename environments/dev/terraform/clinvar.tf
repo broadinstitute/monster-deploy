@@ -13,7 +13,7 @@ module clinvar {
 
   project_name = "broad-dsp-monster-clingen-dev"
   is_production = false
-  command_center_argo_account_email = "TO DO"
+  command_center_argo_account_email = module.command_center.clinvar_argo_runner_email
   region = "us-central1"
   k8s_zone = "a"
   k8s_scaled_cluster_max_size = 3
