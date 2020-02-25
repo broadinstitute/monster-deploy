@@ -28,8 +28,8 @@ data google_project current_project {
   provider = google.target
 }
 
-resource "google_service_account_iam_binding" "admin-account-iam" {
-  service_account_id = module.clinvar_argo_runner_account.email
+resource google_service_account_iam_binding admin_account_iam {
+  service_account_id = module.clinvar_argo_runner_account.id
   role = "roles/iam.workloadIdentityUser"
 
   members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[clinvar/argo-runner]"]
