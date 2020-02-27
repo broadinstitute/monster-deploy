@@ -23,7 +23,7 @@ resource google_storage_bucket v2f_results_bucket {
 module v2f_writer {
   source = "/templates/google-sa"
   providers = {
-    google.target = google-beta.v2f,
+    google.target = google-beta.command-center,
     vault.target = vault.v2f
   }
 
@@ -40,7 +40,7 @@ data google_project command_center {
 resource google_storage_bucket_iam_member v2f_iam {
   provider = google-beta.v2f
   bucket = google_storage_bucket.v2f_results_bucket.name
-  role = "roles/storage.objectCreator"
+  role = "roles/storage.objectAdmin"
   member = "serviceAccount:${module.v2f_writer.email}"
   depends_on = [module.v2f_writer.delay]
 }
