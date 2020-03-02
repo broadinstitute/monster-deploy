@@ -18,6 +18,7 @@ module enable_services {
     "runtimeconfig.googleapis.com",
     "stackdriver.googleapis.com",
     "storage-api.googleapis.com",
-    "storage-component.googleapis.com"
+    "storage-component.googleapis.com",
+    "bigquery.googleapis.com"
   ]
 }
