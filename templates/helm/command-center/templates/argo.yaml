@@ -43,7 +43,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-controller
-    version: 0.1.0
+    version: 0.2.0
   values:
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
@@ -66,7 +66,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-server
-    version: 0.2.0
+    version: 0.3.0
   values:
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy

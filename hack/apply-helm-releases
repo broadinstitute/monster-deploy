@@ -98,26 +98,15 @@ function main () {
   fi
 
   local -r config_dir=${env_dir}/.kubeconfig
-  local -r processing_config_dir=${config_dir}/processing
-  mkdir -p ${processing_config_dir}
+  mkdir -p ${config_dir}
 
   local -r helm_dir=${env_dir}/.helm
   mkdir -p ${helm_dir}
-
-  # Pull the names of expected processing projects from Vault.
-  local -ra project_names=($(get_processing_names ${env}))
 
   # Push releases to the command center.
   local -r center_config=${config_dir}/command-center
   get_command_center_config ${env} ${center_config}
   run_command_center_release ${center_config} ${env} ${helm_dir}
-
-  # Push releases to processing projects.
-  for project in ${project_names[@]}; do
-    local -r project_config=${processing_config_dir}/${project}
-    get_processing_config ${env} ${project} ${project_config}
-    run_processing_release ${project_config} ${env} ${helm_dir}
-  done
 }
 
 main ${@}

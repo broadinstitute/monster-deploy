@@ -14,11 +14,6 @@ declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
   argo-ui
   v2f
 )
-declare -ra PROCESSING_NAMESPACES=(
-  fluxcd
-  secrets-manager
-  argo
-)
 declare -ra CRDS=(
   https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
   https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
@@ -122,11 +117,7 @@ function main () {
   fi
 
   local -r config_dir=${env_dir}/.kubeconfig
-  local -r processing_config_dir=${config_dir}/processing
-  mkdir -p ${processing_config_dir}
-
-  # Pull the names of expected processing projects from Vault.
-  local -ra project_names=($(get_processing_names ${env}))
+  mkdir -p ${config_dir}
 
   # Set up the command center for the environment.
   local -ra all_command_center_namespaces=(${COMMAND_CENTER_BASE_NAMESPACES[@]} ${project_names[@]})
@@ -135,15 +126,6 @@ function main () {
   get_command_center_config ${env} ${center_config}
   install_namespaces ${center_config} ${all_command_center_namespaces[@]}
   install_crds ${center_config} ${CRDS[@]}
-
-  # Set up each processing project.
-  for project in ${project_names[@]}; do
-    local -r project_config=${processing_config_dir}/${project}
-
-    get_processing_config ${env} ${project} ${project_config}
-    install_namespaces ${project_config} ${PROCESSING_NAMESPACES[@]}
-    install_crds ${project_config} ${CRDS[@]}
-  done
 }
 
 main ${@}
