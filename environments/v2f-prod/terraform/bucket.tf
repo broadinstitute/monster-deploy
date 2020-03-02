@@ -52,3 +52,10 @@ resource google_service_account_iam_binding v2f_binding_iam {
 
   members = ["serviceAccount:${data.google_project.command_center.name}.svc.id.goog[v2f/argo-runner]"]
 }
+
+resource google_storage_bucket_iam_member v2f_reader_iam {
+  provider = google-beta.v2f
+  bucket = google_storage_bucket.v2f_results_bucket.name
+  role = "roles/storage.objectViewer"
+  member = "group:v2fcir@broadinstitute.org"
+}
