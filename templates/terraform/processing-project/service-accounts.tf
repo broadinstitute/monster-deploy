@@ -12,7 +12,7 @@ module dataflow_runner_account {
 }
 
 resource google_project_iam_member command_center_argo_account_iam {
-  for_each = toset(["dataflow.developer", "compute.viewer"])
+  for_each = toset(["dataflow.developer", "compute.viewer", "bigquery.jobUser"])
 
   provider = google.target
   role = "roles/${each.value}"

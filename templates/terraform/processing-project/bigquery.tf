@@ -9,8 +9,4 @@ resource google_bigquery_dataset dataset {
     role = "roles/bigquery.dataEditor"
     user_by_email = var.command_center_argo_account_email
   }
-  access {
-    role = "roles/bigquery.jobUser"
-    user_by_email = var.command_center_argo_account_email
-  }
 }
