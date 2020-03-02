@@ -1,8 +1,7 @@
 resource google_bigquery_dataset dataset {
   provider = google.target
-  dataset_id = "bigquery-dataset-dev"
-  friendly_name = "BigQuery Dev Dataset"
-  description = "BigQuery development dataset"
+  dataset_id = "monster_staging_data"
+  description = "Dataset used by the Monster team for ingest ETL"
   location = "US"
   default_table_expiration_ms = 604800000 # 7 days
 
