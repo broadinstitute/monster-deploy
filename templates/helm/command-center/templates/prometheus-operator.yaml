@@ -1,0 +1,68 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator-secrets
+spec:
+  releaseName: prometheus-operator-secrets
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: grafana-google-client-secret
+        nameSpace: monitoring
+        vals:
+          - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
+            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            vaultKey: key
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator
+spec:
+  releaseName: prometheus-operator
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: prometheus-operator
+    version: 8.10.0
+  values:
+    prometheusOperator:
+      createCustomResource: false
+    grafana:
+      rbac:
+        create: true
+        pspEnabled: true
+      plugins: ["doitintl-bigquery-datasource"]
+      env:
+        GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Editor"
+        GF_AUTH_GOOGLE_ENABLED: "true"
+        GF_AUTH_GOOGLE_ALLOW_SIGN_UP: "true"
+        GF_AUTH_GOOGLE_CLIENT_ID: "274016428892-rkbfqfj472iqh5r9n523gr6g1l29o21f.apps.googleusercontent.com"
+        GF_AUTH_GOOGLE_SCOPES: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        GF_AUTH_GOOGLE_AUTH_URL: "https://accounts.google.com/o/oauth2/auth"
+        GF_AUTH_GOOGLE_AUTH_TOKEN: "https://accounts.google.com/o/oauth2/token"
+        GF_AUTH_GOOGLE_API_URL: "https://www.googleapis.com/oauth2/v1/userinfo"
+        GF_AUTH_GOOGLE_ALLOWED_DOMAINS: "broadinstitute.org"
+        GF_SERVER_DOMAIN: "grafana.monster-dev.broadinstitute.org"
+        GF_SERVER_ROOT_URL: "https://grafana.monster-dev.broadinstitute.org"
+      envFromSecret: "grafana-google-client-secret"
+      service:
+        type: NodePort
+      ingress:
+        enabled: true
+        path: /*
+        hosts:
+          - grafana.monster-dev.broadinstitute.org
+          - grafana-global-dev.monster-dev.broadinstitute.org
+        annotations:
+          kubernetes.io/ingress.global-static-ip-name: grafana-ip
+          networking.gke.io/managed-certificates: "grafana-tls"
+          kubernetes.io/ingress.allow-http: "false"
+          ingress.kubernetes.io/whitelist-source-range: "69.173.112.0/21,69.173.127.232/29,69.173.127.128/26,69.173.127.0/25,69.173.127.240/28,69.173.127.224/30,69.173.127.230/31,69.173.120.0/22,69.173.127.228/32,69.173.126.0/24,69.173.96.0/20,69.173.64.0/19,69.173.127.192/27,69.173.124.0/23"

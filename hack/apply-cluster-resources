@@ -13,11 +13,19 @@ declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
   cloudsql-proxy
   argo-ui
   v2f
+  monitoring
 )
 declare -ra CRDS=(
   https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
   https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
   https://raw.githubusercontent.com/argoproj/argo/${ARGO_VERSION}/manifests/base/crds/workflow-crd.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+
 )
 
 #####
