@@ -18,7 +18,25 @@ spec:
         vals:
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
             path: secret/dsde/monster/{{ .Values.env }}/oauth2
-            vaultKey: key
+            vaultKey: web.client_secret
+          - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_ID
+            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            vaultKey: web.client_id
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: gcp-managed-cert-grafana
+spec:
+  releaseName: gcp-managed-cert-grafana
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/monster-helm
+    name: gcp-managed-cert
+    version: 0.1.0
+  values:
+    domainName: grafana.monster-{{ .Values.env }}.broadinstitute.org
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -44,14 +62,13 @@ spec:
         GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Editor"
         GF_AUTH_GOOGLE_ENABLED: "true"
         GF_AUTH_GOOGLE_ALLOW_SIGN_UP: "true"
-        GF_AUTH_GOOGLE_CLIENT_ID: "274016428892-rkbfqfj472iqh5r9n523gr6g1l29o21f.apps.googleusercontent.com"
         GF_AUTH_GOOGLE_SCOPES: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
         GF_AUTH_GOOGLE_AUTH_URL: "https://accounts.google.com/o/oauth2/auth"
         GF_AUTH_GOOGLE_AUTH_TOKEN: "https://accounts.google.com/o/oauth2/token"
         GF_AUTH_GOOGLE_API_URL: "https://www.googleapis.com/oauth2/v1/userinfo"
         GF_AUTH_GOOGLE_ALLOWED_DOMAINS: "broadinstitute.org"
-        GF_SERVER_DOMAIN: "grafana.monster-dev.broadinstitute.org"
-        GF_SERVER_ROOT_URL: "https://grafana.monster-dev.broadinstitute.org"
+        GF_SERVER_DOMAIN: "grafana.monster-{{ .Values.env }}.broadinstitute.org"
+        GF_SERVER_ROOT_URL: "https://grafana.monster-{{ .Values.env }}.broadinstitute.org"
       envFromSecret: "grafana-google-client-secret"
       service:
         type: NodePort
@@ -59,8 +76,8 @@ spec:
         enabled: true
         path: /*
         hosts:
-          - grafana.monster-dev.broadinstitute.org
-          - grafana-global-dev.monster-dev.broadinstitute.org
+          - grafana.monster-{{ .Values.env }}.broadinstitute.org
+          - grafana-global-{{ .Values.env }}.monster-{{ .Values.env }}.broadinstitute.org
         annotations:
           kubernetes.io/ingress.global-static-ip-name: grafana-ip
           networking.gke.io/managed-certificates: "grafana-tls"
