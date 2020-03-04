@@ -59,3 +59,10 @@ resource google_storage_bucket_iam_member v2f_reader_iam {
   role = "roles/storage.objectViewer"
   member = "group:v2fcir@broadinstitute.org"
 }
+
+resource google_storage_bucket_iam_member v2f_admin_iam {
+  provider = google-beta.v2f
+  bucket = google_storage_bucket.v2f_results_bucket.name
+  role = "roles/storage.objectAdmin"
+  member = "user:schaluva@broadinstitute.org"
+}
