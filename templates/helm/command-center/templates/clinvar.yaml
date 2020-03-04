@@ -1,0 +1,18 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: clinvar-orchestration
+spec:
+  releaseName: clinvar-orchestration
+  targetNamespace: clinvar
+  resetValues: true
+  chart:
+    git: git://github.com/databiosphere/clinvar-ingest.git
+    ref: master
+    path: orchestration
+  values:
+    gcs:
+      bucketName: broad-dsp-monster-clingen-dev-staging-storage
+    serviceAccount:
+      k8sName: argo-runner
+      googleName: clinvar-argo-runner@broad-dsp-monster-dev.iam.gserviceaccount.com
