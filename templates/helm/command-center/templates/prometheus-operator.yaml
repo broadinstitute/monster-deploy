@@ -73,10 +73,6 @@ spec:
         GF_SERVER_DOMAIN: "grafana.monster-{{ .Values.env }}.broadinstitute.org"
         GF_SERVER_ROOT_URL: "https://grafana.monster-{{ .Values.env }}.broadinstitute.org"
       envFromSecret: "grafana-google-client-secret"
-      adminPassword: null
-      admin:
-        existingSecret: grafana-google-client-secret
-        passwordKey: GF_SECURITY_ADMIN_PASSWORD
       service:
         type: NodePort
       ingress:
