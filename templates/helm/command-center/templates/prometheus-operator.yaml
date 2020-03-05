@@ -34,7 +34,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: gcp-managed-cert
-    version: 0.1.0
+    version: 0.1.1
   values:
     domainName: grafana.monster-{{ .Values.env }}.broadinstitute.org
 ---
