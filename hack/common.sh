@@ -11,7 +11,7 @@ declare -r HELM=lachlanevenson/k8s-helm:v3.0.3
 
 declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
 declare -r SECRETS_MANAGER_VERSION=release-1.0.2
-declare -r ARGO_VERSION=v2.6.0
+declare -r ARGO_VERSION=v2.6.1
 
 #####
 ## Read the kubeconfig for a command-center GKE cluster from its expected
