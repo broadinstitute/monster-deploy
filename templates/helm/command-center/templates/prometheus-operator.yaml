@@ -18,10 +18,10 @@ spec:
         vals:
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
             path: secret/dsde/monster/{{ .Values.env }}/oauth2
-            vaultKey: web.client_secret
+            vaultKey: client_secret
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_ID
             path: secret/dsde/monster/{{ .Values.env }}/oauth2
-            vaultKey: web.client_id
+            vaultKey: client_id
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
