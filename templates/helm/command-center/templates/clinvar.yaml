@@ -12,7 +12,10 @@ spec:
     path: orchestration
   values:
     gcs:
-      bucketName: broad-dsp-monster-clingen-dev-staging-storage
+      bucketName: broad-dsp-monster-clingen-{{ .Values.env }}-staging-storage
     serviceAccount:
       k8sName: argo-runner
-      googleName: clinvar-argo-runner@broad-dsp-monster-dev.iam.gserviceaccount.com
+      googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
+    cron:
+      # 8:00am every day for now, as we test.
+      schedule: "0 8 * * *"
