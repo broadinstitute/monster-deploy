@@ -1,0 +1,88 @@
+---
+{{ $secretName := "grafana-secrets" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator-secrets
+spec:
+  releaseName: prometheus-operator-secrets
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: monitoring
+        vals:
+          - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
+            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            vaultKey: client_secret
+          - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_ID
+            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            vaultKey: client_id
+          - kubeSecretKey: GF_SECURITY_ADMIN_PASSWORD
+            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            vaultKey: admin_password
+---
+{{ $grafanaCertName := "grafana-certificate" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: gcp-managed-cert-grafana
+spec:
+  releaseName: {{ $grafanaCertName }}
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/monster-helm
+    name: gcp-managed-cert
+    version: 0.1.1
+  values:
+    domainName: grafana.monster-{{ .Values.env }}.broadinstitute.org
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator
+spec:
+  releaseName: prometheus-operator
+  targetNamespace: monitoring
+  resetValues: true
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: prometheus-operator
+    version: 8.10.0
+  values:
+    prometheusOperator:
+      createCustomResource: false
+    grafana:
+      rbac:
+        create: true
+        pspEnabled: true
+      plugins: ["doitintl-bigquery-datasource"]
+      env:
+        GF_USERS_AUTO_ASSIGN_ORG_ROLE: "Editor"
+        GF_AUTH_GOOGLE_ENABLED: "true"
+        GF_AUTH_GOOGLE_ALLOW_SIGN_UP: "true"
+        GF_AUTH_GOOGLE_SCOPES: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        GF_AUTH_GOOGLE_AUTH_URL: "https://accounts.google.com/o/oauth2/auth"
+        GF_AUTH_GOOGLE_AUTH_TOKEN: "https://accounts.google.com/o/oauth2/token"
+        GF_AUTH_GOOGLE_API_URL: "https://www.googleapis.com/oauth2/v1/userinfo"
+        GF_AUTH_GOOGLE_ALLOWED_DOMAINS: "broadinstitute.org"
+        GF_SERVER_DOMAIN: "grafana.monster-{{ .Values.env }}.broadinstitute.org"
+        GF_SERVER_ROOT_URL: "https://grafana.monster-{{ .Values.env }}.broadinstitute.org"
+      envFromSecret: {{ $secretName }}
+      service:
+        type: NodePort
+      ingress:
+        enabled: true
+        path: /*
+        hosts:
+          - grafana.monster-{{ .Values.env }}.broadinstitute.org
+        annotations:
+          kubernetes.io/ingress.global-static-ip-name: grafana-ip
+          networking.gke.io/managed-certificates: "{{ $grafanaCertName }}"
+          kubernetes.io/ingress.allow-http: "false"

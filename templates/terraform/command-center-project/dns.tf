@@ -18,5 +18,5 @@ module dns_names {
   dependencies = [module.enable_services]
   zone_gcp_name = google_dns_managed_zone.dns_zone.name
   zone_dns_name = google_dns_managed_zone.dns_zone.dns_name
-  dns_names = ["argo"]
+  dns_names = ["argo","grafana"]
 }
