@@ -1,4 +1,5 @@
 ---
+{{ $secretName := "grafana-secrets" }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -13,7 +14,7 @@ spec:
     version: 0.0.5
   values:
     secrets:
-      - secretName: grafana-google-client-secret
+      - secretName: {{ $secretName }}
         nameSpace: monitoring
         vals:
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
@@ -26,12 +27,13 @@ spec:
             path: secret/dsde/monster/{{ .Values.env }}/oauth2
             vaultKey: admin_password
 ---
+{{ $grafanaCertName := "grafana-certificate" }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
   name: gcp-managed-cert-grafana
 spec:
-  releaseName: gcp-managed-cert-grafana
+  releaseName: {{ $grafanaCertName }}
   targetNamespace: monitoring
   resetValues: true
   chart:
@@ -72,7 +74,7 @@ spec:
         GF_AUTH_GOOGLE_ALLOWED_DOMAINS: "broadinstitute.org"
         GF_SERVER_DOMAIN: "grafana.monster-{{ .Values.env }}.broadinstitute.org"
         GF_SERVER_ROOT_URL: "https://grafana.monster-{{ .Values.env }}.broadinstitute.org"
-      envFromSecret: "grafana-google-client-secret"
+      envFromSecret: {{ $secretName }}
       service:
         type: NodePort
       ingress:
@@ -82,6 +84,5 @@ spec:
           - grafana.monster-{{ .Values.env }}.broadinstitute.org
         annotations:
           kubernetes.io/ingress.global-static-ip-name: grafana-ip
-          networking.gke.io/managed-certificates: "gcp-managed-cert-grafana"
+          networking.gke.io/managed-certificates: "{{ $grafanaCertName }}"
           kubernetes.io/ingress.allow-http: "false"
-          ingress.kubernetes.io/whitelist-source-range: "69.173.112.0/21,69.173.127.232/29,69.173.127.128/26,69.173.127.0/25,69.173.127.240/28,69.173.127.224/30,69.173.127.230/31,69.173.120.0/22,69.173.127.228/32,69.173.126.0/24,69.173.96.0/20,69.173.64.0/19,69.173.127.192/27,69.173.124.0/23"
