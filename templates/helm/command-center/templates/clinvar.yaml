@@ -1,0 +1,21 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: clinvar-orchestration
+spec:
+  releaseName: clinvar-orchestration
+  targetNamespace: clinvar
+  resetValues: true
+  chart:
+    git: git://github.com/databiosphere/clinvar-ingest.git
+    ref: master
+    path: orchestration
+  values:
+    gcs:
+      bucketName: broad-dsp-monster-clingen-{{ .Values.env }}-staging-storage
+    serviceAccount:
+      k8sName: argo-runner
+      googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
+    cron:
+      # 8:00am every day for now, as we test.
+      schedule: "0 8 * * *"

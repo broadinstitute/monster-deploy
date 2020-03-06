@@ -12,8 +12,10 @@ declare -ra COMMAND_CENTER_BASE_NAMESPACES=(
   secrets-manager
   cloudsql-proxy
   argo-ui
-  v2f
   monitoring
+  clinvar
+  encode
+  dog-aging
 )
 declare -ra CRDS=(
   https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
@@ -128,7 +130,7 @@ function main () {
   mkdir -p ${config_dir}
 
   # Set up the command center for the environment.
-  local -ra all_command_center_namespaces=(${COMMAND_CENTER_BASE_NAMESPACES[@]} ${project_names[@]})
+  local -ra all_command_center_namespaces=(${COMMAND_CENTER_BASE_NAMESPACES[@]})
   local -r center_config=${config_dir}/command-center
 
   get_command_center_config ${env} ${center_config}
