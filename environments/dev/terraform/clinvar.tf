@@ -17,6 +17,6 @@ module clinvar {
   region = "us-central1"
   reader_groups = ["clingendevs@broadinstitute.org"]
   jade_repo_email = "jade-k8-sa@broad-jade-dev.iam.gserviceaccount.com"
-  deletion_age_days = null # FIXME: Reset back to 30 after we set up prod.
+  deletion_age_days = 14
   vault_prefix = "${local.vault_prefix}/processing-projects/clinvar"
 }
