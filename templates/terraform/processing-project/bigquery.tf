@@ -6,7 +6,19 @@ resource google_bigquery_dataset dataset {
   default_table_expiration_ms = 604800000 # 7 days
 
   access {
-    role = "roles/bigquery.dataEditor"
+    role = "OWNER"
+    special_group = "projectOwners"
+  }
+  access {
+    role = "EDITOR"
+    special_group = "projectWriters"
+  }
+  access {
+    role = "READER"
+    special_group = "projectReaders"
+  }
+  access {
+    role = "EDITOR"
     user_by_email = var.command_center_argo_account_email
   }
 }
