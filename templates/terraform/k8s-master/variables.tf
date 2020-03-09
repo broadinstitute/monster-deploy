@@ -22,6 +22,11 @@ variable subnetwork {
   type = string
 }
 
+variable restrict_master_access {
+  type = bool
+  description = "If true, access to the control plane will be restricted to only Broad IPs"
+}
+
 variable vault_path {
   type = string
   description = "Path in Vault where secrets for the master should be stored."

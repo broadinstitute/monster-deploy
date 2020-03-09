@@ -1,3 +1,4 @@
+{{ $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -12,10 +13,16 @@ spec:
     path: orchestration
   values:
     gcs:
-      bucketName: broad-dsp-monster-clingen-{{ .Values.env }}-staging-storage
+      bucketName: {{ $project }}-staging-storage
     serviceAccount:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
       # 8:00am every day for now, as we test.
       schedule: "0 8 * * *"
+    dataflow:
+      project: {{ $project }}
+      tmpBucketName: {{ $project }}-temp-storage
+      subnetName: monster-processing-network
+      workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
+      useFlexRS: {{ eq .Values.env "prod" }}

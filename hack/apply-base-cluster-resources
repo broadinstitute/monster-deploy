@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
+declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
+
+declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
+declare -r SECRETS_MANAGER_VERSION=release-1.0.2
+
+declare -ra CRDS=(
+  https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
+  https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
+)
+
+declare -ra BASE_NAMESPACES=(
+  fluxcd
+  secrets-manager
+)
+
+# Pull in common definitions.
+source ${SCRIPT_DIR}/common.sh
+
+#####
+## Install operators which handle our "base" CRDs:
+##  1. Flux, for publishing Helm releases
+##  2. secrets-manager, for syncing Vault
+##
+## It's important to install these before any other
+## operators / deployments because if they're all applied
+## together, it's possible for the secrets-manager
+## to be enqueued after deployments that rely on it,
+## deadlocking the entire deployment.
+#####
+function install_base_operators () {
+  local -r kubeconfig=$1 env=$2 helm_dir=$3
+
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
+
+  ${helm[@]} dependency update /charts/crd-operators
+  ${helm[@]} upgrade base-crd-operators /charts/crd-operators \
+    --namespace fluxcd \
+    --install \
+    --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
+    --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
+}
+
+#####
+## Entrypoint to the script.
+##
+## Ensures expected namespaces and CRDs are registered in the
+## command-center and processing clusters within a core Monster
+## environment.
+#####
+function main () {
+  # Check args.
+  if [ $# -ne 1 ]; then
+    1>&2 echo Usage: ${0} '<env>'
+    exit 1
+  fi
+
+  # Make sure config exists.
+  local -r env=$1
+  local -r env_dir=${REPO_ROOT}/environments/$env
+  if [ ! -d ${env_dir} ]; then
+    1>&2 echo Error: Invalid environment "'$1'"
+    exit 1
+  fi
+
+  local -r config_dir=${env_dir}/.kubeconfig
+  mkdir -p ${config_dir}
+
+  local -r helm_dir=${env_dir}/.helm
+  mkdir -p ${helm_dir}
+
+  local -r center_config=${config_dir}/command-center
+
+  # Set up the command center for the environment.
+  get_command_center_config ${env} ${center_config}
+  apply_namespaces ${center_config} ${BASE_NAMESPACES[@]}
+  apply_urls ${center_config} ${CRDS[@]}
+  install_base_operators ${center_config} ${env} ${helm_dir}
+}
+
+main ${@}

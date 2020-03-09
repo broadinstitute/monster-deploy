@@ -37,13 +37,13 @@ kind: HelmRelease
 metadata:
   name: {{$ns}}-argo-controller
 spec:
-  releaseName: {{$ns}}-argo-controller
+  releaseName: {{$ns}}-argo
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-controller
-    version: 0.3.0
+    version: 0.3.1
   values:
     debug: {{ eq $env "dev" }}
     persistence:
@@ -54,6 +54,7 @@ spec:
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
+      clusterId: command-center
 {{- end }}
 ---
 apiVersion: helm.fluxcd.io/v1
@@ -61,13 +62,13 @@ kind: HelmRelease
 metadata:
   name: argo-server
 spec:
-  releaseName: argo-server
+  releaseName: argo
   targetNamespace: argo-ui
   resetValues: true
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-server
-    version: 0.4.0
+    version: 0.4.1
   values:
     debug: {{ eq $env "dev" }}
     persistence:
@@ -78,6 +79,7 @@ spec:
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
+      clusterId: command-center
     service:
       ingress:
         create: true

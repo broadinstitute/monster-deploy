@@ -19,6 +19,7 @@ module enable_services {
     "sql-component.googleapis.com",
     "stackdriver.googleapis.com",
     "storage-api.googleapis.com",
-    "storage-component.googleapis.com"
+    "storage-component.googleapis.com",
+    "dataflow.googleapis.com"
   ]
 }

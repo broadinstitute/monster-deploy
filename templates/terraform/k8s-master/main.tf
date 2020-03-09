@@ -84,11 +84,14 @@ resource google_container_cluster master {
     master_ipv4_cidr_block = "10.0.82.0/28"
   }
 
-  master_authorized_networks_config {
-    dynamic "cidr_blocks" {
-      for_each = local.broad_network_cidrs
-      content {
-        cidr_block = cidr_blocks.value
+  dynamic "master_authorized_networks_config" {
+    for_each = var.restrict_master_access ? [1] : []
+    content {
+      dynamic "cidr_blocks" {
+        for_each = local.broad_network_cidrs
+        content {
+          cidr_block = cidr_blocks.value
+        }
       }
     }
   }
