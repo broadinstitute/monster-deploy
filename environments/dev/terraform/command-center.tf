@@ -19,8 +19,8 @@ module command_center {
   }
 
   is_production = false
-  k8s_cluster_size = 2
-  k8s_machine_type = "n1-standard-2"
+  k8s_cluster_size = 3
+  k8s_machine_type = "n1-standard-4"
   # 4 CPU, 15 GiB of RAM.
   db_tier = "db-custom-4-15360"
 }

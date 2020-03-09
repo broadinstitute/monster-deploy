@@ -13,6 +13,8 @@ module master {
   network = module.k8s_network.network_link
   subnetwork = module.k8s_network.subnet_links[0]
 
+  restrict_master_access = var.is_production
+
   vault_path = "${local.vault_prefix}/gke"
 }
 
