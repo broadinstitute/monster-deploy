@@ -26,3 +26,9 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        dataset: monster_staging_data
+      jadeData:
+        project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
