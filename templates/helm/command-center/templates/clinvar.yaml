@@ -9,7 +9,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: dm-diff-clinical-assertion-DSPDC-821
+    ref: master
     path: orchestration
   values:
     gcs:
