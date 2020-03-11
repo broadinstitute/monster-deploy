@@ -63,9 +63,8 @@ resource google_storage_bucket_iam_member staging_iam_reader {
 
   provider = google.target
   bucket = google_storage_bucket.staging_storage.name
-  # The legacyBucketReader policy seems to be the correct role to have the equivalent of a "Bucket Reader" ACL,
-  # as noted here https://cloud.google.com/storage/docs/access-control/iam
-  role = "roles/storage.legacyBucketReader"
+  # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
+  role = "roles/storage.objectViewer"
   member = "group:${each.value}"
 }
 
@@ -92,8 +91,7 @@ resource google_storage_bucket_iam_member command_center_argo_temp_bucket_iam {
 resource google_storage_bucket_iam_member staging_account_iam_reader {
   provider = google.target
   bucket = google_storage_bucket.staging_storage.name
-  # The legacyBucketReader policy seems to be the correct role to have the equivalent of a "Bucket Reader" ACL,
-  # as noted here https://cloud.google.com/storage/docs/access-control/iam
-  role = "roles/storage.legacyBucketReader"
+  # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
+  role = "roles/storage.objectViewer"
   member = "serviceAccount:${var.jade_repo_email}"
 }
