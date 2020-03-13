@@ -1,21 +1,11 @@
-provider google-beta {
-  project = "broad-dsp-monster-${var.env}"
-  region = "us-central1"
-  alias = "command-center"
-}
-
-provider vault {
-  alias = "command-center"
-}
-
 module command_center {
   # NOTE: This path is where we expect the template to be mounted
   # within the Docker image we run in init.sh, not where we expect
   # it to be located in the git repo.
   source = "/templates/command-center-project"
   providers = {
-    google.target = google-beta.command-center,
-    vault.target = vault.command-center
+    google.target = google.target,
+    vault.target = vault.target
   }
 
   is_production = false
