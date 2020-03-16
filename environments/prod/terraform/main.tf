@@ -8,11 +8,18 @@ provider vault {
   alias = "command-center"
 }
 
+provider google-beta {
+  project = "broad-dsp-monster-clingen-prod"
+  region = "us-central1"
+  alias = "clinvar"
+}
+
 module monster_infrastructure {
   source = "/templates/monster-infrastructure"
   providers = {
     google.target = google-beta.command-center
     vault.target = vault.command-center
+    google.clinvar = google-beta.clinvar
   }
 
   env = "prod"

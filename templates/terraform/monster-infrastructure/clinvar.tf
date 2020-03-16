@@ -1,16 +1,7 @@
-# TODO just as with the backend, can't seem to do variable injection into provider blocks. Need to rethink how to
-# do this one per project/environment
-provider google-beta {
-  project = "broad-dsp-monster-clingen-${var.env}"
-  region = "us-central1"
-  alias = "clinvar"
-}
-
-# TODO I changed the jade_repo_email to switch on the environment, not sure if this is right
 module clinvar {
   source = "/templates/processing-project"
   providers = {
-    google.target = google-beta.clinvar,
+    google.target = google.clinvar,
     vault.target = vault.target
   }
 
