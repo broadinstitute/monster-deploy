@@ -1,6 +1,6 @@
 variable is_production {
   type = bool
-  description = "True -> prod, false -> dev."
+  description = "true -> prod, false -> dev."
   default = false
 }
 
