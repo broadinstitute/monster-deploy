@@ -17,12 +17,12 @@ provider google-beta {
 module monster_infrastructure {
   source = "/templates/monster-infrastructure"
   providers = {
-    google.target = google-beta.command-center
+    google.command-center = google-beta.command-center
     vault.target = vault.command-center
     google.clinvar = google-beta.clinvar
   }
 
-  env = "prod"
+  is_production = true
   cluster_size = 3
   machine_type = "n1-standard-4"
   # 4 CPU, 15 GiB of RAM.

@@ -1,5 +1,5 @@
 provider google {
-  alias = "target"
+  alias = "command-center"
 }
 
 provider vault {

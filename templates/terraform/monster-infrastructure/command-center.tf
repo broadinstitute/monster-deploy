@@ -4,11 +4,11 @@ module command_center {
   # it to be located in the git repo.
   source = "/templates/command-center-project"
   providers = {
-    google.target = google.target,
+    google.target = google.command-center,
     vault.target = vault.target
   }
 
-  is_production = false
+  is_production = var.is_production
   k8s_cluster_size = var.cluster_size
   k8s_machine_type = var.machine_type
   # 4 CPU, 15 GiB of RAM.

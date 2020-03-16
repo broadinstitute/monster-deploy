@@ -1,6 +1,7 @@
-variable env {
-  type = string
-  description = "Environment of infrastructure (dev or prod)."
+variable is_production {
+  type = bool
+  description = "True -> prod, false -> dev."
+  default = false
 }
 
 variable cluster_size {
@@ -19,5 +20,7 @@ variable db_tier {
 }
 
 locals {
-  vault_prefix = "secret/dsde/monster/${var.env}"
+  env = var.is_production ? "prod" : "dev"
+  vault_prefix = "secret/dsde/monster/${local.env}"
+
 }
