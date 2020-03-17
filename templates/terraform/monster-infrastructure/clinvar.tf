@@ -1,22 +1,16 @@
-provider google-beta {
-  project = "broad-dsp-monster-clingen-dev"
-  region = "us-central1"
-  alias = "clinvar"
-}
-
 module clinvar {
   source = "/templates/processing-project"
   providers = {
-    google.target = google-beta.clinvar,
-    vault.target = vault.command-center
+    google.target = google.clinvar,
+    vault.target = vault.target
   }
 
-  project_name = "broad-dsp-monster-clingen-dev"
-  is_production = false
+  project_name = "broad-dsp-monster-clingen-${local.env}"
+  is_production = var.is_production
   command_center_argo_account_email = module.command_center.clinvar_argo_runner_email
   region = "us-central1"
   reader_groups = ["clingendevs@broadinstitute.org"]
-  jade_repo_email = "jade-k8-sa@broad-jade-dev.iam.gserviceaccount.com"
+  jade_repo_email = local.jade_repo_email
   deletion_age_days = 14
   vault_prefix = "${local.vault_prefix}/processing-projects/clinvar"
 }
