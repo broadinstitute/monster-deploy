@@ -21,6 +21,6 @@ variable db_tier {
 
 locals {
   env = var.is_production ? "prod" : "dev"
-  jade_repo_email = is_production ? "terra-data-repository@broad-datarepo-terra-prod.iam.gserviceaccount.com" : "jade-k8-sa@broad-jade-dev.iam.gserviceaccount.com"
+  jade_repo_email = var.is_production ? "terra-data-repository@broad-datarepo-terra-prod.iam.gserviceaccount.com" : "jade-k8-sa@broad-jade-dev.iam.gserviceaccount.com"
   vault_prefix = "secret/dsde/monster/${local.env}"
 }
