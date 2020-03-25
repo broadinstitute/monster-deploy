@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
+declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
+
+source ${SCRIPT_DIR}/common.sh
+
+function install_orchestration_workflows () {
+  local -r kubeconfig=$1 env=$2 helm_dir=$3
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+
+  ${helm[@]} dependency update /charts/orchestration-workflows
+  ${helm[@]} upgrade orchestration-workflows /charts/orchestration-workflows \
+    --namespace fluxcd \
+    --install \
+    --set "env=${env}" \
+    --set "clinvar.enable=true" \
+    --set 'clinvar.schedule="0 8 * * *"'
+}
+
+function main () {
+  # Check args.
+  if [ $# -ne 1 ]; then
+    1>&2 echo Usage: ${0} '<env>'
+    exit 1
+  fi
+
+  # Make sure config exists.
+  local -r env=$1
+  local -r env_dir=${REPO_ROOT}/environments/${env}
+  if [ ! -d ${env_dir} ]; then
+    1>&2 echo Error: Invalid environment "'$1'"
+    exit 1
+  fi
+
+  local -r config_dir=${env_dir}/.kubeconfig
+  mkdir -p ${config_dir}
+
+  local -r helm_dir=${env_dir}/.helm
+  mkdir -p ${helm_dir}
+
+  # Push releases to the command center.
+  local -r center_config=${config_dir}/command-center
+  get_command_center_config ${env} ${center_config}
+  install_orchestration_workflows ${center_config} ${env} ${helm_dir}
+}
+
+main ${@}
