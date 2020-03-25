@@ -41,10 +41,14 @@ spec:
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
-    repository: https://broadinstitute.github.io/monster-helm
-    name: argo-controller
-    version: 0.3.1
+    git: git://github.com/broadinstitute/monster-helm.git
+    ref: dm-argo-27-rc2-DSPDC-926
+    path: charts/argo-controller
+    # repository: https://broadinstitute.github.io/monster-helm
+    # name: argo-controller
+    # version: 0.4.0
   values:
+    clusterName: command-center-cluster
     debug: {{ eq $env "dev" }}
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
@@ -54,7 +58,17 @@ spec:
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-      clusterId: command-center
+    workflowDefaults:
+      {{ $isDev := eq $env "dev" }}
+      podGarbageCollection:
+        enabled: {{ not $isDev }}
+        {{- if not $isDev }}
+        strategy: OnWorkflowSuccess
+        {{- end }}
+      workflowTTL:
+        enabled: true
+        secondsAfterSuccess: {{ if $isDev }}86400{{ else }}3600{{ end }}
+        secondsAfterFailure: {{ if $isDev }}604800{{ else }}259200{{ end }}
 {{- end }}
 ---
 apiVersion: helm.fluxcd.io/v1
@@ -66,10 +80,15 @@ spec:
   targetNamespace: argo-ui
   resetValues: true
   chart:
-    repository: https://broadinstitute.github.io/monster-helm
-    name: argo-server
-    version: 0.4.1
+    git: git://github.com/broadinstitute/monster-helm.git
+    ref: dm-argo-27-rc2-DSPDC-926
+    path: charts/argo-server
+    # repository: https://broadinstitute.github.io/monster-helm
+    # name: argo-server
+    # version: 0.5.0
   values:
+    clusterName: command-center-cluster
+    stackdriverProject: broad-dsp-monster-{{ .Values.env }}
     debug: {{ eq $env "dev" }}
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
@@ -79,7 +98,6 @@ spec:
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-      clusterId: command-center
     service:
       ingress:
         create: true

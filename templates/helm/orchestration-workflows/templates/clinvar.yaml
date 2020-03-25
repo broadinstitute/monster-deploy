@@ -1,4 +1,5 @@
-{{ $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
+{{- if .Values.clinvar.enable }}
+{{- $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -18,8 +19,7 @@ spec:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
-      # 8:00am every day for now, as we test.
-      schedule: "0 8 * * *"
+      schedule: {{ .Values.clinvar.schedule }}
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage
@@ -32,3 +32,4 @@ spec:
         dataset: monster_staging_data
       jadeData:
         project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
+{{- end }}
