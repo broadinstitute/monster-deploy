@@ -41,12 +41,9 @@ spec:
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
-    git: git://github.com/broadinstitute/monster-helm.git
-    ref: dm-argo-27-rc2-DSPDC-926
-    path: charts/argo-controller
-    # repository: https://broadinstitute.github.io/monster-helm
-    # name: argo-controller
-    # version: 0.4.0
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-controller
+    version: 0.5.0
   values:
     clusterName: command-center-cluster
     debug: {{ eq $env "dev" }}
@@ -80,12 +77,9 @@ spec:
   targetNamespace: argo-ui
   resetValues: true
   chart:
-    git: git://github.com/broadinstitute/monster-helm.git
-    ref: dm-argo-27-rc2-DSPDC-926
-    path: charts/argo-server
-    # repository: https://broadinstitute.github.io/monster-helm
-    # name: argo-server
-    # version: 0.5.0
+    repository: https://broadinstitute.github.io/monster-helm
+    name: argo-server
+    version: 0.6.0
   values:
     clusterName: command-center-cluster
     stackdriverProject: broad-dsp-monster-{{ .Values.env }}
