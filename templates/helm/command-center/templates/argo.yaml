@@ -64,6 +64,11 @@ spec:
         {{- end }}
       workflowTTL:
         enabled: true
+        {{- /*
+             * Timing translations:
+             *   - In dev, keep successes for 1 day, failures for a week
+             *   - In prod, keep successes for 1 hour, failures for 3 days
+             */}}
         secondsAfterSuccess: {{ if $isDev }}86400{{ else }}3600{{ end }}
         secondsAfterFailure: {{ if $isDev }}604800{{ else }}259200{{ end }}
 {{- end }}
