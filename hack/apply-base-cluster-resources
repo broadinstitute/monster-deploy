@@ -4,11 +4,11 @@ set -euo pipefail
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
-declare -r HELM_OPERATOR_VERSION=v1.0.0-rc8
+declare -r HELM_OPERATOR_VERSION=1.0.0
 declare -r SECRETS_MANAGER_VERSION=release-1.0.2
 
 declare -ra CRDS=(
-  https://raw.githubusercontent.com/fluxcd/helm-operator/${HELM_OPERATOR_VERSION}/deploy/flux-helm-release-crd.yaml
+  https://raw.githubusercontent.com/fluxcd/helm-operator/v${HELM_OPERATOR_VERSION}/deploy/crds.yaml
   https://raw.githubusercontent.com/tuenti/secrets-manager/${SECRETS_MANAGER_VERSION}/config/crd/bases/secrets-manager.tuenti.io_secretdefinitions.yaml
 )
 
@@ -41,6 +41,7 @@ function install_base_operators () {
   ${helm[@]} upgrade base-crd-operators /charts/crd-operators \
     --namespace fluxcd \
     --install \
+    --set "helm-operator.image.tag=${HELM_OPERATOR_VERSION}" \
     --set "secretManager.roleId=$(vault read -field=role_id ${bootstrap_secret})" \
     --set "secretManager.secretId=$(vault read -field=secret_id ${bootstrap_secret})"
 }
