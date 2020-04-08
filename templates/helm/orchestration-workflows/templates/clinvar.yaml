@@ -1,5 +1,30 @@
+---
 {{- if .Values.clinvar.enable }}
 {{- $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
+{{- $secretName := "clinvar-key" }}
+{{- $keyName := "key.json" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: clinvar-secrets
+spec:
+  releaseName: clinvar-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: clinvar
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: secret/dsde/monster/{{ .Values.env }}/command-center/service-accounts/clinvar-argo-runner
+            vaultKey: key
+---
+
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -10,7 +35,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: master
+    ref: ra-DSPDC-793-ingest-xml
     path: orchestration
   values:
     gcs:
@@ -32,4 +57,11 @@ spec:
         dataset: monster_staging_data
       jadeData:
         project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
+    repo:
+      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
+      datasetId: a0a876a6-1016-4149-8a6b-21bca7468335
+      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
+    saCreds:
+      saSecret: {{ $secretName }}
+      saSecretKey: {{ $keyName }}
 {{- end }}
