@@ -16,7 +16,7 @@ function install_orchestration_workflows () {
     --install \
     --set "env=${env}" \
     --set "clinvar.enable=true" \
-    --set 'clinvar.schedule="40 13 * * *"'
+    --set 'clinvar.schedule="55 16 * * *"'
 }
 
 function main () {
