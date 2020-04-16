@@ -14,7 +14,7 @@ module dataflow_runner_account {
 # Allow the command-center account to run Dataflow jobs...
 resource google_project_iam_member command_center_argo_account_iam {
   provider = google.target
-  for_each = toset(["dataflow.developer", "compute.viewer", "bigquery.jobUser"])
+  for_each = toset(["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"])
 
   role = "roles/${each.value}"
   member = "serviceAccount:${var.command_center_argo_account_email}"
