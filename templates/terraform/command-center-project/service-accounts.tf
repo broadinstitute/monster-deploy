@@ -21,7 +21,7 @@ module clinvar_argo_runner_account {
   account_id = "clinvar-argo-runner"
   display_name = "Service account to run ClinVar's Argo workflow."
   vault_path = "${local.vault_prefix}/service-accounts/clinvar-argo-runner"
-  roles = ["container.developer", "roles/bigquery.dataOwner"]
+  roles = ["container.developer", "bigquery.dataOwner"]
 }
 
 data google_project current_project {
