@@ -35,7 +35,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: ra-DSPDC-949-bqdataset-per-run
+    ref: master
     path: orchestration
   values:
     gcs:
