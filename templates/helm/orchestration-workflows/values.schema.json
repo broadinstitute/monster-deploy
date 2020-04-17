@@ -8,7 +8,13 @@
       "properties": {
         "enable": { "type": "boolean" },
         "schedule": { "type": "string" }
-      }
+      },
+      "encode": {
+        "type": "object",
+        "properties": {
+          "enable": { "type": "boolean" },
+          "schedule": { "type": "string" }
+        }
     }
   },
   "required": ["env"]

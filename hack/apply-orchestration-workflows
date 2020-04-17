@@ -17,6 +17,7 @@ function install_orchestration_workflows () {
     --set "env=${env}" \
     --set "clinvar.enable=true" \
     --set 'clinvar.schedule="0 8 * * *"'
+    # make encode equivalent here
 }
 
 function main () {

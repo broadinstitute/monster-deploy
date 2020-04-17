@@ -9,3 +9,7 @@ provider vault {
 provider google {
   alias = "clinvar"
 }
+
+provider google {
+  alias = "encode"
+}

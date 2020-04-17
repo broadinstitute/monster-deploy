@@ -1,0 +1,68 @@
+---
+{{- if .Values.encode.enable }}
+  {{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
+  {{- $secretName := "encode-key" }}
+  {{- $keyName := "key.json" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: encode-secrets
+spec:
+  releaseName: encode-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: encode
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: secret/dsde/monster/{{ .Values.env }}/command-center/service-accounts/encode-argo-runner
+            vaultKey: key
+---
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: encode-orchestration
+spec:
+  releaseName: encode-orchestration
+  targetNamespace: encode
+  resetValues: true
+  chart:
+    git: git://github.com/databiosphere/encode-ingest.git
+    ref: master
+    path: orchestration
+  values:
+    gcs:
+      bucketName: {{ $project }}-staging-storage
+    serviceAccount:
+      k8sName: argo-runner
+      googleName: encode-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
+    cron:
+      schedule: {{ .Values.encode.schedule }}
+    dataflow:
+      project: {{ $project }}
+      tmpBucketName: {{ $project }}-temp-storage
+      subnetName: monster-processing-network
+      workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
+      useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        dataset: monster_staging_data
+      jadeData:
+        project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
+    repo:
+      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
+      # both the datasetId and profileId will eventually need to be conditional on .Values.env, once encode is in prod
+      datasetId: a0a876a6-1016-4149-8a6b-21bca7468335
+      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
+      accessKey:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
+  {{- end }}
