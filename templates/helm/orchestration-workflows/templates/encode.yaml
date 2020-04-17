@@ -1,8 +1,8 @@
 ---
 {{- if .Values.encode.enable }}
-  {{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
-  {{- $secretName := "encode-key" }}
-  {{- $keyName := "key.json" }}
+{{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
+{{- $secretName := "encode-key" }}
+{{- $keyName := "key.json" }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -51,18 +51,4 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
-    bigquery:
-      stagingData:
-        project: {{ $project }}
-        dataset: monster_staging_data
-      jadeData:
-        project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
-    repo:
-      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
-      # both the datasetId and profileId will eventually need to be conditional on .Values.env, once encode is in prod
-      datasetId: a0a876a6-1016-4149-8a6b-21bca7468335
-      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
-      accessKey:
-        secretName: {{ $secretName }}
-        secretKey: {{ $keyName }}
   {{- end }}
