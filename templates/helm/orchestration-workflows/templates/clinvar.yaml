@@ -56,7 +56,7 @@ spec:
         project: {{ $project }}
         datasetPrefix: monster_staging_data
         description: Dataset used by the Monster team for ingest ETL
-        expiration: 604800000
+        expiration: '604800000'
       jadeData:
         project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
     repo:
