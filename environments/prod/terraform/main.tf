@@ -16,7 +16,7 @@ provider google-beta {
 
 provider google-beta {
   project = "broad-dsp-monster-encode-prod"
-  region = "us-west-1"
+  region = "us-west1"
   alias = "encode"
 }
 
