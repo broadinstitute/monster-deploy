@@ -14,12 +14,19 @@ provider google-beta {
   alias = "clinvar"
 }
 
+provider google-beta {
+  project = "broad-dsp-monster-encode-prod"
+  region = "us-west1"
+  alias = "encode"
+}
+
 module monster_infrastructure {
   source = "/templates/monster-infrastructure"
   providers = {
     google.command-center = google-beta.command-center
     vault.target = vault.command-center
     google.clinvar = google-beta.clinvar
+    google.encode = google-beta.encode
   }
 
   is_production = true
