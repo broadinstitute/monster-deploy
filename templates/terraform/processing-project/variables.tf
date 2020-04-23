@@ -13,9 +13,16 @@ variable region {
   description = "Region where processing should run"
 }
 
-variable reader_groups {
+variable create_results_bucket {
+  type = bool
+  description = "If true, create a dedicated bucket for delivery of ingest outputs outside of the Data Repo."
+  default = false
+}
+
+variable result_reader_groups {
   type = list(string)
-  description = "Email addresses that represent google groups to share bucket read access with."
+  description = "Email addresses of google groups that should be able to read from the results bucket."
+  default = []
 }
 
 variable deletion_age_days {
