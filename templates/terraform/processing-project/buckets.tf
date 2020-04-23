@@ -95,3 +95,20 @@ resource google_storage_bucket_iam_member staging_account_iam_reader {
   role = "roles/storage.objectViewer"
   member = "serviceAccount:${var.jade_repo_email}"
 }
+
+# Bucket for long term Argo logs storage, currently want no "delete after N days" rule.
+resource google_storage_bucket argo_archive {
+  provider = google.target
+  name = "${var.project_name}-argo-archive"
+  location = "US"
+}
+
+resource google_storage_bucket_iam_member command_center_argo_logs_bucket_iam {
+  provider = google.target
+  bucket =  google_storage_bucket.argo_archive.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${var.command_center_argo_account_email}"
+}
