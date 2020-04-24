@@ -57,17 +57,6 @@ resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   depends_on = [module.dataflow_runner_account.delay]
 }
 
-resource google_storage_bucket_iam_member staging_iam_reader {
-  # for_each doesn't like lists, so we convert it to a set
-  for_each = toset(var.reader_groups)
-
-  provider = google.target
-  bucket = google_storage_bucket.staging_storage.name
-  # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
-  role = "roles/storage.objectViewer"
-  member = "group:${each.value}"
-}
-
 resource google_storage_bucket_iam_member command_center_argo_staging_bucket_iam {
   provider = google.target
   bucket =  google_storage_bucket.staging_storage.name
@@ -111,4 +100,32 @@ resource google_storage_bucket_iam_member command_center_argo_logs_bucket_iam {
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
   role = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
+}
+
+resource google_storage_bucket results_storage {
+  provider = google.target
+  count = var.create_results_bucket ? 1 : 0
+
+  name = "${var.project_name}-ingest-results"
+  location = "US"
+}
+
+resource google_storage_bucket_iam_member results_writer {
+  provider = google.target
+  count = var.create_results_bucket ? 1 : 0
+
+  bucket = google_storage_bucket.results_storage[0].name
+  role = "roles/storage.admin"
+  member = "serviceAccount:${var.command_center_argo_account_email}"
+}
+
+resource google_storage_bucket_iam_member results_external_readers {
+  # for_each doesn't like lists, so we convert it to a set
+  for_each = toset(var.create_results_bucket ? var.result_reader_groups : [])
+
+  provider = google.target
+  bucket = google_storage_bucket.results_storage[0].name
+  # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
+  role = "roles/storage.objectViewer"
+  member = "group:${each.value}"
 }
