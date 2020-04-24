@@ -20,13 +20,19 @@ provider google-beta {
   alias = "encode"
 }
 
+provider aws {
+  region = "us-east-1"
+  alias = "encode"
+}
+
 module monster_infrastructure {
   source = "/templates/monster-infrastructure"
   providers = {
     google.command-center = google-beta.command-center
     vault.target = vault.command-center
     google.clinvar = google-beta.clinvar
-    google.encode = google-beta.encode
+    google.encode = google-beta.encode,
+    aws.encode = aws.encode
   }
 
   is_production = false
