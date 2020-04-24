@@ -13,3 +13,13 @@ module encode {
   deletion_age_days = 14
   vault_prefix = "${local.vault_prefix}/processing-projects/encode"
 }
+
+module encode_s3_user {
+  source = "/templates/aws-sa"
+  providers = {
+    aws.target = aws.encode
+  }
+
+  account_id = "monster-${local.env}-encode-downloader"
+  vault_path = "${local.vault_prefix}/processing-projects/encode/s3-downloader"
+}

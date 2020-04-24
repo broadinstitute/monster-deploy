@@ -13,3 +13,7 @@ provider google {
 provider google {
   alias = "encode"
 }
+
+provider aws {
+  alias = "encode"
+}

@@ -5,7 +5,7 @@
 #####
 ## Constants.
 #####
-declare -r TERRAFORM=hashicorp/terraform:0.12.23
+declare -r TERRAFORM=hashicorp/terraform:0.12.24
 declare -r KUBECTL=lachlanevenson/k8s-kubectl:v1.14.10
 declare -r HELM=lachlanevenson/k8s-helm:v3.0.3
 

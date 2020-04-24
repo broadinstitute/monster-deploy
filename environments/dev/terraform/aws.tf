@@ -29,24 +29,14 @@ resource aws_s3_bucket s3_west_bucket {
 ###
 ## Create a machine user, and stash its access secrets in Vault
 ###
-resource aws_iam_user s3_transfer_user {
-  provider = aws.us-east-1
-  name = "monster-s3-tester"
-}
-resource aws_iam_access_key s3_transfer_user_key {
-  provider = aws.us-east-1
-  user = aws_iam_user.s3_transfer_user.name
-}
-resource vault_generic_secret s3_transfer_user_secret {
-  provider = vault.command-center
+module test_transfer_user {
+  providers = {
+    aws.target = aws.us-east-1
+  }
 
-  path = "${local.vault_prefix}/aws/s3-transfer-user"
-  data_json = <<DATA
-{
-  "access_key_id": "${aws_iam_access_key.s3_transfer_user_key.id}",
-  "secret_access_key": "${aws_iam_access_key.s3_transfer_user_key.secret}"
-}
-DATA
+  source = "/templates/aws-sa"
+  account_id = "monster-s3-tester"
+  vault_path = "${local.vault_prefix}/aws/s3-transfer-user"
 }
 
 ###
@@ -74,5 +64,5 @@ resource aws_iam_user_policy s3_transfer_access_policy {
   provider = aws.us-east-1
   name = "MonsterS3TransferAccessPolicy"
   policy = data.aws_iam_policy_document.s3_transfer_access_policy.json
-  user = aws_iam_user.s3_transfer_user.name
+  user = module.test_transfer_user.name
 }
