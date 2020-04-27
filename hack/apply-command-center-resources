@@ -38,7 +38,7 @@ source ${SCRIPT_DIR}/common.sh
 function install_command_center_services () {
   local -r kubeconfig=$1 env=$2 helm_dir=$3
 
-  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
   local -r sql_instance_secret=secret/dsde/monster/${env}/command-center/cloudsql/instance
 
   ${helm[@]} dependency update /charts/command-center

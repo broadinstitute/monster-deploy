@@ -25,7 +25,7 @@ function get_command_center_config () {
 ## Configure Helm in Docker
 #####
 function configure_helm () {
-  local -r kubeconfig=$1 helm_dir=$2
+  local -r kubeconfig=$1 helm_dir=$2 env=$3
 
   declare -ra helm=(
     docker run
@@ -40,6 +40,8 @@ function configure_helm () {
     -v ${helm_dir}/cache:/root/.cache/helm
     # Make our local charts available.
     -v ${HELM_CHARTS_DIR}:/charts
+    # Make local values available.
+    -v ${REPO_ROOT}/environments/${env}/helm:/values
     ${HELM}
   )
   echo ${helm[@]}

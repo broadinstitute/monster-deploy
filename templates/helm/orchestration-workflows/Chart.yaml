@@ -1,4 +1,0 @@
-apiVersion: v2
-name: orchestration-workflows
-description: Argo workflows pulled from other projects to run regular ingests.
-version: 0.1.0

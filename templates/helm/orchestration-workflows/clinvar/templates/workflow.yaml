@@ -1,5 +1,5 @@
+{{- if .Values.enable }}
 ---
-{{- if .Values.clinvar.enable }}
 {{- $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
 {{- $secretName := "clinvar-key" }}
 {{- $keyName := "key.json" }}
@@ -44,7 +44,7 @@ spec:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
-      schedule: {{ .Values.clinvar.schedule }}
+      schedule: {{ .Values.schedule }}
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage

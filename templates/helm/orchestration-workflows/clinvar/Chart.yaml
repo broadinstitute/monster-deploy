@@ -1,0 +1,4 @@
+apiVersion: v2
+name: clinvar-ingest
+description: Argo workflow for regular ingest of ClinVar archives.
+version: 0.0.0
