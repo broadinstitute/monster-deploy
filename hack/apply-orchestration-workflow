@@ -11,7 +11,7 @@ function install_orchestration_workflow () {
   local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
 
   ${helm[@]} dependency update /charts/orchestration-workflows/${wf}
-  ${helm[@]} upgrade orchestration-workflows /charts/orchestration-workflows/${wf} \
+  ${helm[@]} upgrade ${wf}-ingest /charts/orchestration-workflows/${wf} \
     --namespace fluxcd \
     --install \
     --set "env=${env}" \

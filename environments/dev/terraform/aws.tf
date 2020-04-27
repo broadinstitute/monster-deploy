@@ -37,32 +37,23 @@ module test_transfer_user {
   source = "/templates/aws-sa"
   account_id = "monster-s3-tester"
   vault_path = "${local.vault_prefix}/aws/s3-transfer-user"
-}
 
-###
-## Grant the machine user full access to the two test buckets.
-###
-data aws_iam_policy_document s3_transfer_access_policy {
-  statement {
-    sid = "ListObjects"
-    actions = ["s3:ListBucket"]
-    resources = [
-      aws_s3_bucket.s3_east_bucket.arn,
-      aws_s3_bucket.s3_west_bucket.arn
-    ]
-  }
-  statement {
-    sid = "ObjectActions"
-    actions = ["s3:*Object"]
-    resources = [
-      "${aws_s3_bucket.s3_east_bucket.arn}/*",
-      "${aws_s3_bucket.s3_west_bucket.arn}/*"
-    ]
-  }
-}
-resource aws_iam_user_policy s3_transfer_access_policy {
-  provider = aws.us-east-1
-  name = "MonsterS3TransferAccessPolicy"
-  policy = data.aws_iam_policy_document.s3_transfer_access_policy.json
-  user = module.test_transfer_user.name
+  iam_policy = [
+    {
+      subject_id = "ListObjects",
+      actions = ["s3:ListBucket"],
+      resources = [
+        aws_s3_bucket.s3_east_bucket.arn,
+        aws_s3_bucket.s3_west_bucket.arn
+      ]
+    },
+    {
+      subject_id = "ObjectActions",
+      actions = ["s3:*Object"]
+      resources = [
+        "${aws_s3_bucket.s3_east_bucket.arn}/*",
+        "${aws_s3_bucket.s3_west_bucket.arn}/*"
+      ]
+    }
+  ]
 }
