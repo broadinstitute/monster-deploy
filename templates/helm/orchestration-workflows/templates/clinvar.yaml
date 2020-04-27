@@ -63,7 +63,7 @@ spec:
     repo:
       url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
       # both the datasetId and profileId will eventually need to be conditional on .Values.env, once clinvar is in prod
-      datasetId: a0a876a6-1016-4149-8a6b-21bca7468335
+      datasetId: 7ab64465-3557-47cd-a3d7-28340ebb33dd
       profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
       accessKey:
         secretName: {{ $secretName }}
