@@ -45,7 +45,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/encode-ingest.git
-    ref: master
+    ref: dm-port-example-DSPDC-915
     path: orchestration
   values:
     gcs:
@@ -61,4 +61,6 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    aws:
+      credentialsSecretName: {{ $awsSecretName }}
 {{- end }}
