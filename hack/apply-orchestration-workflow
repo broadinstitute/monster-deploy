@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
+declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
+
+source ${SCRIPT_DIR}/common.sh
+
+function install_orchestration_workflow () {
+  local -r kubeconfig=$1 env=$2 wf=$3 helm_dir=$4
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
+
+  ${helm[@]} dependency update /charts/orchestration-workflows/${wf}
+  ${helm[@]} upgrade ${wf}-ingest /charts/orchestration-workflows/${wf} \
+    --namespace fluxcd \
+    --install \
+    --set "env=${env}" \
+    --values /values/orchestration-workflows/${wf}/values.yaml
+}
+
+function main () {
+  # Check args.
+  if [ $# -ne 2 ]; then
+    1>&2 echo Usage: ${0} '<env>' '<workflow-name>'
+    exit 1
+  fi
+
+  # Make sure config exists.
+  local -r env=$1 wf=$2
+  local -r env_dir=${REPO_ROOT}/environments/${env}
+  local -r wf_values=${env_dir}/helm/orchestration-workflows/${wf}/values.yaml
+  if [ ! -d ${env_dir} ]; then
+    1>&2 echo Error: Invalid environment "'$env'"
+    exit 1
+  fi
+  if [ ! -f ${wf_values} ]; then
+    1>&2 echo Error: Invalid workflow for ${env}: "'$wf'"
+    exit 1
+  fi
+
+  local -r config_dir=${env_dir}/.kubeconfig
+  mkdir -p ${config_dir}
+
+  local -r helm_dir=${env_dir}/.helm
+  mkdir -p ${helm_dir}
+
+  # Push releases to the command center.
+  local -r center_config=${config_dir}/command-center
+  get_command_center_config ${env} ${center_config}
+  install_orchestration_workflow ${center_config} ${env} ${wf} ${helm_dir}
+}
+
+main ${@}

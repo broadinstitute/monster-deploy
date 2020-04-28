@@ -22,4 +22,14 @@ module encode_s3_user {
 
   account_id = "monster-${local.env}-encode-downloader"
   vault_path = "${local.vault_prefix}/processing-projects/encode/s3-downloader"
+
+  iam_policy = [
+    {
+      subject_id = "ObjectActions",
+      actions = ["s3:GetObject"]
+      resources = [
+        "arn:aws:s3:::encode-public/*"
+      ]
+    }
+  ]
 }

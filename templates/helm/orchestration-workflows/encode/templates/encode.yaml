@@ -1,8 +1,9 @@
+{{- if .Values.enable }}
 ---
-{{- if .Values.encode.enable }}
 {{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
 {{- $secretName := "encode-key" }}
 {{- $keyName := "key.json" }}
+{{- $awsSecretName := "encode-aws-credentials" }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -23,8 +24,17 @@ spec:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/{{ .Values.env }}/command-center/service-accounts/encode-argo-runner
             vaultKey: key
+      - secretName: {{ $awsSecretName }}
+        nameSpace: encode
+        vals:
+          {{- $path := printf "secret/dsde/monster/%s/processing-projects/encode/s3-downloader" .Values.env }}
+          - kubeSecretKey: AWS_ACCESS_KEY_ID
+            path: {{ $path }}
+            vaultKey: access_key_id
+          - kubeSecretKey: AWS_SECRET_ACCESS_KEY
+            path: {{ $path }}
+            vaultKey: secret_access_key
 ---
-
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -44,11 +54,13 @@ spec:
       k8sName: argo-runner
       googleName: encode-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
-      schedule: {{ .Values.encode.schedule }}
+      schedule: {{ .Values.schedule }}
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    aws:
+      credentialsSecretName: {{ $awsSecretName }}
 {{- end }}
