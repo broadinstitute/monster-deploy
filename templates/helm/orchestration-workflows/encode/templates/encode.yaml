@@ -45,7 +45,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/encode-ingest.git
-    ref: dm-port-example-DSPDC-915
+    ref: master
     path: orchestration
   values:
     gcs:
