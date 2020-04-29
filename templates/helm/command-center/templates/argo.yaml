@@ -41,7 +41,7 @@ spec:
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
-    git: git@github.com:broadinstitute/monster-helm
+    git: git://github.com/broadinstitute/monster-helm.git
     ref: SW-DSPDC-859-Add-argo-metrics
     path: charts/argo-controller
   values:
