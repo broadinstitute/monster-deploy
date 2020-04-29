@@ -41,9 +41,9 @@ spec:
   targetNamespace: {{ $ns }}
   resetValues: true
   chart:
-    repository: https://broadinstitute.github.io/monster-helm
-    name: argo-controller
-    version: 0.5.2
+    git: git@github.com:broadinstitute/monster-helm
+    ref: SW-DSPDC-859-Add-argo-metrics
+    path: charts/argo-controller
   values:
     clusterName: command-center-cluster
     debug: {{ eq $env "dev" }}
