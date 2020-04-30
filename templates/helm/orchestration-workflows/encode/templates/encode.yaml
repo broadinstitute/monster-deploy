@@ -1,5 +1,6 @@
 {{- if .Values.enable }}
 ---
+{{- $smokeTest := eq .Values.env "dev" }}
 {{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
 {{- $secretName := "encode-key" }}
 {{- $keyName := "key.json" }}
@@ -34,6 +35,14 @@ spec:
           - kubeSecretKey: AWS_SECRET_ACCESS_KEY
             path: {{ $path }}
             vaultKey: secret_access_key
+      {{- if $smokeTest }}
+      - secretName: smoke-test-secrets
+        nameSpace: encode
+        vals:
+          - kubeSecretKey: slack-url
+            path: secret/dsde/monster/{{ .Values.env }}/slack-notifier
+            vaultKey: monster-ci-url
+      {{- end }}
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -45,7 +54,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/encode-ingest.git
-    ref: master
+    ref: dm-smoke-test-DSPDC-238
     path: orchestration
   values:
     gcs:
@@ -63,4 +72,11 @@ spec:
       useFlexRS: {{ eq .Values.env "prod" }}
     aws:
       credentialsSecretName: {{ $awsSecretName }}
+    smokeTest:
+      enable: {{ $smokeTest }}
+      {{- if $smokeTest }}
+      slackUrl:
+        secretName: smoke-test-secrets
+        secretKey: slack-url
+      {{- end }}
 {{- end }}
