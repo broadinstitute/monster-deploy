@@ -4,7 +4,7 @@ set -euo pipefail
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 
-declare -r ARGO_VERSION=v2.6.1
+declare -r ARGO_VERSION=v2.7.1
 declare -r PROMETHEUS_OPERATOR_VERSION=release-0.36
 
 declare -ra CRDS=(
