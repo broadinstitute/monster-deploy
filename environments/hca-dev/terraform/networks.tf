@@ -1,7 +1,7 @@
 module k8s_network {
   source = "/templates/compute-network"
   providers = {
-    google.target = google.target
+    google.target = google-beta.target
   }
   dependencies = [module.enable_services]
 

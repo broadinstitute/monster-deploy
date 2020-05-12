@@ -2,7 +2,7 @@
 module hca_gke_runner_account {
   source = "/templates/google-sa"
   providers = {
-    google.target = google.target,
+    google.target = google-beta.target,
     vault.target = vault.target
   }
 
@@ -16,7 +16,7 @@ module hca_gke_runner_account {
 module hca_dataflow_account {
   source = "/templates/google-sa"
   providers = {
-    google.target = google.target,
+    google.target = google-beta.target,
     vault.target = vault.target
   }
 
@@ -29,7 +29,7 @@ module hca_dataflow_account {
 module hca_argo_runner_account {
   source = "/templates/google-sa"
   providers = {
-    google.target = google.target,
+    google.target = google-beta.target,
     vault.target = vault.target
   }
 
@@ -40,11 +40,11 @@ module hca_argo_runner_account {
 }
 
 data google_project current_project {
-  provider = google.target
+  provider = google-beta.target
 }
 
 resource google_service_account_iam_binding clinvar_workload_identity_binding {
-  provider = google.target
+  provider = google-beta.target
 
   service_account_id = module.hca_argo_runner_account.id
   role = "roles/iam.workloadIdentityUser"

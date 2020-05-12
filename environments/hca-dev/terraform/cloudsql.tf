@@ -1,7 +1,7 @@
 module cloudsql {
   source = "/templates/cloudsql"
   providers = {
-    google.target = google.target
+    google.target = google-beta.target
     vault.target = vault.target
   }
 

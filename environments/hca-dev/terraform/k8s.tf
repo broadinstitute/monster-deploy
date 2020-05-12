@@ -3,7 +3,7 @@
 module master {
   source = "/templates/k8s-master"
   providers = {
-    google.target = google.target
+    google.target = google-beta.target
   }
   dependencies = [module.enable_services, module.k8s_network]
 
@@ -21,7 +21,7 @@ module master {
 module node_pool {
   source = "/templates/k8s-node-pool"
   providers = {
-    google.target = google.target
+    google.target = google-beta.target
   }
   dependencies = [module.enable_services, module.master]
 

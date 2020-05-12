@@ -1,7 +1,7 @@
 module enable_services {
   source = "/templates/api-services"
   providers = {
-    google.target = google.target
+    google.target = google-beta.target
   }
   service_ids = [
     "compute.googleapis.com",
