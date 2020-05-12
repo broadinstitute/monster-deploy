@@ -37,3 +37,17 @@ module node_pool {
   taints = null
   service_account_email = module.hca_gke_runner_account.email
 }
+
+# gke service account
+module hca_gke_runner_account {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google-beta.target,
+    vault.target = vault.target
+  }
+
+  account_id = "hca-gke-runner"
+  display_name = "Service account to run GKE system pods"
+  vault_path = "${local.vault_prefix}/service-accounts/gke-runner"
+  roles = ["logging.logWriter", "monitoring.metricWriter", "monitoring.viewer"]
+}
