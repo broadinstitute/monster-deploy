@@ -20,9 +20,9 @@ module hca_dataflow_account {
     vault.target = vault.target
   }
 
-  account_id = "hca-runner"
-  display_name = " Service account to run HCA jobs"
-  vault_path = "${local.vault_prefix}/service-accounts/hca-runner"
+  account_id = "hca-dataflow-runner"
+  display_name = " Service account to run HCA dataflow jobs"
+  vault_path = "${local.vault_prefix}/service-accounts/hca-dataflow-runner"
   roles = ["dataflow.worker", "bigquery.jobUser", "bigquery.dataOwner"]
 }
 
@@ -43,10 +43,10 @@ data google_project current_project {
   provider = google-beta.target
 }
 
-resource google_service_account_iam_binding clinvar_workload_identity_binding {
+resource google_service_account_iam_binding hca_workload_identity_binding {
   provider = google-beta.target
 
   service_account_id = module.hca_argo_runner_account.id
   role = "roles/iam.workloadIdentityUser"
-  members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[clinvar/argo-runner]"]
+  members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[hca/argo-runner]"]
 }

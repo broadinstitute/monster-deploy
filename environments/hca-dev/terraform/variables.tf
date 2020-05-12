@@ -13,7 +13,7 @@ variable k8s_cluster_size {
 variable k8s_machine_type {
   type = string
   description = "Machine type of k8s cluster for command center."
-  default = "n1-standard-4"
+  default = "n1-standard-2"
 }
 
 locals {
