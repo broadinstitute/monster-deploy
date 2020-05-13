@@ -25,7 +25,7 @@ module node_pool {
   }
   dependencies = [module.enable_services, module.master]
 
-  name = "command-center-node-pool"
+  name = "hca-node-pool"
   master_name = module.master.name
   location = "us-central1-c"
 
