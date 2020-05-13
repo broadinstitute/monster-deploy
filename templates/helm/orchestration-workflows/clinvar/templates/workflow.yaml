@@ -35,11 +35,12 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: master
+    ref: DSPDC-978-QH
     path: orchestration
   values:
     gcs:
       bucketName: {{ $project }}-staging-storage
+      resultBucketName: {{ $project }}-ingest-results
     serviceAccount:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
