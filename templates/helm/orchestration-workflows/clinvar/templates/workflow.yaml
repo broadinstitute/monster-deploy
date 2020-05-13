@@ -35,7 +35,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: DSPDC-978-QH
+    ref: master
     path: orchestration
   values:
     gcs:
