@@ -70,6 +70,15 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        datasetPrefix: monster_staging_data
+        description: Dataset used by the Monster team for ingest ETL
+        # 7 days in units of seconds
+        expiration: '604800'
+      jadeData:
+        project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-encode{{end}}
     aws:
       credentialsSecretName: {{ $awsSecretName }}
     smokeTest:
