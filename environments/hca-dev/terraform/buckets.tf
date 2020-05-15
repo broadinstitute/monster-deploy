@@ -129,7 +129,7 @@ module hca_dataflow_account {
   account_id = "hca-dataflow-runner"
   display_name = " Service account to run HCA dataflow jobs"
   vault_path = "${local.vault_prefix}/service-accounts/hca-dataflow-runner"
-  roles = ["dataflow.worker", "bigquery.jobUser", "bigquery.dataOwner"]
+  roles = ["dataflow.worker"]
 }
 
 module hca_argo_runner_account {
@@ -142,7 +142,7 @@ module hca_argo_runner_account {
   account_id = "hca-argo-runner"
   display_name = "Service account to run HCA's Argo workflow."
   vault_path = "${local.vault_prefix}/service-accounts/hca-argo-runner"
-  roles = ["container.developer"]
+  roles = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
 }
 
 data google_project current_project {
