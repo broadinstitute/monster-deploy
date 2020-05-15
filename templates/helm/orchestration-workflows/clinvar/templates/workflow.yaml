@@ -38,6 +38,7 @@ spec:
     ref: master
     path: orchestration
   values:
+    maxParallelism: 1 # Weep
     gcs:
       bucketName: {{ $project }}-staging-storage
       resultBucketName: {{ $project }}-ingest-results
