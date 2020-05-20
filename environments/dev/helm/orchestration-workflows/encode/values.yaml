@@ -1,2 +1,6 @@
 enable: true
 schedule: '0 8 * * *'
+argo:
+  env: dev
+  namespace: encode
+  artifactBucket: broad-dsp-monster-encode-dev-argo-archive

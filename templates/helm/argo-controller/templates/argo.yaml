@@ -5,9 +5,9 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: argo-server-secrets
+  name: {{ .Release.Name }}-argo-secrets
 spec:
-  releaseName: argo-server-secrets
+  releaseName: {{ .Release.Name }}-argo-secrets
   targetNamespace: secrets-manager
   resetValues: true
   chart:
@@ -17,7 +17,7 @@ spec:
   values:
     secrets:
       - secretName: {{ $secretName }}
-        nameSpace: argo-ui
+        nameSpace: {{ .Values.namespace }}
         vals:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/{{ $env }}/command-center/cloudsql/users/argo
@@ -26,18 +26,19 @@ spec:
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: argo-server
+  name: {{ .Release.Name }}-argo-controller
 spec:
-  releaseName: argo
-  targetNamespace: argo-ui
+  releaseName: {{ .Release.Name }}-argo
+  targetNamespace: {{ .Values.namespace }}
   resetValues: true
   chart:
     repository: https://broadinstitute.github.io/monster-helm
-    name: argo-server
+    name: argo-controller
     version: 0.7.0
   values:
+    logs:
+      bucket: {{ .Values.artifactBucket }}
     clusterName: command-center-cluster
-    stackdriverProject: broad-dsp-monster-{{ .Values.env }}
     debug: {{ eq $env "dev" }}
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
@@ -47,8 +48,19 @@ spec:
       password:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-    service:
-      ingress:
-        create: true
-        ipName: argo-ip
-        domainName: argo.monster-{{ .Values.env }}.broadinstitute.org
+    workflowDefaults:
+      {{ $isDev := eq $env "dev" }}
+      podGarbageCollection:
+        enabled: {{ not $isDev }}
+        {{- if not $isDev }}
+        strategy: OnWorkflowSuccess
+        {{- end }}
+      workflowTTL:
+        enabled: true
+        {{- /*
+             * Timing translations:
+             *   - In dev, keep successes for 1 day, failures for a week
+             *   - In prod, keep successes for 1 hour, failures for 3 days
+             */}}
+        secondsAfterSuccess: {{ if $isDev }}86400{{ else }}3600{{ end }}
+        secondsAfterFailure: {{ if $isDev }}604800{{ else }}259200{{ end }}

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: argo-controller
+description: Value-template for deploying an Argo controller instance.
+version: 0.0.0

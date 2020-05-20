@@ -1,2 +1,6 @@
 enable: true
-schedule: '0 20 * * *'
+schedule: '15 15 * * *'
+argo:
+  env: dev
+  namespace: clinvar
+  artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
