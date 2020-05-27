@@ -1,4 +1,3 @@
-{{- if .Values.enable }}
 ---
 {{- $project := printf "broad-dsp-monster-clingen-%s" .Values.env }}
 {{- $secretName := "clinvar-key" }}
@@ -45,7 +44,10 @@ spec:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
+      enable: {{ .Values.enable }}
+      {{- if .Values.schedule }}
       schedule: {{ .Values.schedule }}
+      {{- end }}
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage
@@ -69,4 +71,3 @@ spec:
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-{{- end }}

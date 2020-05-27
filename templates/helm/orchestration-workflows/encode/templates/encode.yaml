@@ -1,4 +1,3 @@
-{{- if .Values.enable }}
 ---
 {{- $smokeTest := eq .Values.env "dev" }}
 {{- $project := printf "broad-dsp-monster-encode-%s" .Values.env }}
@@ -63,7 +62,10 @@ spec:
       k8sName: argo-runner
       googleName: encode-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
     cron:
+      enable: {{ .Values.enable }}
+      {{- if .Values.schedule }}
       schedule: {{ .Values.schedule }}
+      {{- end }}
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage
@@ -88,4 +90,3 @@ spec:
         secretName: smoke-test-secrets
         secretKey: slack-url
       {{- end }}
-{{- end }}

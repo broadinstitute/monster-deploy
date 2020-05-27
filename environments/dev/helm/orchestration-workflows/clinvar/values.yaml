@@ -1,5 +1,5 @@
 enable: true
-schedule: '15 15 * * *'
+schedule: '0 15 * * *'
 argo:
   env: dev
   namespace: clinvar
