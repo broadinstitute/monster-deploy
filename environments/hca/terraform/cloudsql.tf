@@ -15,6 +15,6 @@ module cloudsql {
   }
   db_names = ["argo"]
   user_names = ["argo"]
-  vault_prefix = local.vault_prefix
+  vault_prefix = local.dev_vault_prefix
   dependencies = module.enable_services
 }

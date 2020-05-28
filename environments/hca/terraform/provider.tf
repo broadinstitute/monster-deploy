@@ -1,5 +1,5 @@
 provider google-beta {
-  project = local.project_name
+  project = local.dev_project_name
   region = "us-central1"
   alias = "target"
 }
