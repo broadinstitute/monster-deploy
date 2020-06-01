@@ -18,6 +18,12 @@ function install_orchestration_workflow () {
     --values /values/orchestration-workflows/${wf}/values.yaml
 }
 
+function get_hca_config () {
+  local -r env=$1 config_target=$2
+
+  vault read -field=kubeconfig secret/dsde/monster/${env}/ingest/hca/gke > ${config_target}
+}
+
 function main () {
   # Check args.
   if [ $# -ne 2 ]; then
@@ -46,7 +52,7 @@ function main () {
 
   # Push releases to the command center.
   local -r center_config=${config_dir}/command-center
-  get_command_center_config ${env} ${center_config}
+  get_hca_config ${env} ${center_config}
   install_orchestration_workflow ${center_config} ${env} ${wf} ${helm_dir}
 }
 
