@@ -7,7 +7,7 @@ declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
 source ${SCRIPT_DIR}/common.sh
 
 function install_orchestration_workflow () {
-  local -r kubeconfig=$1 env=$2 wf=$3 helm_dir=$4
+  local -r kubeconfig=$1 env=$2 wf=hca helm_dir=$3
   local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
 
   ${helm[@]} dependency update /charts/orchestration-workflows/${wf}
@@ -26,34 +26,34 @@ function get_hca_config () {
 
 function main () {
   # Check args.
-  if [ $# -ne 2 ]; then
-    1>&2 echo Usage: ${0} '<env>' '<workflow-name>'
+  if [ $# -ne 1 ]; then
+    1>&2 echo Usage: ${0} '<env>'
     exit 1
   fi
 
   # Make sure config exists.
-  local -r env=$1 wf=$2
+  local -r env=$1
   local -r env_dir=${REPO_ROOT}/environments/${env}
-  local -r wf_values=${env_dir}/helm/orchestration-workflows/${wf}/values.yaml
+  local -r wf_values=${env_dir}/helm/orchestration-workflows/hca/values.yaml
   if [ ! -d ${env_dir} ]; then
     1>&2 echo Error: Invalid environment "'$env'"
     exit 1
   fi
   if [ ! -f ${wf_values} ]; then
-    1>&2 echo Error: Invalid workflow for ${env}: "'$wf'"
+    1>&2 echo Error: Invalid workflow for ${env}: "'hca'"
     exit 1
   fi
 
-  local -r config_dir=${env_dir}/.kubeconfig
+  local -r config_dir=${REPO_ROOT}/environments/hca-${env}/.kubeconfig
   mkdir -p ${config_dir}
 
   local -r helm_dir=${env_dir}/.helm
   mkdir -p ${helm_dir}
 
-  # Push releases to the command center.
-  local -r center_config=${config_dir}/command-center
-  get_hca_config ${env} ${center_config}
-  install_orchestration_workflow ${center_config} ${env} ${wf} ${helm_dir}
+  # Push releases.
+  local -r hca_config=${config_dir}/hca
+  get_hca_config ${env} ${hca_config}
+  install_orchestration_workflow ${hca_config} ${env} ${helm_dir}
 }
 
 main ${@}

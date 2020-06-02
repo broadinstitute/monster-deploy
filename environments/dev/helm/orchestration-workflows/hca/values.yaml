@@ -1,0 +1,7 @@
+enable: true
+env: dev
+#schedule: '0 15 * * *'
+argo:
+  env: dev
+  namespace: hca
+  artifactBucket: broad-dsp-monster-hca-dev-argo-archive
