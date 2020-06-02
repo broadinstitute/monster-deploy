@@ -19,7 +19,7 @@ spec:
         nameSpace: cloudsql-proxy
         vals:
           - kubeSecretKey: {{ $keyName }}
-            path: secret/dsde/monster/{{ .Values.env }}/command-center/service-accounts/command-center-proxy-runner
+            path: {{ .Values.vaultPrefix }}/service-accounts/command-center-proxy-runner
             vaultKey: key
 ---
 apiVersion: helm.fluxcd.io/v1
@@ -33,7 +33,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/datarepo-helm
     name: gcloud-sqlproxy
-    version: 0.19.4
+    version: 0.19.6
   values:
     cloudsql:
       instances:

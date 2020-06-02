@@ -78,7 +78,8 @@ spec:
       service:
         type: NodePort
       ingress:
-        enabled: true
+        enabled: {{ eq .Values.env "dev" }}
+        {{- if (eq .Values.env "dev") }}
         path: /*
         hosts:
           - grafana.monster-{{ .Values.env }}.broadinstitute.org
@@ -86,3 +87,4 @@ spec:
           kubernetes.io/ingress.global-static-ip-name: grafana-ip
           networking.gke.io/managed-certificates: "{{ $grafanaCertName }}"
           kubernetes.io/ingress.allow-http: "false"
+        {{- end }}

@@ -20,7 +20,7 @@ spec:
         nameSpace: argo-ui
         vals:
           - kubeSecretKey: {{ $keyName }}
-            path: secret/dsde/monster/{{ $env }}/command-center/cloudsql/users/argo
+            path: {{ .Values.vaultPrefix }}/cloudsql/users/argo
             vaultKey: password
 ---
 apiVersion: helm.fluxcd.io/v1
@@ -49,6 +49,8 @@ spec:
         secretKey: {{ $keyName }}
     service:
       ingress:
-        create: true
+        create: {{ eq $env "dev" }}
+        {{- if (eq $env "dev") }}
         ipName: argo-ip
         domainName: argo.monster-{{ .Values.env }}.broadinstitute.org
+        {{- end }}

@@ -1,7 +1,7 @@
 ---
-{{- $project := printf "broad-dsp-monster-hca-%s" .Values.env }}
-  {{- $secretName := "hca-key" }}
-  {{- $keyName := "key.json" }}
+{{- $project := "broad-dsp-monster-hca-dev" }}
+{{- $secretName := "hca-key" }}
+{{- $keyName := "key.json" }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -20,7 +20,7 @@ spec:
         nameSpace: hca
         vals:
           - kubeSecretKey: {{ $keyName }}
-            path: secret/dsde/monster/{{ .Values.env }}/ingest/hca/service-accounts/hca-argo-runner
+            path: secret/dsde/monster/dev/ingest/hca/service-accounts/hca-argo-runner
             vaultKey: key
 ---
 
@@ -41,7 +41,7 @@ spec:
       stagingBucketName: {{ $project }}-ingest-results
     serviceAccount:
       k8sName: argo-runner
-      googleName: hca-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
+      googleName: hca-argo-runner@{{ $project }}.iam.gserviceaccount.com
     cron:
       enable: {{ .Values.enable }}
       {{- if .Values.schedule }}
