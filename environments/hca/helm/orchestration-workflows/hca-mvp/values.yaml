@@ -1,4 +1,5 @@
 argo:
   env: dev
-  namespace: hca
+  vaultPrefix: secret/dsde/monster/dev/ingest/hca
+  namespace: hca-mvp
   artifactBucket: broad-dsp-monster-hca-dev-argo-archive

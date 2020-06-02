@@ -17,7 +17,7 @@ spec:
   values:
     secrets:
       - secretName: {{ $secretName }}
-        nameSpace: hca
+        nameSpace: hca-mvp
         vals:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/dev/ingest/hca/service-accounts/hca-argo-runner
@@ -30,7 +30,7 @@ metadata:
   name: hca-orchestration
 spec:
   releaseName: hca-orchestration
-  targetNamespace: hca
+  targetNamespace: hca-mvp
   resetValues: true
   chart:
     git: git://github.com/databiosphere/hca-ingest.git
