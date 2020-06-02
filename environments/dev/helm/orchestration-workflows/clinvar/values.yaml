@@ -1,4 +1,4 @@
-enable: true
+enable: false 
 schedule: '0 12 * * *'
 argo:
   env: dev
