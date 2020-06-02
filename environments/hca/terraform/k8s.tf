@@ -13,9 +13,9 @@ module master {
   network = module.k8s_network.network_link
   subnetwork = module.k8s_network.subnet_links[0]
 
-  restrict_master_access = var.is_production
+  restrict_master_access = false
 
-  vault_path = "${local.vault_prefix}/gke"
+  vault_path = "${local.dev_vault_prefix}/gke"
 }
 
 module node_pool {
@@ -29,8 +29,8 @@ module node_pool {
   master_name = module.master.name
   location = "us-central1-c"
 
-  node_count = var.k8s_cluster_size
-  machine_type = var.k8s_machine_type
+  node_count = 3
+  machine_type = "n1-standard-2"
   disk_size_gb = 10
 
   autoscaling = null
@@ -48,6 +48,6 @@ module hca_gke_runner_account {
 
   account_id = "hca-gke-runner"
   display_name = "Service account to run GKE system pods"
-  vault_path = "${local.vault_prefix}/service-accounts/gke-runner"
+  vault_path = "${local.dev_vault_prefix}/service-accounts/gke-runner"
   roles = ["logging.logWriter", "monitoring.metricWriter", "monitoring.viewer"]
 }
