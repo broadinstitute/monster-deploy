@@ -1,7 +1,6 @@
 ---
 {{- $secretName := "db-password" }}
 {{- $keyName := "password" }}
-{{- $env := .Values.env }}
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -37,8 +36,8 @@ spec:
     version: 0.7.0
   values:
     clusterName: command-center-cluster
-    stackdriverProject: broad-dsp-monster-{{ .Values.env }}
-    debug: {{ eq $env "dev" }}
+    stackdriverProject: {{ .Values.stackdriverProject }}
+    debug: {{ .Values.debug }}
     persistence:
       host: cloudsql-proxy-gcloud-sqlproxy.cloudsql-proxy
       port: 5432
@@ -49,8 +48,6 @@ spec:
         secretKey: {{ $keyName }}
     service:
       ingress:
-        create: {{ eq $env "dev" }}
-        {{- if (eq $env "dev") }}
-        ipName: argo-ip
-        domainName: argo.monster-{{ .Values.env }}.broadinstitute.org
-        {{- end }}
+        create: true
+        ipName: {{ .Values.dns.argo }}-ip
+        domainName: {{ .Values.dns.argo }}.{{ .Values.dns.zone }}.broadinstitute.org
