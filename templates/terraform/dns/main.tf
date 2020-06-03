@@ -1,7 +1,7 @@
 resource google_compute_global_address global_ip_address {
   for_each = toset(var.dns_names)
 
-  provider = google.target
+  provider = google.ip
   name = "${each.value}-ip"
   depends_on = [var.dependencies]
 }
@@ -9,7 +9,7 @@ resource google_compute_global_address global_ip_address {
 resource google_dns_record_set a_dns {
   for_each = toset(var.dns_names)
 
-  provider = google.target
+  provider = google.dns
   type = "A"
   ttl = "300"
 
@@ -22,7 +22,7 @@ resource google_dns_record_set a_dns {
 resource google_dns_record_set cname_dns {
   for_each = toset(var.dns_names)
 
-  provider = google.target
+  provider = google.dns
   type = "CNAME"
   ttl = "300"
 

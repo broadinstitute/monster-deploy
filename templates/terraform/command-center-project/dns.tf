@@ -13,7 +13,8 @@ resource google_dns_managed_zone dns_zone {
 module dns_names {
   source = "/templates/dns"
   providers = {
-    google.target = google.target
+    google.ip = google.target,
+    google.dns = google.target
   }
   dependencies = [module.enable_services]
   zone_gcp_name = google_dns_managed_zone.dns_zone.name

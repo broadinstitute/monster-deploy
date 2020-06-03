@@ -17,6 +17,12 @@ declare -ra BASE_NAMESPACES=(
   secrets-manager
 )
 
+declare -rA APPROLE_PATHS=(
+  [dev]=secret/dsde/monster/dev/approle-monster-dev
+  [prod]=secret/dsde/monster/prod/approle-monster-prod
+  [hca]=secret/dsde/monster/dev/approle-monster-dev
+)
+
 # Pull in common definitions.
 source ${SCRIPT_DIR}/common.sh
 
@@ -34,8 +40,8 @@ source ${SCRIPT_DIR}/common.sh
 function install_base_operators () {
   local -r kubeconfig=$1 env=$2 helm_dir=$3
 
-  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir}))
-  local -r bootstrap_secret=secret/dsde/monster/${env}/approle-monster-${env}
+  local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
+  local -r bootstrap_secret=${APPROLE_PATHS[${env}]}
 
   ${helm[@]} dependency update /charts/crd-operators
   ${helm[@]} upgrade base-crd-operators /charts/crd-operators \

@@ -18,13 +18,13 @@ spec:
         nameSpace: monitoring
         vals:
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_SECRET
-            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            path: {{ .Values.vaultPrefix }}/oauth2
             vaultKey: client_secret
           - kubeSecretKey: GF_AUTH_GOOGLE_CLIENT_ID
-            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            path: {{ .Values.vaultPrefix }}/oauth2
             vaultKey: client_id
           - kubeSecretKey: GF_SECURITY_ADMIN_PASSWORD
-            path: secret/dsde/monster/{{ .Values.env }}/oauth2
+            path: {{ .Values.vaultPrefix }}/oauth2
             vaultKey: admin_password
 ---
 {{ $grafanaCertName := "grafana-certificate" }}
@@ -41,7 +41,7 @@ spec:
     name: gcp-managed-cert
     version: 0.1.1
   values:
-    domainName: grafana.monster-{{ .Values.env }}.broadinstitute.org
+    domainName: {{ .Values.dns.grafana }}.{{ .Values.dns.zone }}.broadinstitute.org
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -72,8 +72,8 @@ spec:
         GF_AUTH_GOOGLE_AUTH_TOKEN: "https://accounts.google.com/o/oauth2/token"
         GF_AUTH_GOOGLE_API_URL: "https://www.googleapis.com/oauth2/v1/userinfo"
         GF_AUTH_GOOGLE_ALLOWED_DOMAINS: "broadinstitute.org"
-        GF_SERVER_DOMAIN: "grafana.monster-{{ .Values.env }}.broadinstitute.org"
-        GF_SERVER_ROOT_URL: "https://grafana.monster-{{ .Values.env }}.broadinstitute.org"
+        GF_SERVER_DOMAIN: "{{ .Values.dns.grafana }}.{{ .Values.dns.zone }}.broadinstitute.org"
+        GF_SERVER_ROOT_URL: "https://{{ .Values.dns.grafana }}.{{ .Values.dns.zone }}.broadinstitute.org"
       envFromSecret: {{ $secretName }}
       service:
         type: NodePort
@@ -81,8 +81,8 @@ spec:
         enabled: true
         path: /*
         hosts:
-          - grafana.monster-{{ .Values.env }}.broadinstitute.org
+          - {{ .Values.dns.grafana }}.{{ .Values.dns.zone }}.broadinstitute.org
         annotations:
-          kubernetes.io/ingress.global-static-ip-name: grafana-ip
+          kubernetes.io/ingress.global-static-ip-name: {{ .Values.dns.grafana }}-ip
           networking.gke.io/managed-certificates: "{{ $grafanaCertName }}"
           kubernetes.io/ingress.allow-http: "false"

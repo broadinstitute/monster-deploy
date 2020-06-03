@@ -1,0 +1,55 @@
+---
+{{- $project := "broad-dsp-monster-hca-dev" }}
+{{- $secretName := "hca-key" }}
+{{- $keyName := "key.json" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: hca-secrets
+spec:
+  releaseName: hca-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: hca-mvp
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: secret/dsde/monster/dev/ingest/hca/service-accounts/hca-argo-runner
+            vaultKey: key
+---
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: hca-orchestration
+spec:
+  releaseName: hca-orchestration
+  targetNamespace: hca-mvp
+  resetValues: true
+  chart:
+    git: git://github.com/databiosphere/hca-ingest.git
+    ref: master
+    path: orchestration
+  values:
+    gcs:
+      stagingBucketName: {{ $project }}-ingest-results
+    serviceAccount:
+      k8sName: argo-runner
+      googleName: hca-argo-runner@{{ $project }}.iam.gserviceaccount.com
+    cron:
+      enable: {{ .Values.enable }}
+      {{- if .Values.schedule }}
+      schedule: {{ .Values.schedule }}
+      {{- end }}
+    dataflow:
+      project: {{ $project }}
+      tmpBucketName: {{ $project }}-temp-storage
+      subnetName: monster-processing-network
+      workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
+      useFlexRS: {{ eq .Values.env "prod" }}

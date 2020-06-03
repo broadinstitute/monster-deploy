@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "env": { "type": "string", "enum": ["dev"] },
+    "vaultPrefix": { "type": "string" },
     "cloudsql": {
       "type": "object",
       "properties": {
@@ -11,7 +11,18 @@
         "region": { "type": "string" }
       },
       "required": ["name", "project", "region"]
-    }
+    },
+    "dns": {
+      "type": "object",
+      "properties": {
+        "zone": { "type": "string" },
+        "argo": { "type": "string" },
+        "grafana": { "type": "string" }
+      },
+      "required": ["zone", "argo", "grafana"]
+    },
+    "stackdriverProject": { "type": "string" },
+    "debug": { "type": "boolean" }
   },
-  "required": ["env", "cloudsql"]
+  "required": ["vaultPrefix", "cloudsql", "dns", "stackdriverProject", "debug"]
 }

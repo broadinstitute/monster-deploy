@@ -5,7 +5,7 @@ module cloudsql {
     vault.target = vault.target
   }
 
-  name_prefix = "hca"
+  name_prefix = "command-center"
   cpu = 4
   ram = 15360
   labels = {

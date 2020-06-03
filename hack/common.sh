@@ -11,6 +11,12 @@ declare -r HELM=lachlanevenson/k8s-helm:v3.0.3
 
 declare -r HELM_CHARTS_DIR=${REPO_ROOT}/templates/helm
 
+declare -rA VAULT_PREFIXES=(
+  [dev]=secret/dsde/monster/dev/command-center
+  [prod]=secret/dsde/monster/prod/command-center
+  [hca]=secret/dsde/monster/dev/ingest/hca
+)
+
 #####
 ## Read the kubeconfig for a command-center GKE cluster from its expected
 ## Vault path for the target environment.
@@ -18,7 +24,7 @@ declare -r HELM_CHARTS_DIR=${REPO_ROOT}/templates/helm
 function get_command_center_config () {
   local -r env=$1 config_target=$2
 
-  vault read -field=kubeconfig secret/dsde/monster/${env}/command-center/gke > ${config_target}
+  vault read -field=kubeconfig ${VAULT_PREFIXES[${env}]}/gke > ${config_target}
 }
 
 #####

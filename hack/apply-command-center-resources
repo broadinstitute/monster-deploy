@@ -21,9 +21,30 @@ declare -ra COMMAND_CENTER_NAMESPACES=(
   cloudsql-proxy
   argo-ui
   monitoring
-  clinvar
-  encode
-  dog-aging
+)
+
+declare -rA IP_PREFIXES=(
+  [dev]=''
+  [hca]=hca-
+  [prod]=''
+)
+
+declare -rA DEBUG=(
+  [dev]=true
+  [hca]=true
+  [prod]=false
+)
+
+declare -rA DNS_ZONES=(
+  [dev]=monster-dev
+  [hca]=monster-dev
+  [prod]=monster-prod
+)
+
+declare -rA STACKDRIVER_PROJECTS=(
+  [dev]=broad-dsp-monster-dev
+  [hca]=broad-dsp-monster-hca-dev
+  [prod]=broad-dsp-monster-prod
 )
 
 source ${SCRIPT_DIR}/common.sh
@@ -39,18 +60,24 @@ function install_command_center_services () {
   local -r kubeconfig=$1 env=$2 helm_dir=$3
 
   local -ra helm=($(configure_helm ${kubeconfig} ${helm_dir} ${env}))
-  local -r sql_instance_secret=secret/dsde/monster/${env}/command-center/cloudsql/instance
+  local -r vault_prefix=${VAULT_PREFIXES[${env}]}
+  local -r sql_instance_secret=${vault_prefix}/cloudsql/instance
+  local -r ip_prefix=${IP_PREFIXES[${env}]}
 
   ${helm[@]} dependency update /charts/command-center
   ${helm[@]} upgrade command-center /charts/command-center \
    --namespace fluxcd \
    --install \
    --set "env=${env}" \
+   --set "vaultPrefix=${vault_prefix}" \
    --set "cloudsql.name=$(vault read -field=name ${sql_instance_secret})" \
    --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
    --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
-   --set "argoNamespaces[0]=clinvar" \
-   --set "argoNamespaces[1]=encode"
+   --set "dns.argo=${ip_prefix}argo" \
+   --set "dns.grafana=${ip_prefix}grafana" \
+   --set "dns.zone=${DNS_ZONES[${env}]}" \
+   --set "stackdriverProject=${STACKDRIVER_PROJECTS[${env}]}" \
+   --set "debug=${DEBUG[${env}]}"
 }
 
 #####
