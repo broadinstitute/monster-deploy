@@ -7,6 +7,7 @@ module enable_services {
     "compute.googleapis.com",
     "container.googleapis.com",
     "containerregistry.googleapis.com",
+    "dns.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "logging.googleapis.com",

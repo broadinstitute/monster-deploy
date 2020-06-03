@@ -26,6 +26,11 @@ resource google_container_node_pool pool {
     auto_upgrade = true
   }
 
+  upgrade_settings {
+    max_surge = 1
+    max_unavailable = 0
+  }
+
   node_config {
     # CIS compliance: COS image
     image_type = "COS"
