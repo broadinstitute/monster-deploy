@@ -34,7 +34,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/hca-ingest.git
-    ref: master
+    ref: dm-diff-data-files-DSPDC-1101
     path: orchestration
   values:
     gcs:
@@ -53,3 +53,14 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        datasetPrefix: ingest_staging
+        description: 'Temporary storage for HCA ingest'
+        # 7 days in units of seconds
+        expiration: '604800'
+      jadeData:
+        # FIXME: Parameterize for prod.
+        project: broad-jade-dev-data
+        dataset: datarepo_hca_mvp
