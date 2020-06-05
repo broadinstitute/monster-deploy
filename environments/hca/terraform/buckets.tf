@@ -99,7 +99,7 @@ module hca_dataflow_account {
   }
 
   account_id = "hca-dataflow-runner"
-  display_name = " Service account to run HCA dataflow jobs"
+  display_name = "Service account to run HCA dataflow jobs"
   vault_path = "${local.dev_vault_prefix}/service-accounts/hca-dataflow-runner"
   roles = ["dataflow.worker"]
 }
@@ -126,5 +126,13 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
 
   service_account_id = module.hca_argo_runner_account.id
   role = "roles/iam.workloadIdentityUser"
-  members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[hca/argo-runner]"]
+  members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[hca-mvp/argo-runner]"]
+}
+
+resource google_service_account_iam_binding dataflow_runner_user_binding {
+  provider = google-beta.target
+
+  service_account_id = module.hca_dataflow_account.id
+  role = "roles/iam.serviceAccountUser"
+  members = ["serviceAccount:${module.hca_argo_runner_account.email}"]
 }
