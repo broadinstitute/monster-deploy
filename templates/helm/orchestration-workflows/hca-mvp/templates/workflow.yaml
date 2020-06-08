@@ -34,7 +34,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/hca-ingest.git
-    ref: master
+    ref: dm-bulk-ingest-files-DSPDC-1069
     path: orchestration
   values:
     gcs:
@@ -64,3 +64,11 @@ spec:
         # FIXME: Parameterize for prod.
         project: broad-jade-dev-data
         dataset: datarepo_hca_mvp
+    repo:
+      # TODO: Switch on environment
+      url: https://jade.datarepo-dev.broadinstitute.org
+      datasetId: 8c6633e3-ce9c-4aa4-b0ae-3fba122386a1
+      profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
+      accessKey:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
