@@ -29,6 +29,18 @@ spec:
             path: secret/dsde/monster/{{ .Values.env }}/slack-notifier
             # TODO: Generate a URL for #clinvar-ingest, to use in prod.
             vaultKey: monster-ci-url
+      - secretName: kafka-login
+        nameSpace: clinvar
+        vals:
+          - kubeSecretKey: KAFKA_URL
+            path: secret/dsde/monster/{{ .Values.env }}/clingen/kafka-login
+            vaultKey: bootstrap_url
+          - kubeSecretKey: KAFKA_USERNAME
+            path: secret/dsde/monster/{{ .Values.env }}/clingen/kafka-login
+            vaultKey: username
+          - kubeSecretKey: KAFKA_PASSWORD
+            path: secret/dsde/monster/{{ .Values.env }}/clingen/kafka-login
+            vaultKey: password
 ---
 
 apiVersion: helm.fluxcd.io/v1
@@ -70,10 +82,11 @@ spec:
         expiration: '604800'
       jadeData:
         project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
+        dataset: datarepo_monster_clinvar
     repo:
       url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
       # both the datasetId and profileId will eventually need to be conditional on .Values.env, once clinvar is in prod
-      datasetId: c0de9407-4f05-404f-bd94-cd8d820c947e
+      datasetId: 315d5411-1f67-4a16-8274-9da9bb137c0b
       profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
       accessKey:
         secretName: {{ $secretName }}
@@ -83,3 +96,6 @@ spec:
       slackUrl:
         secretName: slack-info
         secretKey: slack-url
+    kafka:
+      topic: broad_dsp_clinvar
+      secretName: kafka-login
