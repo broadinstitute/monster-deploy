@@ -53,12 +53,27 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: master
+    ref: dm-create-snapshot-DSPDC-908
     path: orchestration
   values:
-    gcs:
-      bucketName: {{ $project }}-staging-storage
-      resultBucketName: {{ $project }}-ingest-results
+    staging:
+      gcsBucket: {{ $project }}-staging-storage
+      bigquery:
+        project: {{ $project }}
+        datasetPrefix: monster_staging_data
+        description: Dataset used by the Monster team for ingest ETL
+        # 7 days in units of seconds
+        expiration: '604800'
+    jade:
+      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
+      # both the datasetId and profileId will eventually need to be conditional on .Values.env, once clinvar is in prod
+      datasetId: 315d5411-1f67-4a16-8274-9da9bb137c0b
+      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
+      accessKey:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}
+      dataProject: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
+      datasetName: monster_clinvar
     serviceAccount:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
@@ -73,29 +88,13 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
-    bigquery:
-      stagingData:
-        project: {{ $project }}
-        datasetPrefix: monster_staging_data
-        description: Dataset used by the Monster team for ingest ETL
-        # 7 days in units of seconds
-        expiration: '604800'
-      jadeData:
-        project: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
-        dataset: datarepo_monster_clinvar
-    repo:
-      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
-      # both the datasetId and profileId will eventually need to be conditional on .Values.env, once clinvar is in prod
-      datasetId: 315d5411-1f67-4a16-8274-9da9bb137c0b
-      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
-      accessKey:
-        secretName: {{ $secretName }}
-        secretKey: {{ $keyName }}
     notification:
       onlyOnFailure: {{ eq .Values.env "prod" }}
       slackUrl:
         secretName: slack-info
         secretKey: slack-url
-    kafka:
-      topic: broad_dsp_clinvar
-      secretName: kafka-login
+    clingen:
+      gcsBucket: {{ $project }}-ingest-results
+      kafka:
+        topic: broad_dsp_clinvar
+        secretName: kafka-login
