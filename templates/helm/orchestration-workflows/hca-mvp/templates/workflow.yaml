@@ -38,7 +38,7 @@ spec:
     path: orchestration
   values:
     gcs:
-      stagingBucketName: {{ $project }}-ingest-results
+      stagingBucketName: {{ $project }}-staging-storage
     serviceAccount:
       k8sName: argo-runner
       googleName: hca-argo-runner@{{ $project }}.iam.gserviceaccount.com
@@ -50,6 +50,17 @@ spec:
     dataflow:
       project: {{ $project }}
       tmpBucketName: {{ $project }}-temp-storage
-      subnetName: monster-processing-network
-      workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
+      subnetName: hca-network
+      workerAccount: hca-dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        datasetPrefix: ingest_staging
+        description: 'Temporary storage for HCA ingest'
+        # 7 days in units of seconds
+        expiration: '604800'
+      jadeData:
+        # FIXME: Parameterize for prod.
+        project: broad-jade-dev-data
+        dataset: datarepo_hca_mvp
