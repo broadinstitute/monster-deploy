@@ -51,10 +51,8 @@ spec:
     workflowDefaults:
       {{ $isDev := eq $env "dev" }}
       podGarbageCollection:
-        enabled: {{ not $isDev }}
-        {{- if not $isDev }}
-        strategy: OnWorkflowSuccess
-        {{- end }}
+        enabled: true
+        strategy: OnPodSuccess
       workflowTTL:
         enabled: true
         {{- /*

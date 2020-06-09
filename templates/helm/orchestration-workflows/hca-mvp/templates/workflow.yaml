@@ -34,7 +34,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/hca-ingest.git
-    ref: dm-bulk-ingest-files-DSPDC-1069
+    ref: dm-ingest-table-data-DSPDC-1068
     path: orchestration
   values:
     gcs:
