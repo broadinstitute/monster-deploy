@@ -31,7 +31,7 @@ module node_pool {
 
   node_count = 3
   machine_type = "n1-standard-2"
-  disk_size_gb = 10
+  disk_size_gb = 30
 
   autoscaling = null
   taints = null

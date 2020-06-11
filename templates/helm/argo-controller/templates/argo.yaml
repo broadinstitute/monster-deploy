@@ -34,7 +34,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-controller
-    version: 0.7.0
+    version: 0.7.2
   values:
     logs:
       bucket: {{ .Values.artifactBucket }}
@@ -51,10 +51,8 @@ spec:
     workflowDefaults:
       {{ $isDev := eq $env "dev" }}
       podGarbageCollection:
-        enabled: {{ not $isDev }}
-        {{- if not $isDev }}
-        strategy: OnWorkflowSuccess
-        {{- end }}
+        enabled: true
+        strategy: OnPodSuccess
       workflowTTL:
         enabled: true
         {{- /*
