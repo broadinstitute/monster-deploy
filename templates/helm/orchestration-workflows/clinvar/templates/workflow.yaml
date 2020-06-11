@@ -53,7 +53,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: dm-create-snapshot-DSPDC-908
+    ref: master
     path: orchestration
   values:
     staging:
