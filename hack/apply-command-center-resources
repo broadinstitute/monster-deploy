@@ -68,7 +68,6 @@ function install_command_center_services () {
   ${helm[@]} upgrade command-center /charts/command-center \
    --namespace fluxcd \
    --install \
-   --set "env=${env}" \
    --set "vaultPrefix=${vault_prefix}" \
    --set "cloudsql.name=$(vault read -field=name ${sql_instance_secret})" \
    --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
