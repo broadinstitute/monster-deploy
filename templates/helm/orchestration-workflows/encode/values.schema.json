@@ -12,7 +12,18 @@
         "ref": { "type": "string" }
       },
       "required": ["git", "ref"]
+    },
+    "repo": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "dataProject": { "type": "string" },
+        "datasetName": { "type": "string" },
+        "profileId": { "type": "string" },
+        "datasetId": { "type": "string" }
+      },
+      "required": ["url", "dataProject", "datasetName", "profileId", "datasetId"]
     }
   },
-  "required": ["env", "enable", "chart"]
+  "required": ["env", "enable", "chart", "repo"]
 }
