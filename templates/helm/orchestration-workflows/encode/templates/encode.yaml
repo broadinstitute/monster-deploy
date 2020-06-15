@@ -51,10 +51,18 @@ spec:
   releaseName: encode-orchestration
   targetNamespace: encode
   resetValues: true
+  {{- with .Values.chart }}
   chart:
+    {{- if .git }}
     git: git://github.com/databiosphere/encode-ingest.git
-    ref: master
+    ref: {{ .ref }}
     path: orchestration
+    {{- else }}
+    repository: https://databiosphere.github.io/encode-ingest
+    name: encode-ingest
+    version: {{ .ref }}
+    {{- end }}
+  {{- end }}
   values:
     gcs:
       bucketName: {{ $project }}-staging-storage

@@ -4,7 +4,15 @@
   "properties": {
     "env": { "type": "string", "enum": ["dev"] },
     "enable": { "type": "boolean" },
-    "schedule": { "type": "string" }
+    "schedule": { "type": "string" },
+    "chart": {
+      "type": "object",
+      "properties": {
+        "git": { "type": "boolean" },
+        "ref": { "type": "string" }
+      },
+      "required": ["git", "ref"]
+    }
   },
-  "required": ["env", "enable"]
+  "required": ["env", "enable", "chart"]
 }

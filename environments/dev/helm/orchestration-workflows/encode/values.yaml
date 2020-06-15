@@ -5,3 +5,6 @@ argo:
   vaultPrefix: secret/dsde/monster/dev/command-center
   namespace: encode
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
+chart:
+  git: true
+  ref: master

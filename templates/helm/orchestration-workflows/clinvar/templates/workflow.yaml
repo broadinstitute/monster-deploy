@@ -51,10 +51,18 @@ spec:
   releaseName: clinvar-orchestration
   targetNamespace: clinvar
   resetValues: true
+  {{- with .Values.chart }}
   chart:
+    {{- if .git }}
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: master
+    ref: {{ .ref }}
     path: orchestration
+    {{- else }}
+    repository: https://databiosphere.github.io/clinvar-ingest
+    name: clinvar-ingest
+    version: {{ .ref }}
+    {{- end }}
+  {{- end }}
   values:
     staging:
       gcsBucket: {{ $project }}-staging-storage

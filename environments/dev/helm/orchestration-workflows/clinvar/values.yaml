@@ -1,7 +1,10 @@
-enable: false 
+enable: false
 schedule: '0 12 * * *'
 argo:
   env: dev
   vaultPrefix: secret/dsde/monster/dev/command-center
   namespace: clinvar
   artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
+chart:
+  git: true
+  ref: master
