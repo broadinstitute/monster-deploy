@@ -79,7 +79,6 @@ spec:
       tmpBucketName: {{ $project }}-temp-storage
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
-      useFlexRS: {{ eq .Values.env "prod" }}
     bigquery:
       stagingData:
         project: {{ $project }}

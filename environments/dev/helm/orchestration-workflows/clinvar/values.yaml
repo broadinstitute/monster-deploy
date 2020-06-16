@@ -14,3 +14,8 @@ repo:
   datasetName: monster_clinvar
   datasetId: 315d5411-1f67-4a16-8274-9da9bb137c0b
   profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
+notification:
+  onlyOnFailure: false
+  vaultSecret:
+    path: secret/dsde/monster/dev/slack-notifier
+    key: monster-ci-url

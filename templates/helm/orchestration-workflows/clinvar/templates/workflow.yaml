@@ -26,9 +26,10 @@ spec:
         nameSpace: clinvar
         vals:
           - kubeSecretKey: slack-url
-            path: secret/dsde/monster/{{ .Values.env }}/slack-notifier
-            # TODO: Generate a URL for #clinvar-ingest, to use in prod.
-            vaultKey: monster-ci-url
+            {{- with .Values.notification.vaultSecret }}
+            path: {{ .path }}
+            vaultKey: {{ .key }}
+            {{- end }}
       - secretName: kafka-login
         nameSpace: clinvar
         vals:
@@ -42,7 +43,6 @@ spec:
             path: secret/dsde/monster/{{ .Values.env }}/clingen/kafka-login
             vaultKey: password
 ---
-
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -74,9 +74,7 @@ spec:
         expiration: '604800'
     jade:
       {{- with .Values.repo }}
-      #url: https://datarepo.terra.bio
       url: {{ .url }}
-      #dataProject: broad-datarepo-terra-prod-cgen
       dataProject: {{ .dataProject }}
       datasetName: {{ .datasetName }}
       datasetId: {{ .datasetId }}
@@ -98,14 +96,13 @@ spec:
       tmpBucketName: {{ $project }}-temp-storage
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
-      useFlexRS: {{ eq .Values.env "prod" }}
     notification:
-      onlyOnFailure: {{ eq .Values.env "prod" }}
+      onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
       slackUrl:
         secretName: slack-info
         secretKey: slack-url
     clingen:
       gcsBucket: {{ $project }}-ingest-results
       kafka:
-        topic: broad_dsp_clinvar
+        topic: broad-dsp-clinvar
         secretName: kafka-login
