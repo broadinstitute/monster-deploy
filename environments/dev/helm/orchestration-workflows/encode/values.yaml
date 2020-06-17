@@ -5,3 +5,12 @@ argo:
   vaultPrefix: secret/dsde/monster/dev/command-center
   namespace: encode
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
+chart:
+  git: true
+  ref: master
+repo:
+  url: https://jade.datarepo-dev.broadinstitute.org
+  dataProject: broad-jade-dev-data
+  datasetName: broad_dsp_encode
+  datasetId: 5e07b70a-26d8-4a70-9b7a-d8e3f2833e23
+  profileId: 390e7a85-d47f-4531-b612-165fc977d3bd

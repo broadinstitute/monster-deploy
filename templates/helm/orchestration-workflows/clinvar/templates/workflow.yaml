@@ -26,9 +26,10 @@ spec:
         nameSpace: clinvar
         vals:
           - kubeSecretKey: slack-url
-            path: secret/dsde/monster/{{ .Values.env }}/slack-notifier
-            # TODO: Generate a URL for #clinvar-ingest, to use in prod.
-            vaultKey: monster-ci-url
+            {{- with .Values.notification.vaultSecret }}
+            path: {{ .path }}
+            vaultKey: {{ .key }}
+            {{- end }}
       - secretName: kafka-login
         nameSpace: clinvar
         vals:
@@ -42,7 +43,6 @@ spec:
             path: secret/dsde/monster/{{ .Values.env }}/clingen/kafka-login
             vaultKey: password
 ---
-
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -51,10 +51,18 @@ spec:
   releaseName: clinvar-orchestration
   targetNamespace: clinvar
   resetValues: true
+  {{- with .Values.chart }}
   chart:
+    {{- if .git }}
     git: git://github.com/databiosphere/clinvar-ingest.git
-    ref: master
+    ref: {{ .ref }}
     path: orchestration
+    {{- else }}
+    repository: https://databiosphere.github.io/clinvar-ingest
+    name: clinvar-ingest
+    version: {{ .ref }}
+    {{- end }}
+  {{- end }}
   values:
     staging:
       gcsBucket: {{ $project }}-staging-storage
@@ -65,15 +73,16 @@ spec:
         # 7 days in units of seconds
         expiration: '604800'
     jade:
-      url: {{ if (eq .Values.env "dev") }}https://jade.datarepo-dev.broadinstitute.org{{ else }}https://datarepo.terra.bio{{end}}
-      # both the datasetId and profileId will eventually need to be conditional on .Values.env, once clinvar is in prod
-      datasetId: 315d5411-1f67-4a16-8274-9da9bb137c0b
-      profileId: cdfce15c-e1c4-42ce-94a3-ab1393c2b1f5
+      {{- with .Values.repo }}
+      url: {{ .url }}
+      dataProject: {{ .dataProject }}
+      datasetName: {{ .datasetName }}
+      datasetId: {{ .datasetId }}
+      profileId: {{ .profileId }}
+      {{- end }}
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-      dataProject: {{ if (eq .Values.env "dev") }}broad-jade-dev-data{{ else }}broad-datarepo-terra-prod-cgen{{end}}
-      datasetName: monster_clinvar
     serviceAccount:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
@@ -87,14 +96,13 @@ spec:
       tmpBucketName: {{ $project }}-temp-storage
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
-      useFlexRS: {{ eq .Values.env "prod" }}
     notification:
-      onlyOnFailure: {{ eq .Values.env "prod" }}
+      onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
       slackUrl:
         secretName: slack-info
         secretKey: slack-url
     clingen:
       gcsBucket: {{ $project }}-ingest-results
       kafka:
-        topic: broad_dsp_clinvar
+        topic: broad-dsp-clinvar
         secretName: kafka-login
