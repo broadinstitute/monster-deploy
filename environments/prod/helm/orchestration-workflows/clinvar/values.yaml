@@ -1,4 +1,5 @@
-enable: false
+enable: true
+schedule: '0 13 * * *'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
@@ -6,12 +7,12 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.0.0-RC1
+  ref: 1.1.0-M1
 repo:
   url: https://jade-terra.datarepo-prod.broadinstitute.org
   dataProject: broad-datarepo-terra-prod-cgen
   datasetName: broad_dsp_clinvar
-  datasetId: f8818986-2b81-4487-a7df-6e166d4c87a7
+  datasetId: dfbd0c7e-088b-45ab-a161-7b79aa28d872
   profileId: 5c001e19-ea18-41e4-8671-de42503fadcc
 notification:
   onlyOnFailure: false

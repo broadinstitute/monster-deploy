@@ -12,7 +12,7 @@ repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: broad-jade-dev-data
   datasetName: monster_clinvar
-  datasetId: a1fc768d-b58a-4996-8210-11581e9a2ce9
+  datasetId: 9952ebf2-65d9-44b7-b5a8-b500bc458909
   profileId: b94944a9-df3d-4b35-b573-c7d9b249ea52
 notification:
   onlyOnFailure: false
