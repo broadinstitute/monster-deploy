@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.1.0-M1
+  ref: 1.1.0-M2
 repo:
   url: https://jade-terra.datarepo-prod.broadinstitute.org
   dataProject: broad-datarepo-terra-prod-cgen
@@ -19,3 +19,6 @@ notification:
   vaultSecret:
     path: secret/dsde/monster/prod/clingen/slack-notifier
     key: url
+volumes:
+  downloadSize: 2Gi
+  extractSize: 15Gi
