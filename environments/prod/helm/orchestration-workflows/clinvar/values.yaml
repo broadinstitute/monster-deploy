@@ -19,6 +19,3 @@ notification:
   vaultSecret:
     path: secret/dsde/monster/prod/clingen/slack-notifier
     key: url
-volumes:
-  downloadSize: 2Gi
-  extractSize: 15Gi
