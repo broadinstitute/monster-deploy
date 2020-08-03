@@ -1,0 +1,15 @@
+enable: true
+argo:
+  env: prod
+  vaultPrefix: secret/dsde/monster/prod/ingest/hca
+  namespace: hca
+  artifactBucket: broad-dsp-monster-hca-prod-argo-archive
+repo:
+  profileId: TODO
+  datasetId: TODO
+  datasetName: broad_dsp_hca BUT TODO
+  dataProject: broad-datarepo-terra-prod-TODO
+  url: https://jade-terra.datarepo-prod.broadinstitute.org
+chart:
+  git: false
+  ref: TODO

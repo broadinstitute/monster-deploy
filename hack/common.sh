@@ -15,6 +15,7 @@ declare -rA VAULT_PREFIXES=(
   [dev]=secret/dsde/monster/dev/command-center
   [prod]=secret/dsde/monster/prod/command-center
   [hca]=secret/dsde/monster/dev/ingest/hca
+  [hca-prod]=secret/dsde/monster/prod/ingest/hca
 )
 
 #####

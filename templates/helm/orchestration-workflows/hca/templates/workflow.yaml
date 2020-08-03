@@ -1,0 +1,76 @@
+---
+{{- $projectName := "broad-dsp-monster-hca-prod" }}
+{{- $projectId := "mystical-slate-284720" }}
+{{- $secretName := "hca-key" }}
+{{- $keyName := "key.json" }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: hca-secrets
+spec:
+  releaseName: hca-secrets
+  targetNamespace: secrets-manager
+  resetValues: true
+  chart:
+    repository: https://broadinstitute.github.io/datarepo-helm
+    name: create-secret-manager-secret
+    version: 0.0.5
+  values:
+    secrets:
+      - secretName: {{ $secretName }}
+        nameSpace: hca
+        vals:
+          - kubeSecretKey: {{ $keyName }}
+            path: secret/dsde/monster/prod/ingest/hca/service-accounts/hca-argo-runner
+            vaultKey: key
+---
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: hca-orchestration
+spec:
+  releaseName: hca-orchestration
+  targetNamespace: hca
+  resetValues: true
+  chart:
+    git: git://github.com/databiosphere/hca-ingest.git
+    ref: master
+    path: orchestration
+  values:
+    gcs:
+      stagingBucketName: {{ $projectName }}-staging-storage
+    serviceAccount:
+      k8sName: argo-runner
+      googleName: hca-argo-runner@{{ $projectId }}.iam.gserviceaccount.com
+    cron:
+      enable: {{ .Values.enable }}
+      {{- if .Values.schedule }}
+      schedule: {{ .Values.schedule }}
+      {{- end }}
+    dataflow:
+      project: {{ $project }}
+      tmpBucketName: {{ $projectName }}-temp-storage
+      subnetName: hca-network
+      workerAccount: hca-dataflow-runner@{{ $projectId }}.iam.gserviceaccount.com
+      useFlexRS: {{ eq .Values.env "prod" }}
+    bigquery:
+      stagingData:
+        project: {{ $project }}
+        datasetPrefix: ingest_staging
+        description: 'Temporary storage for HCA ingest'
+        # 7 days in units of seconds
+        expiration: '604800'
+      jadeData:
+        # FIXME: Parameterize for prod.
+        project: broad-jade-dev-data
+        dataset: datarepo_hca_mvp
+    repo:
+      {{- with .Values.repo }}
+      url: {{ .url }}
+      datasetId: {{ .datasetId }}
+      profileId: {{ .profileId }}
+      {{- end }}
+      accessKey:
+        secretName: {{ $secretName }}
+        secretKey: {{ $keyName }}

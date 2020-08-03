@@ -21,6 +21,7 @@ declare -rA APPROLE_PATHS=(
   [dev]=secret/dsde/monster/dev/approle-monster-dev
   [prod]=secret/dsde/monster/prod/approle-monster-prod
   [hca]=secret/dsde/monster/dev/approle-monster-dev
+  [hca-prod]=secret/dsde/monster/prod/approle-monster-prod
 )
 
 # Pull in common definitions.
