@@ -49,28 +49,25 @@ spec:
       schedule: {{ .Values.schedule }}
       {{- end }}
     dataflow:
-      project: {{ $project }}
+      project: {{ $projectId }}
       tmpBucketName: {{ $projectName }}-temp-storage
       subnetName: hca-network
       workerAccount: hca-dataflow-runner@{{ $projectId }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
     bigquery:
       stagingData:
-        project: {{ $project }}
+        project: {{ $projectName }}
         datasetPrefix: ingest_staging
         description: 'Temporary storage for HCA ingest'
         # 7 days in units of seconds
         expiration: '604800'
       jadeData:
-        # FIXME: Parameterize for prod.
-        project: broad-jade-dev-data
-        dataset: datarepo_hca_mvp
+        project: broad-datarepo-terra-prod-hca
+        dataset: datarepo_broad_dsp_hca
     repo:
-      {{- with .Values.repo }}
-      url: {{ .url }}
-      datasetId: {{ .datasetId }}
-      profileId: {{ .profileId }}
-      {{- end }}
+      url: https://jade-terra.datarepo-prod.broadinstitute.org
+      datasetId: 7c311f7f-8df0-43a6-b0c4-f9d1b37de6da
+      profileId: 1da21148-2acb-4b1c-a2a2-1fe71a74d2b3
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
