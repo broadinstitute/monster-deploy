@@ -29,6 +29,52 @@ resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
   member = "serviceAccount:${each.value}"
 }
 
+# Service account for EBI to use when writing to the bucket.
+module ebi_writer_account {
+  source = "/templates/google-sa"
+  providers = {
+    google.target = google-beta.target,
+    vault.target = vault.target
+  }
+
+  account_id = "ebi-staging-writer"
+  display_name = "Account used by EBI to interact with their staging bucket"
+  vault_path = "${local.prod_vault_prefix}/service-accounts/ebi-storage-writer"
+  roles = ["storagetransfer.user", "storagetransfer.viewer"]
+}
+
+# EBI is an admin on their bucket.
+resource google_storage_bucket_iam_member ebi_writer_iam {
+  provider = google-beta.target
+  bucket = google_storage_bucket.ebi_bucket.name
+  role = "roles/storage.objectAdmin"
+  member = "serviceAccount:${module.ebi_writer_account.email}"
+}
+
+# Both TDRs and our Dataflow SA can read from the bucket.
+resource google_storage_bucket_iam_member tdr_reader_iam {
+  provider = google-beta.target
+  for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
+
+  bucket = google_storage_bucket.ebi_bucket.name
+  role = "roles/storage.objectViewer"
+  member = "serviceAccount:${each.value}"
+}
+
+# Google's Storage Transfer Service can interact with the bucket.
+data google_storage_transfer_project_service_account sts_account {
+  provider = google-beta.target
+}
+
+resource google_storage_bucket_iam_member sts_iam {
+  provider = google-beta.target
+
+  bucket = google_storage_bucket.ebi_bucket.name
+  role = "roles/storage.objectAdmin"
+  member = "serviceAccount:${data.google_storage_transfer_project_service_account.sts_account.email}"
+}
+
+
 # bucket for UCSC
 resource google_storage_bucket ucsc_bucket {
   provider = google-beta.target
@@ -177,6 +223,7 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
   service_account_id = module.hca_argo_runner_account.id
   role = "roles/iam.workloadIdentityUser"
   members = ["serviceAccount:${data.google_project.current_project.id}.svc.id.goog[hca/argo-runner]"]
+  depends_on = [module.hca_argo_runner_account]
 }
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
