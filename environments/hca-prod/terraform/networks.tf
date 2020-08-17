@@ -10,5 +10,5 @@ module k8s_network {
     region = "us-central1",
     cidr = "10.0.0.0/22"
   }]
-  enable_flow_logs = false
+  enable_flow_logs = true
 }
