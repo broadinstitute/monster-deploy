@@ -34,7 +34,7 @@ spec:
   resetValues: true
   chart:
     git: git://github.com/databiosphere/hca-ingest.git
-    ref: ra-DSPDC-1237-multiflow
+    ref: master
     path: orchestration
   values:
     gcs:
