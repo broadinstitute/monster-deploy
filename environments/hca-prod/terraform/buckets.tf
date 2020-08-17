@@ -52,7 +52,7 @@ resource google_storage_bucket_iam_member ebi_writer_iam {
 }
 
 # Both TDRs and our Dataflow SA can read from the bucket.
-resource google_storage_bucket_iam_member tdr_reader_iam {
+resource google_storage_bucket_iam_member tdr_ebi_reader_iam {
   provider = google-beta.target
   for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
 
@@ -92,6 +92,16 @@ resource google_storage_bucket_iam_member ucsc_bucket_iam {
 
   role = "roles/storage.admin"
   member = "user:${each.value}"
+}
+
+# Both TDRs and our Dataflow SA can read from the bucket.
+resource google_storage_bucket_iam_member tdr_ucsc_reader_iam {
+  provider = google-beta.target
+  for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
+
+  bucket = google_storage_bucket.ucsc_bucket.name
+  role = "roles/storage.objectViewer"
+  member = "serviceAccount:${each.value}"
 }
 
 # temp bucket for dataflow temporary files
@@ -217,14 +227,14 @@ data google_project current_project {
   provider = google-beta.target
 }
 
-resource google_service_account_iam_binding hca_workload_identity_binding {
-  provider = google-beta.target
-
-  service_account_id = module.hca_argo_runner_account.id
-  role = "roles/iam.workloadIdentityUser"
-  members = ["serviceAccount:${data.google_project.current_project.id}.svc.id.goog[hca/argo-runner]"]
-  depends_on = [module.hca_argo_runner_account]
-}
+//resource google_service_account_iam_binding hca_workload_identity_binding {
+//  provider = google-beta.target
+//
+//  service_account_id = module.hca_argo_runner_account.id
+//  role = "roles/iam.workloadIdentityUser"
+//  members = ["serviceAccount:${data.google_project.current_project.id}.svc.id.goog[hca/argo-runner]"]
+//  depends_on = [module.hca_argo_runner_account]
+//}
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
   provider = google-beta.target
