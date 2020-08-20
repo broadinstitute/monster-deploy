@@ -1,0 +1,5 @@
+argo:
+  env: prod
+  vaultPrefix: secret/dsde/monster/prod/ingest/hca
+  namespace: hca
+  artifactBucket: broad-dsp-monster-hca-prod-argo-archive

@@ -27,24 +27,28 @@ declare -rA IP_PREFIXES=(
   [dev]=''
   [hca]=hca-
   [prod]=''
+  [hca-prod]=hca-
 )
 
 declare -rA DEBUG=(
   [dev]=true
   [hca]=true
   [prod]=false
+  [hca-prod]=false
 )
 
 declare -rA DNS_ZONES=(
   [dev]=monster-dev
   [hca]=monster-dev
   [prod]=monster-prod
+  [hca-prod]=monster-prod
 )
 
 declare -rA STACKDRIVER_PROJECTS=(
   [dev]=broad-dsp-monster-dev
   [hca]=broad-dsp-monster-hca-dev
   [prod]=broad-dsp-monster-prod
+  [hca-prod]=broad-dsp-monster-prod
 )
 
 source ${SCRIPT_DIR}/common.sh
