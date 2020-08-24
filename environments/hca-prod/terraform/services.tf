@@ -21,6 +21,7 @@ module enable_services {
     "stackdriver.googleapis.com",
     "storage-api.googleapis.com",
     "storage-component.googleapis.com",
-    "dataflow.googleapis.com"
+    "dataflow.googleapis.com",
+    "storagetransfer.googleapis.com"
   ]
 }

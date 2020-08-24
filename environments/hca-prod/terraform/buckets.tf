@@ -68,9 +68,10 @@ data google_storage_transfer_project_service_account sts_account {
 
 resource google_storage_bucket_iam_member sts_iam {
   provider = google-beta.target
+  for_each = toset(["storage.legacyBucketReader", "storage.objectViewer", "storage.legacyBucketWriter"])
 
   bucket = google_storage_bucket.ebi_bucket.name
-  role = "roles/storage.objectAdmin"
+  role = "roles/${each.value}"
   member = "serviceAccount:${data.google_storage_transfer_project_service_account.sts_account.email}"
 }
 
