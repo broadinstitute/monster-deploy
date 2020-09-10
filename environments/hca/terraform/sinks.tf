@@ -1,16 +1,22 @@
-module dataflow_log_sink {
-  source = "github.com/broadinstitute/terraform-shared.git//terraform-modules/gcs_bq_log_sink?ref=sinks-0.0.11"
+resource google_storage_bucket logs {
+  provider = google-beta.target
+  name  = "${local.dev_project_name}-error-logs"
+}
 
-  providers = {
-    google.target      = google.target
-    google-beta.target = google-beta.target
-  }
+# Grant service account access to the storage bucket
+resource "google_storage_bucket_iam_member" "bucket-log-writer" {
+  provider = google-beta.target
+  bucket     = google_storage_bucket.logs.name
+  role       = "roles/storage.objectCreator"
+  member     = google_logging_project_sink.bucket-log-sink.writer_identity
+  depends_on = [google_storage_bucket.logs]
+}
 
-  enable_bigquery         = 0
-  enable_pubsub           = 0
-  enable_gcs              = 1
-  owner                   = "monster"
-  application_name        = "hca-ingest"
-  log_filter              = "resource.type=\"dataflow_step\" severity=ERROR resource.labels.step_id : \"Validate\""
-  project                 = local.dev_project_name
+resource "google_logging_project_sink" "bucket-log-sink" {
+  provider = google-beta.target
+  name                   = "${local.dev_project_name}-gcs-log-sink"
+  destination            = "storage.googleapis.com/${google_storage_bucket.logs.name}"
+  filter                 = "resource.type=\"dataflow_step\" severity=ERROR resource.labels.step_id : \"Validate\""
+  unique_writer_identity = true
+  depends_on             = [google_storage_bucket.logs]
 }

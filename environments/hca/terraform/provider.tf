@@ -5,10 +5,6 @@ provider google-beta {
   region = "us-central1"
 }
 
-provider google {
-  alias = "target"
-}
-
 provider google-beta {
   alias = "dev-core"
 
