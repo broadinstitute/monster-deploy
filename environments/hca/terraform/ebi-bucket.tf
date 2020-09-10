@@ -27,6 +27,19 @@ resource google_storage_bucket_iam_member ebi_writer_iam {
   member = "serviceAccount:${module.ebi_writer_account.email}"
 }
 
+# Rolando and Enrique are admin on their bucket
+resource google_storage_bucket_iam_member ebi_user_bucket_iam {
+  provider = google-beta.target
+  bucket = google_storage_bucket.ebi_staging_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  for_each = toset(["enrique@ebi.ac.uk", "rolando@ebi.ac.uk"])
+
+  role = "roles/storage.admin"
+  member = "user:${each.value}"
+}
+
 # Both TDRs and our Dataflow SA can read from the bucket.
 resource google_storage_bucket_iam_member tdr_reader_iam {
   provider = google-beta.target
