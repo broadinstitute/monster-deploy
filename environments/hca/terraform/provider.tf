@@ -4,6 +4,7 @@ provider google-beta {
   project = local.dev_project_name
   region = "us-central1"
 }
+
 provider google-beta {
   alias = "dev-core"
 
