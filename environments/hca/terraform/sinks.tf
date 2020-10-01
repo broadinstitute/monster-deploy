@@ -16,7 +16,7 @@ resource "google_logging_project_sink" "bucket-log-sink" {
   provider = google-beta.target
   name                   = "${local.dev_project_name}-gcs-log-sink"
   destination            = "storage.googleapis.com/${google_storage_bucket.logs.name}"
-  filter                 = "resource.type=\"dataflow_step\" severity=ERROR resource.labels.step_id : \"Validate\""
+  filter                 = "resource.type=\"dataflow_step\" severity=ERROR jsonPayload.message : (\"SchemaValidationError\" OR \"FileMismatchError\" OR \"NoRegexPatternMatchError\" OR \"MissingPropertyError\")"
   unique_writer_identity = true
   depends_on             = [google_storage_bucket.logs]
 }
