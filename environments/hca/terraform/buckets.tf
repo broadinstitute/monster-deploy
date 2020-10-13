@@ -28,14 +28,14 @@ resource google_storage_bucket_iam_member temp_bucket_runner_iam {
 }
 
 resource google_storage_bucket_iam_member temp_bucket_test_iam {
-provider = google-beta.target
-bucket = google_storage_bucket.temp_bucket.name
-# When the storage.admin role is applied to an individual bucket,
-# the control applies only to the specified bucket and objects within
-# the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-role = "roles/storage.admin"
-member = "serviceAccount:${module.hca_test_account.email}"
-depends_on = [module.hca_test_account.delay]
+  provider = google-beta.target
+  bucket = google_storage_bucket.temp_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.hca_test_account.email}"
+  depends_on = [module.hca_test_account.delay]
 }
 
 resource google_storage_bucket_iam_member hca_argo_temp_bucket_iam {
