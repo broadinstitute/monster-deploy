@@ -228,14 +228,14 @@ data google_project current_project {
   provider = google-beta.target
 }
 
-//resource google_service_account_iam_binding hca_workload_identity_binding {
-//  provider = google-beta.target
-//
-//  service_account_id = module.hca_argo_runner_account.id
-//  role = "roles/iam.workloadIdentityUser"
-//  members = ["serviceAccount:${data.google_project.current_project.id}.svc.id.goog[hca/argo-runner]"]
-//  depends_on = [module.hca_argo_runner_account]
-//}
+resource google_service_account_iam_binding hca_workload_identity_binding {
+  provider = google-beta.target
+
+  service_account_id = module.hca_argo_runner_account.id
+  role = "roles/iam.workloadIdentityUser"
+  members = ["serviceAccount:${local.prod_project_id}.svc.id.goog[hca/argo-runner]"]
+  depends_on = [module.hca_argo_runner_account]
+}
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
   provider = google-beta.target
