@@ -63,8 +63,13 @@ spec:
     version: {{ .ref }}
     {{- end }}
   {{- end }}
+  {{- with .Values.chart }}
   values:
-    version: 1.2.0
+    {{- if .git }}
+    {{- else }}
+    version: {{ .ref }}
+    {{- end}}
+  {{- end}}
     volumes:
       downloadSize: 2Gi
       extractSize: 15Gi
