@@ -30,7 +30,7 @@ module node_pool {
   location = "us-central1-c"
 
   node_count = 3
-  machine_type = "n1-standard-2"
+  machine_type = "n1-standard-4"
   disk_size_gb = 30
 
   autoscaling = null
