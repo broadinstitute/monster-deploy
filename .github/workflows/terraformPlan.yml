@@ -1,6 +1,5 @@
 name: 'Terraform Plan'
 env:
-  terraform_directory: "./environments/${{ matrix.environment }}/terraform"
   terraform_version: "0.13.5"
 on:
   pull_request:
@@ -17,6 +16,8 @@ jobs:
       matrix:
         # environment: [dev, hca, hca-prod, prod, v2f-prod]
         environment: [dev]
+    env:
+      terraform_directory: "./environments/${{ matrix.environment }}/terraform"
     if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
