@@ -48,14 +48,6 @@ jobs:
         run: terraform fmt -check -recursive
         continue-on-error: true
 
-      - name: "${{ matrix.environment }} - Set backend config bucket"
-        run: |
-          ls -al
-          echo 'bucket<<EOF' >> $GITHUB_ENV
-          grep google_project ${{ matrix.environment }}.tfvars | awk '{print $3}' >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-        working-directory: ${{ env.terraform_directory }}/tfvars
-
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
         run: terraform init -backend-config=bucket=${{ env.bucket }}
