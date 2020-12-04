@@ -1,0 +1,101 @@
+name: 'Terraform Plan'
+env:
+  terraform_directory: "."
+  terraform_version: "0.13.5"
+on:
+  pull_request:
+    paths:
+      - '!hack/**'
+      - '!.github/**'
+      - '.github/workflows/terraformPlan.yml'
+      - 'environments/*/terraform/**'
+      - 'templates/terraform/**
+jobs:
+  terraform_plan:
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        environment: [dev, hca, hca-prod, prod, v2f-prod]
+    if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
+    name: "${{ matrix.environment }} Terraform Plan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "${{ matrix.environment }} Checkout"
+        uses: actions/checkout@v2
+
+      - name: install terraform
+        uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_version: ${{ env.terraform_version }}
+
+      - name: "${{ matrix.environment }} set VAULT_TOKEN"
+        id: token
+        run: |
+          VAULT_TOKEN=$(curl \
+            --request POST \
+            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+          echo ::add-mask::${VAULT_TOKEN}
+          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+          echo ::set-output name=vault_token::${VAULT_TOKEN}
+        env:
+          ROLE_ID: ${{ secrets.ROLE_ID }}
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: "${{ matrix.environment }} - Set backend config bucket"
+        run: |
+          ls -al
+          echo 'bucket<<EOF' >> $GITHUB_ENV
+          grep google_project ${{ matrix.environment }}.tfvars | awk '{print $3}' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+        working-directory: ${{ env.terraform_directory }}/tfvars
+
+      - name: "${{ matrix.environment }} - Terraform Init"
+        id: init
+        run: terraform init -backend-config=bucket=${{ env.bucket }}
+        working-directory: ${{ env.terraform_directory }}
+
+      - name: "${{ matrix.environment }} - Terraform Validate"
+        id: validate
+        run: terraform validate -no-color
+        continue-on-error: true
+
+      - name: "${{ matrix.environment }} - Terraform Plan"
+        id: plan
+        run: terraform plan -var-file=tfvars/${{ matrix.environment }}.tfvars -input=false -no-color
+        working-directory: ${{ env.terraform_directory }}
+        continue-on-error: true
+
+      - name: Outputs
+        uses: actions/github-script@0.9.0
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### ${{ matrix.environment }} - Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### ${{ matrix.environment }} - Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
+            #### ${{ matrix.environment }} - Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>${{ matrix.environment }} - Show Plan</summary>
+
+            \`\`\`${process.env.PLAN}\`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
