@@ -9,7 +9,7 @@ on:
       - '!.github/**'
       - '.github/workflows/terraformPlan.yml'
       - 'environments/*/terraform/**'
-      - 'templates/terraform/**
+      - 'templates/terraform/**'
 jobs:
   terraform_plan:
     timeout-minutes: 30
