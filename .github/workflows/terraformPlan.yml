@@ -21,6 +21,9 @@ jobs:
     if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
+    container:
+      volumes:
+        - "./templates/terraform:/templates"
     steps:
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
@@ -52,7 +55,7 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
-        run: terraform init -backend-config=bucket=${{ env.bucket }}
+        run: terraform init
         working-directory: ${{ env.terraform_directory }}
 
       - name: "${{ matrix.environment }} - Terraform Validate"
@@ -62,7 +65,7 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
-        run: terraform plan -var-file=tfvars/${{ matrix.environment }}.tfvars -input=false -no-color
+        run: terraform plan -var-file=variables.tf -input=false -no-color
         working-directory: ${{ env.terraform_directory }}
         continue-on-error: true
 
