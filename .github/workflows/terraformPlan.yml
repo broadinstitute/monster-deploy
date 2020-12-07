@@ -46,9 +46,6 @@ jobs:
           SECRET_ID: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
-      - name: aeiou
-        run: echo ${{ secrets.MONSTER_AUTH_ROLE_ID }}
-
       - name: "${{ matrix.environment }} consul-template render templates for terraform"
         uses: broadinstitute/github-action-consul-template@master
         with:
