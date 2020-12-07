@@ -54,6 +54,7 @@ jobs:
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
         run: terraform init ${{ env.terraform_directory }}
+        working-directory: ${{ env.terraform_directory }}
 
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
