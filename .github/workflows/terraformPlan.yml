@@ -18,7 +18,7 @@ jobs:
         # environment: [dev, hca, hca-prod, prod, v2f-prod]
         environment: [dev]
     env:
-      terraform_directory: "/env/terraform"
+      terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
     if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
@@ -35,6 +35,13 @@ jobs:
         uses: hashicorp/setup-terraform@v1.2.1
         with:
           terraform_version: ${{ env.terraform_version }}
+
+      - name: test print root dir
+        run: ls /
+
+      - name: test print root dir workingdir
+        run: ls /
+        working-directory: ${{ env.terraform_directory }}
 
       # - name: "${{ matrix.environment }} set VAULT_TOKEN"
       #   id: token
