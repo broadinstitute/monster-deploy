@@ -39,6 +39,9 @@ jobs:
       - name: test ls templates
         run: ls /templates
 
+      - name: test ls workspace
+        run: ls ${{ github.workspace }}
+
       - name: test ls templates source
         run: ls ${{ github.workspace }}/templates/terraform
 
