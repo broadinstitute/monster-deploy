@@ -37,7 +37,10 @@ jobs:
           terraform_version: ${{ env.terraform_version }}
 
       - name: test print root dir
-        run: ls /
+        run: ls /templates
+
+      - name: test print root dir env
+        run: ls /env
 
       - name: test print root dir workingdir
         run: ls /
