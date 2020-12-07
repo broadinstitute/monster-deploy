@@ -35,20 +35,20 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: "${{ matrix.environment }} set VAULT_TOKEN"
-        id: token
-        run: |
-          VAULT_TOKEN=$(curl \
-            --request POST \
-            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
-            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-          echo ::add-mask::${VAULT_TOKEN}
-          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
-          echo ::set-output name=vault_token::${VAULT_TOKEN}
-        env:
-          ROLE_ID: ${{ secrets.ROLE_ID }}
-          SECRET_ID: ${{ secrets.SECRET_ID }}
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      # - name: "${{ matrix.environment }} set VAULT_TOKEN"
+      #   id: token
+      #   run: |
+      #     VAULT_TOKEN=$(curl \
+      #       --request POST \
+      #       --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+      #       ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+      #     echo ::add-mask::${VAULT_TOKEN}
+      #     echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+      #     echo ::set-output name=vault_token::${VAULT_TOKEN}
+      #   env:
+      #     ROLE_ID: ${{ secrets.ROLE_ID }}
+      #     SECRET_ID: ${{ secrets.SECRET_ID }}
+      #     VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
       - name: Terraform fmt
         id: fmt
