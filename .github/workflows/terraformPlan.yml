@@ -42,8 +42,8 @@ jobs:
           echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
           echo ::set-output name=vault_token::${VAULT_TOKEN}
         env:
-          ROLE_ID: ${{ secrets.ROLE_ID }}
-          SECRET_ID: ${{ secrets.SECRET_ID }}
+          ROLE_ID: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          SECRET_ID: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
       - name: "${{ matrix.environment }} consul-template render templates for terraform"
