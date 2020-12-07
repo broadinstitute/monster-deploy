@@ -1,5 +1,5 @@
 module dataflow_runner_account {
-  source = "/templates/google-sa"
+  source = ".//google-sa"
   providers = {
     google.target = google.target,
     vault.target = vault.target
