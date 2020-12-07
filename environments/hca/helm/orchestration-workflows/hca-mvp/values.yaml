@@ -3,3 +3,8 @@ argo:
   vaultPrefix: secret/dsde/monster/dev/ingest/hca
   namespace: hca-mvp
   artifactBucket: broad-dsp-monster-hca-dev-argo-archive
+notification:
+  onlyOnFailure: false
+  vaultSecret:
+    path: secret/dsde/monster/dev/ingest/hca/slack-notifier
+    key: oauth-token
