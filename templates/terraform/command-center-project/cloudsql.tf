@@ -1,5 +1,5 @@
 module cloudsql {
-  source = "..//cloudsql"
+  source = "../cloudsql"
   providers = {
     google.target = google.target
     vault.target = vault.target

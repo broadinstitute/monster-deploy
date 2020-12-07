@@ -1,5 +1,5 @@
 module encode {
-  source = "..//processing-project"
+  source = "../processing-project"
   providers = {
     google.target = google.encode,
     vault.target = vault.target
@@ -15,7 +15,7 @@ module encode {
 }
 
 module encode_s3_user {
-  source = "..//aws-sa"
+  source = "../aws-sa"
   providers = {
     aws.target = aws.encode
   }

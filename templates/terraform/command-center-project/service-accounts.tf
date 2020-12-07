@@ -1,5 +1,5 @@
 module command_center_gke_runner_account {
-  source = "..//google-sa"
+  source = "../google-sa"
   providers = {
     google.target = google.target,
     vault.target = vault.target
@@ -12,7 +12,7 @@ module command_center_gke_runner_account {
 }
 
 module clinvar_argo_runner_account {
-  source = "..//google-sa"
+  source = "../google-sa"
   providers = {
     google.target = google.target,
     vault.target = vault.target
@@ -25,7 +25,7 @@ module clinvar_argo_runner_account {
 }
 
 module encode_argo_runner_account {
-  source = "..//google-sa"
+  source = "../google-sa"
   providers = {
     google.target = google.target,
     vault.target = vault.target

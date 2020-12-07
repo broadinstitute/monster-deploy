@@ -1,5 +1,5 @@
 module enable_services {
-  source = "..//api-services"
+  source = "../api-services"
   providers = {
     google.target = google.target
   }

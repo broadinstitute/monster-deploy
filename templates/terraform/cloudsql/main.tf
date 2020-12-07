@@ -79,7 +79,7 @@ resource google_sql_database db {
 
 # Create a service account for accessing the instance.
 module proxy_sa {
-  source = "..//google-sa"
+  source = "../google-sa"
   providers = {
     google.target = google.target,
     vault.target = vault.target

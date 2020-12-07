@@ -1,7 +1,7 @@
 # Provision a cluster for running "command center" services.
 # For example, this cluster will run Airflow, Argo CD, and the Argo controllers.
 module master {
-  source = "..//k8s-master"
+  source = "../k8s-master"
   providers = {
     google.target = google.target
   }
@@ -19,7 +19,7 @@ module master {
 }
 
 module node_pool {
-  source = "..//k8s-node-pool"
+  source = "../k8s-node-pool"
   providers = {
     google.target = google.target
   }

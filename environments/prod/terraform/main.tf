@@ -1,4 +1,5 @@
 provider google-beta {
+  credentials = file("../../gcs_sa_key.json")
   project = "broad-dsp-monster-prod"
   region = "us-central1"
   alias = "command-center"
@@ -9,12 +10,14 @@ provider vault {
 }
 
 provider google-beta {
+  credentials = file("../../gcs_sa_key.json")
   project = "broad-dsp-monster-clingen-prod"
   region = "us-central1"
   alias = "clinvar"
 }
 
 provider google-beta {
+  credentials = file("../../gcs_sa_key.json")
   project = "broad-dsp-monster-encode-prod"
   region = "us-west1"
   alias = "encode"

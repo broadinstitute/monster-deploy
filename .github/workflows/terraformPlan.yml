@@ -46,6 +46,14 @@ jobs:
           SECRET_ID: ${{ secrets.SECRET_ID }}
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
+      - name: "${{ matrix.environment }} consul-template render templates for terraform"
+        uses: broadinstitute/github-action-consul-template@master
+        with:
+          vault-address: ${{ secrets.VAULT_ADDR }}
+          vault-token: ${{ steps.token.outputs.vault_token }}
+          environment: ${{ matrix.environment }}
+          env_path: "environments"
+
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check -recursive

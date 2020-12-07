@@ -1,4 +1,5 @@
 provider google-beta {
+  credentials = file("../../gcs_sa_key.json")
   alias = "target"
 
   project = local.dev_project_name
@@ -6,6 +7,7 @@ provider google-beta {
 }
 
 provider google-beta {
+  credentials = file("../../gcs_sa_key.json")
   alias = "dev-core"
 
   project = "broad-dsp-monster-dev"
