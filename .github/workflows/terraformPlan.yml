@@ -27,6 +27,7 @@ jobs:
       volumes:
         - "${{ github.workspace }}/environments/${{ matrix.environment }}:/env"
         - "${{ github.workspace }}/templates/terraform:/templates"
+        - "${{ github.workspace }}:${{ github.workspace }}"
     steps:
       - name: test ls base working dir precheckout
         run: ls -la /__w/monster-deploy/monster-deploy
