@@ -18,7 +18,7 @@ resource google_storage_bucket_iam_member test_bucket_iam {
 
 
 module hca_test_account {
-  source = "/templates/google-sa"
+  source = "../../templates/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target

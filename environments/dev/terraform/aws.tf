@@ -34,7 +34,7 @@ module test_transfer_user {
     aws.target = aws.us-east-1
   }
 
-  source = "/templates/aws-sa"
+  source = "../../templates/aws-sa"
   account_id = "monster-s3-tester"
   vault_path = "${local.vault_prefix}/aws/s3-transfer-user"
 

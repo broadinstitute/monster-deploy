@@ -7,7 +7,7 @@ resource google_storage_bucket ebi_staging_bucket {
 
 # Service account for EBI to use when writing to the bucket.
 module ebi_writer_account {
-  source = "/templates/google-sa"
+  source = "../../templates/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target

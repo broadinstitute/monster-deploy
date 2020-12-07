@@ -22,14 +22,7 @@ jobs:
     if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
-    container:
-      image: node:10.16-jessie
-      volumes:
-        - "${{ github.workspace }}:${{ github.workspace }}:z"
-        - "${{ github.workspace }}/environments/${{ matrix.environment }}:/env:z"
-        - "${{ github.workspace }}/templates/terraform:/templates:z"
     steps:
-
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
 
@@ -38,26 +31,20 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: test ls workspace
-        run: ls -la ${{ github.workspace }}/templates/terraform
-
-      - name: test ls templates source
-        run: ls -la /templates
-
-      # - name: "${{ matrix.environment }} set VAULT_TOKEN"
-      #   id: token
-      #   run: |
-      #     VAULT_TOKEN=$(curl \
-      #       --request POST \
-      #       --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
-      #       ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-      #     echo ::add-mask::${VAULT_TOKEN}
-      #     echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
-      #     echo ::set-output name=vault_token::${VAULT_TOKEN}
-      #   env:
-      #     ROLE_ID: ${{ secrets.ROLE_ID }}
-      #     SECRET_ID: ${{ secrets.SECRET_ID }}
-      #     VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      - name: "${{ matrix.environment }} set VAULT_TOKEN"
+        id: token
+        run: |
+          VAULT_TOKEN=$(curl \
+            --request POST \
+            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+          echo ::add-mask::${VAULT_TOKEN}
+          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+          echo ::set-output name=vault_token::${VAULT_TOKEN}
+        env:
+          ROLE_ID: ${{ secrets.ROLE_ID }}
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
       - name: Terraform fmt
         id: fmt
