@@ -25,9 +25,9 @@ jobs:
     container:
       image: node:10.16-jessie
       volumes:
-        - "${{ github.workspace }}:${{ github.workspace }}"
-        - "${{ github.workspace }}/environments/${{ matrix.environment }}:/env"
-        - "${{ github.workspace }}/templates/terraform:/templates"
+        - "${{ github.workspace }}:${{ github.workspace }}:z"
+        - "${{ github.workspace }}/environments/${{ matrix.environment }}:/env:z"
+        - "${{ github.workspace }}/templates/terraform:/templates:z"
     steps:
 
       - name: "${{ matrix.environment }} Checkout"
