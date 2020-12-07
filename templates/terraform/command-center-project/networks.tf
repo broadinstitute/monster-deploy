@@ -1,5 +1,5 @@
 module k8s_network {
-  source = ".//compute-network"
+  source = "..//compute-network"
   providers = {
     google.target = google.target
   }

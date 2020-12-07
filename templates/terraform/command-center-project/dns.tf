@@ -11,7 +11,7 @@ resource google_dns_managed_zone dns_zone {
 }
 
 module dns_names {
-  source = ".//dns"
+  source = "..//dns"
   providers = {
     google.ip = google.target,
     google.dns = google.target

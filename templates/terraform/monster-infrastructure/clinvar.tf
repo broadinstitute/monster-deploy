@@ -1,5 +1,5 @@
 module clinvar {
-  source = ".//processing-project"
+  source = "..//processing-project"
   providers = {
     google.target = google.clinvar,
     vault.target = vault.target
