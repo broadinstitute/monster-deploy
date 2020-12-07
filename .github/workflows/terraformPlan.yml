@@ -36,8 +36,8 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: test ls templates
-        run: ls /templates
+      - name: test ls base working dir
+        run: ls /__w
 
       - name: test ls workspace
         run: ls ${{ github.workspace }}
