@@ -1,5 +1,5 @@
 module cloudsql {
-  source = "./templates/cloudsql"
+  source = "../../../templates/cloudsql"
   providers = {
     google.target = google-beta.target
     vault.target = vault.target
