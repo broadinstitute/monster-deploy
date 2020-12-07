@@ -1,5 +1,5 @@
 module k8s_network {
-  source = "../../templates/compute-network"
+  source = "./templates/compute-network"
   providers = {
     google.target = google-beta.target
   }
