@@ -31,7 +31,7 @@ resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
 
 # Service account for EBI to use when writing to the bucket.
 module ebi_writer_account {
-  source = "../../../../templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target
@@ -199,7 +199,7 @@ resource google_storage_bucket_iam_member hca_argo_logs_bucket_iam {
 # Service accounts that use these buckets
 # sa w/permissions to use dataflow & bigquery
 module hca_dataflow_account {
-  source = "../../../../templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target
@@ -212,7 +212,7 @@ module hca_dataflow_account {
 }
 
 module hca_argo_runner_account {
-  source = "../../../../templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target

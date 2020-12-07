@@ -21,7 +21,7 @@ resource google_storage_bucket v2f_results_bucket {
 }
 
 module v2f_writer {
-  source = "../../../../templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.command-center,
     vault.target = vault.v2f
