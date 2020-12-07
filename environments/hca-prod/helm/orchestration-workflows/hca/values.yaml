@@ -7,4 +7,4 @@ notification:
   onlyOnFailure: false
   vaultSecret:
     path: secret/dsde/monster/prod/ingest/hca/slack-notifier
-    key: url
+    key: oauth-token
