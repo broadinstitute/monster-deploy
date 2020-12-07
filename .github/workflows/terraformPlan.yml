@@ -25,8 +25,8 @@ jobs:
     container:
       image: node:10.16-jessie
       volumes:
-        - "$GITHUB_WORKSPACE/environments/${{ matrix.environment }}:/env"
-        - "$GITHUB_WORKSPACE/templates/terraform:/templates"
+        - "${{ env.GITHUB_WORKSPACE }}/environments/${{ matrix.environment }}:/env"
+        - "${{ env.GITHUB_WORKSPACE }}/templates/terraform:/templates"
     steps:
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
