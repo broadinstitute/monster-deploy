@@ -28,6 +28,9 @@ jobs:
         - "${{ github.workspace }}/environments/${{ matrix.environment }}:/env"
         - "${{ github.workspace }}/templates/terraform:/templates"
     steps:
+      - name: test ls base working dir precheckout
+        run: ls /__w
+
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
 
@@ -37,7 +40,7 @@ jobs:
           terraform_version: ${{ env.terraform_version }}
 
       - name: test ls base working dir
-        run: ls /__w
+        run: ls /__w/monster-deploy
 
       - name: test ls workspace
         run: ls ${{ github.workspace }}
