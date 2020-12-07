@@ -1,5 +1,5 @@
 module enable_services {
-  source = "../../../templates/api-services"
+  source = "../../../../templates/api-services"
   providers = {
     google.target = google-beta.target
   }

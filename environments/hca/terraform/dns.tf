@@ -4,7 +4,7 @@ data google_dns_managed_zone dev_zone {
 }
 
 module dns_names {
-  source = "../../../templates/dns"
+  source = "../../../../templates/dns"
   providers = {
     google.ip = google-beta.target,
     google.dns = google-beta.dev-core

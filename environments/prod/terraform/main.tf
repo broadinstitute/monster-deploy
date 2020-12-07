@@ -26,7 +26,7 @@ provider aws {
 }
 
 module monster_infrastructure {
-  source = "../../../templates/monster-infrastructure"
+  source = "../../../../templates/monster-infrastructure"
   providers = {
     google.command-center = google-beta.command-center
     vault.target = vault.command-center

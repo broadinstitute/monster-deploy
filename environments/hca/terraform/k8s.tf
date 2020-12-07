@@ -1,7 +1,7 @@
 # k8s
 # Provision a cluster for running hca services.
 module master {
-  source = "../../../templates/k8s-master"
+  source = "../../../../templates/k8s-master"
   providers = {
     google.target = google-beta.target
   }
@@ -19,7 +19,7 @@ module master {
 }
 
 module node_pool {
-  source = "../../../templates/k8s-node-pool"
+  source = "../../../../templates/k8s-node-pool"
   providers = {
     google.target = google-beta.target
   }
@@ -40,7 +40,7 @@ module node_pool {
 
 # gke service account
 module hca_gke_runner_account {
-  source = "../../../templates/google-sa"
+  source = "../../../../templates/google-sa"
   providers = {
     google.target = google-beta.target,
     vault.target = vault.target
