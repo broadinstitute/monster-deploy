@@ -29,8 +29,6 @@ jobs:
         - "${{ github.workspace }}/templates/terraform:/templates"
         - "${{ github.workspace }}:${{ github.workspace }}"
     steps:
-      - name: test ls base working dir precheckout
-        run: ls -la /__w/monster-deploy/monster-deploy
 
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
@@ -40,14 +38,11 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: test ls base working dir
-        run: ls -la /__w/monster-deploy/monster-deploy
-
       - name: test ls workspace
         run: ls ${{ github.workspace }}
 
       - name: test ls templates source
-        run: ls ${{ github.workspace }}/templates/terraform
+        run: ls -la /templates
 
       # - name: "${{ matrix.environment }} set VAULT_TOKEN"
       #   id: token
