@@ -112,4 +112,3 @@ Step 3 is to poll the job ID until it finishes. You can do so using the GET `/ap
 route in the Swagger UI. When the job exits the "running" state, you can get its final results using
 the GET `/api/repository/v1/jobs/{id}/result` endpoint. For succeeded jobs, this call will output
 the ID of the new dataset. For failed jobs, this call will show information about what went wrong.
-
