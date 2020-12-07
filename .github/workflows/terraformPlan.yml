@@ -23,6 +23,7 @@ jobs:
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
     container:
+      image: node:10.16-jessie
       volumes:
         - /home/runner/work/monster-deploy/monster-deploy/templates/terraform:/templates
     steps:
