@@ -36,15 +36,11 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: test print root dir
+      - name: test ls templates
         run: ls /templates
 
-      - name: test print root dir env
-        run: ls /env
-
-      - name: test print root dir workingdir
-        run: ls /
-        working-directory: ${{ env.terraform_directory }}
+      - name: test ls templates source
+        run: ls ${{ github.workspace }}/templates/terraform
 
       # - name: "${{ matrix.environment }} set VAULT_TOKEN"
       #   id: token
