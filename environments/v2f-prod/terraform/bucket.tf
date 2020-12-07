@@ -1,12 +1,10 @@
 provider google-beta {
-  credentials = file("../../gcs_sa_key.json")
   project = "broad-dsp-monster-v2f-prod"
   region = "us-central1"
   alias = "v2f"
 }
 
 provider google-beta {
-  credentials = file("../../gcs_sa_key.json")
   project = "broad-dsp-monster-dev"
   region = "us-central1"
   alias = "command-center"
