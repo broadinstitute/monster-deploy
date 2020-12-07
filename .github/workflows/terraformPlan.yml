@@ -22,9 +22,9 @@ jobs:
     if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
-    # container:
-    #   volumes:
-    #     - "./templates/terraform:/templates"
+    container:
+      volumes:
+        - /home/runner/work/monster-deploy/monster-deploy/templates/terraform:/templates
     steps:
       - name: "${{ matrix.environment }} Checkout"
         uses: actions/checkout@v2
