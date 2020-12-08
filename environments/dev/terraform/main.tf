@@ -1,4 +1,4 @@
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-dev"
   region  = "us-central1"
   alias   = "command-center"

@@ -1,6 +1,6 @@
 # a gcs bucket
 resource google_storage_bucket monster_test_bucket {
-  provider = google-beta.command-center
+  provider = google.command-center
   name     = "monster-test-bucket"
   location = "US"
 }
@@ -8,7 +8,7 @@ resource google_storage_bucket monster_test_bucket {
 module test_sa {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.command-center,
+    google.target = google.command-center,
     vault.target  = vault.command-center
   }
 
@@ -18,7 +18,7 @@ module test_sa {
 }
 
 resource google_storage_bucket_iam_member test_iam {
-  provider = google-beta.command-center
+  provider = google.command-center
   bucket   = google_storage_bucket.monster_test_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
