@@ -1,6 +1,6 @@
 # Needed for getting the ID of the project backing the k8s resource.
 data google_project project {
-  provider = google.target
+  provider = google-beta.target
 }
 
 # Create the GKE master.

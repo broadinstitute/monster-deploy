@@ -18,12 +18,10 @@ provider aws {
 resource aws_s3_bucket s3_east_bucket {
   provider = aws.us-east-1
   bucket   = "monster-s3-us-east-1"
-  region   = "us-east-1"
 }
 resource aws_s3_bucket s3_west_bucket {
   provider = aws.us-west-2
   bucket   = "monster-s3-us-west-2"
-  region   = "us-west-2"
 }
 
 ###
