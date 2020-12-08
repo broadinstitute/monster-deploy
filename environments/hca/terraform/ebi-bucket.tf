@@ -1,7 +1,7 @@
 # Staging bucket for EBI.
 resource google_storage_bucket ebi_staging_bucket {
   provider = google-beta.target
-  name = "${local.dev_project_name}-ebi-staging"
+  name     = "${local.dev_project_name}-ebi-staging"
   location = "US"
 }
 
@@ -10,33 +10,33 @@ module ebi_writer_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
-    vault.target = vault.target
+    vault.target  = vault.target
   }
 
-  account_id = "ebi-staging-writer"
+  account_id   = "ebi-staging-writer"
   display_name = "Account used by EBI to interact with their staging bucket"
-  vault_path = "${local.dev_vault_prefix}/service-accounts/ebi-storage-writer"
-  roles = ["storagetransfer.user", "storagetransfer.viewer"]
+  vault_path   = "${local.dev_vault_prefix}/service-accounts/ebi-storage-writer"
+  roles        = ["storagetransfer.user", "storagetransfer.viewer"]
 }
 
 # EBI is an admin on their bucket.
 resource google_storage_bucket_iam_member ebi_writer_iam {
   provider = google-beta.target
-  bucket = google_storage_bucket.ebi_staging_bucket.name
-  role = "roles/storage.objectAdmin"
-  member = "serviceAccount:${module.ebi_writer_account.email}"
+  bucket   = google_storage_bucket.ebi_staging_bucket.name
+  role     = "roles/storage.objectAdmin"
+  member   = "serviceAccount:${module.ebi_writer_account.email}"
 }
 
 # Rolando and Enrique are admin on their bucket
 resource google_storage_bucket_iam_member ebi_user_bucket_iam {
   provider = google-beta.target
-  bucket = google_storage_bucket.ebi_staging_bucket.name
+  bucket   = google_storage_bucket.ebi_staging_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
   for_each = toset(["enrique@ebi.ac.uk", "rolando@ebi.ac.uk"])
 
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "user:${each.value}"
 }
 
@@ -46,7 +46,7 @@ resource google_storage_bucket_iam_member tdr_reader_iam {
   for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
 
   bucket = google_storage_bucket.ebi_staging_bucket.name
-  role = "roles/storage.objectViewer"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${each.value}"
 }
 
@@ -60,6 +60,6 @@ resource google_storage_bucket_iam_member sts_iam {
   for_each = toset(["storage.legacyBucketReader", "storage.objectViewer", "storage.legacyBucketWriter"])
 
   bucket = google_storage_bucket.ebi_staging_bucket.name
-  role = "roles/${each.value}"
+  role   = "roles/${each.value}"
   member = "serviceAccount:${data.google_storage_transfer_project_service_account.sts_account.email}"
 }

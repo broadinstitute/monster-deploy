@@ -9,11 +9,11 @@ data google_project project {
 resource google_container_cluster master {
   provider = google.target
 
-  name = var.name
-  location = var.location
+  name       = var.name
+  location   = var.location
   depends_on = [var.dependencies]
 
-  network = var.network
+  network    = var.network
   subnetwork = var.subnetwork
 
   # CIS compliance: stackdriver logging
@@ -39,7 +39,7 @@ resource google_container_cluster master {
   # Silly, but necessary to have a default pool of 0 nodes. This allows the node definition to be handled cleanly
   # in a separate file
   remove_default_node_pool = true
-  initial_node_count = 1
+  initial_node_count       = 1
 
   # CIS compliance: disable legacy Auth
   enable_legacy_abac = false
@@ -64,7 +64,7 @@ resource google_container_cluster master {
     # According to trial and error, setting these values to null
     # lets Google derive values that actually work.
     # Otherwise you'll end up flipping a table trying to set things manually.
-    cluster_ipv4_cidr_block = null
+    cluster_ipv4_cidr_block  = null
     services_ipv4_cidr_block = null
   }
 
@@ -79,9 +79,9 @@ resource google_container_cluster master {
 
   # OMISSION: CIS compliance: Enable Private Cluster
   private_cluster_config {
-    enable_private_nodes = true
+    enable_private_nodes    = true
     enable_private_endpoint = false
-    master_ipv4_cidr_block = "10.0.82.0/28"
+    master_ipv4_cidr_block  = "10.0.82.0/28"
   }
 
   dynamic "master_authorized_networks_config" {
@@ -106,24 +106,24 @@ resource google_container_cluster master {
 locals {
   # Inspired by https://ahmet.im/blog/authenticating-to-gke-without-gcloud/
   kubeconfig = {
-    apiVersion = "v1",
-    kind = "Config",
+    apiVersion      = "v1",
+    kind            = "Config",
     current-context = "context",
     contexts = [{
       name = "context",
       context = {
         cluster = google_container_cluster.master.name,
-        user = "local-user"
+        user    = "local-user"
       }
     }],
     users = [{
       name = "local-user",
-      user = {auth-provider = {name = "gcp"}}
+      user = { auth-provider = { name = "gcp" } }
     }],
     clusters = [{
       name = google_container_cluster.master.name,
       cluster = {
-        server = "https://${google_container_cluster.master.endpoint}",
+        server                     = "https://${google_container_cluster.master.endpoint}",
         certificate-authority-data = google_container_cluster.master.master_auth[0].cluster_ca_certificate
       }
     }]
@@ -131,7 +131,7 @@ locals {
 }
 
 resource vault_generic_secret master_secrets {
-  path = var.vault_path
+  path      = var.vault_path
   data_json = <<EOT
 {
   "kubeconfig": ${jsonencode(jsonencode(local.kubeconfig))}

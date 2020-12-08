@@ -4,11 +4,11 @@
 ###
 provider aws {
   region = "us-east-1"
-  alias = "us-east-1"
+  alias  = "us-east-1"
 }
 provider aws {
   region = "us-west-2"
-  alias = "us-west-2"
+  alias  = "us-west-2"
 }
 
 ###
@@ -17,13 +17,13 @@ provider aws {
 ###
 resource aws_s3_bucket s3_east_bucket {
   provider = aws.us-east-1
-  bucket = "monster-s3-us-east-1"
-  region = "us-east-1"
+  bucket   = "monster-s3-us-east-1"
+  region   = "us-east-1"
 }
 resource aws_s3_bucket s3_west_bucket {
   provider = aws.us-west-2
-  bucket = "monster-s3-us-west-2"
-  region = "us-west-2"
+  bucket   = "monster-s3-us-west-2"
+  region   = "us-west-2"
 }
 
 ###
@@ -34,14 +34,14 @@ module test_transfer_user {
     aws.target = aws.us-east-1
   }
 
-  source = "../../../templates/terraform/aws-sa"
+  source     = "../../../templates/terraform/aws-sa"
   account_id = "monster-s3-tester"
   vault_path = "${local.vault_prefix}/aws/s3-transfer-user"
 
   iam_policy = [
     {
       subject_id = "ListObjects",
-      actions = ["s3:ListBucket"],
+      actions    = ["s3:ListBucket"],
       resources = [
         aws_s3_bucket.s3_east_bucket.arn,
         aws_s3_bucket.s3_west_bucket.arn
@@ -49,7 +49,7 @@ module test_transfer_user {
     },
     {
       subject_id = "ObjectActions",
-      actions = ["s3:*Object"]
+      actions    = ["s3:*Object"]
       resources = [
         "${aws_s3_bucket.s3_east_bucket.arn}/*",
         "${aws_s3_bucket.s3_west_bucket.arn}/*"

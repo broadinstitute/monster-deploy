@@ -8,7 +8,7 @@ module k8s_network {
   name = "hca-network"
   subnets = [{
     region = "us-central1",
-    cidr = "10.0.0.0/22"
+    cidr   = "10.0.0.0/22"
   }]
   enable_flow_logs = false
 }

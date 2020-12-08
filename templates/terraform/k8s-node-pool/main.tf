@@ -1,11 +1,11 @@
 # Create a GKE node pool, attached to an existing master.
 resource google_container_node_pool pool {
-  provider   = google.target
+  provider = google.target
 
   depends_on = [var.dependencies]
-  name = var.name
-  location = var.location
-  cluster = var.master_name
+  name       = var.name
+  location   = var.location
+  cluster    = var.master_name
   # node_count must be set to null if autoscaling is used
   node_count = var.node_count
 
@@ -27,22 +27,22 @@ resource google_container_node_pool pool {
   }
 
   upgrade_settings {
-    max_surge = 1
+    max_surge       = 1
     max_unavailable = 0
   }
 
   node_config {
     # CIS compliance: COS image
-    image_type = "COS"
-    machine_type = var.machine_type
-    disk_size_gb = var.disk_size_gb
+    image_type      = "COS"
+    machine_type    = var.machine_type
+    disk_size_gb    = var.disk_size_gb
     service_account = var.service_account_email
 
     dynamic "taint" {
       for_each = var.taints == null ? [] : var.taints
       content {
-        key = taint.value["key"]
-        value = taint.value["value"]
+        key    = taint.value["key"]
+        value  = taint.value["value"]
         effect = taint.value["effect"]
       }
     }
