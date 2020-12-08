@@ -1,4 +1,4 @@
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-dev"
   region  = "us-central1"
   alias   = "command-center"
@@ -8,13 +8,13 @@ provider vault {
   alias = "command-center"
 }
 
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-clingen-dev"
   region  = "us-central1"
   alias   = "clinvar"
 }
 
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-encode-dev"
   region  = "us-west1"
   alias   = "encode"
@@ -28,10 +28,10 @@ provider aws {
 module monster_infrastructure {
   source = "../../../templates/terraform/monster-infrastructure"
   providers = {
-    google.command-center = google-beta.command-center
+    google.command-center = google.command-center
     vault.target          = vault.command-center
-    google.clinvar        = google-beta.clinvar
-    google.encode         = google-beta.encode,
+    google.clinvar        = google.clinvar
+    google.encode         = google.encode,
     aws.encode            = aws.encode
   }
 
