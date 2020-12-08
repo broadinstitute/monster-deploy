@@ -1,3 +1,3 @@
-provider google-beta {
+provider google {
   alias = "target"
 }
