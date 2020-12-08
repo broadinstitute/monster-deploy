@@ -56,18 +56,20 @@ spec:
       useFlexRS: {{ eq .Values.env "prod" }}
     bigquery:
       stagingData:
-        project: {{ $projectName }}
+        project: {{ $projectId }}
         datasetPrefix: ingest_staging
         description: 'Temporary storage for HCA ingest'
         # 7 days in units of seconds
         expiration: '604800'
       jadeData:
-        project: broad-datarepo-terra-prod-hca
-        dataset: datarepo_broad_dsp_hca
+        project: broad-datarepo-terra-prod-hca2
+        # isn't used, TODO remove from hca chart
+        dataset: datarepo_hca_prod_20201106
     repo:
       url: https://jade-terra.datarepo-prod.broadinstitute.org
-      datasetId: 7c311f7f-8df0-43a6-b0c4-f9d1b37de6da
-      profileId: 1da21148-2acb-4b1c-a2a2-1fe71a74d2b3
+      # isn't used, TODO remove from hca chart
+      datasetId: 68c08a1d-78fe-41ca-92bd-eff5d78b5f57
+      profileId: db61c343-6dfe-4d14-84e9-60ddf97ea73f
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
