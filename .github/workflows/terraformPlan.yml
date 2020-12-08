@@ -56,7 +56,7 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
-        run: terraform fmt -check -recursive
+        run: terraform fmt -check -recursive -diff=true
         continue-on-error: true
 
       - name: "${{ matrix.environment }} - Terraform Init"
