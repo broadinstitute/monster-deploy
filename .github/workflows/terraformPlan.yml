@@ -65,6 +65,11 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
 
+      - name: print providers for testing
+        run: terraform providers ${{ env.terraform_directory }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
+
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
         run: terraform validate -no-color ${{ env.terraform_directory }}
