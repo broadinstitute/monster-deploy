@@ -53,6 +53,11 @@ spec:
       subnetName: hca-network
       workerAccount: hca-dataflow-runner@{{ $project }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    notification:
+      onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
+      oauthToken:
+        secretName: slack-notifier
+        secretKey: oauth-token
     bigquery:
       stagingData:
         project: {{ $project }}
