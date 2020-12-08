@@ -67,14 +67,17 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
-        run: terraform validate -no-color
+        run: terraform validate -no-color ${{ env.terraform_directory }}
         continue-on-error: true
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
-        run: terraform plan -var-file=variables.tf -input=false -no-color
-        working-directory: ${{ env.terraform_directory }}
+        run: terraform plan -input=false -no-color ${{ env.terraform_directory }}
         continue-on-error: true
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
 
       - name: Outputs
         uses: actions/github-script@0.9.0
