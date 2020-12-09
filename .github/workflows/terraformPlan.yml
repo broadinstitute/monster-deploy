@@ -14,12 +14,20 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        environment: [dev, hca, hca-prod, prod, v2f-prod]
         include:
-        - environment: [dev, hca]
+        - environment: dev
           vault_role_id_secret: MONSTER_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-        - environment: [hca-prod, prod, v2f-prod]
+        - environment: hca
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: hca-prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: v2f-prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     env:
