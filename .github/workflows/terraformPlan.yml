@@ -14,7 +14,22 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        environment: [dev, hca, hca-prod, prod, v2f-prod]
+        include:
+        - environment: dev
+          vault_role_id: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          vault_secret_id: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+        - environment: hca
+          vault_role_id: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          vault_secret_id: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+        - environment: hca-prod
+          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
+          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
+        - environment: prod
+          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
+          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
+        - environment: v2f-prod
+          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
+          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
     env:
       terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
@@ -34,7 +49,7 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: "${{ matrix.environment }} set dev VAULT_TOKEN"
+      - name: "${{ matrix.environment }} set VAULT_TOKEN"
         id: token
         run: |
           VAULT_TOKEN=$(curl \
@@ -45,32 +60,8 @@ jobs:
           echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
           echo ::set-output name=vault_token::${VAULT_TOKEN}
         env:
-          ROLE_ID: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
-          SECRET_ID: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-        if: "contains(['dev', 'hca'], matrix.environment)"
-
-      - name: "${{ matrix.environment }} set prod VAULT_TOKEN"
-        id: token
-        run: |
-          VAULT_TOKEN=$(curl \
-            --request POST \
-            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
-            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-          echo ::add-mask::${VAULT_TOKEN}
-          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
-          echo ::set-output name=vault_token::${VAULT_TOKEN}
-        env:
-          ROLE_ID: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
-          SECRET_ID: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
-        if: "contains(['hca-prod', 'prod', 'v2f-prod'], matrix.environment)"
-
-      - name: "${{ matrix.environment }} consul-template render templates for terraform"
-        uses: broadinstitute/github-action-consul-template@master
-        with:
-          vault-address: ${{ secrets.VAULT_ADDR }}
-          vault-token: ${{ steps.token.outputs.vault_token }}
-          environment: ${{ matrix.environment }}
-          env_path: "environments"
+          ROLE_ID: ${{ matrix.vault_role_id }}
+          SECRET_ID: ${{ matrix.vault_secret_id }}
 
       - name: Terraform fmt
         id: fmt
