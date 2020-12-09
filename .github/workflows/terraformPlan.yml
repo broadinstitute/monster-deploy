@@ -15,21 +15,12 @@ jobs:
     strategy:
       matrix:
         include:
-        - environment: dev
-          vault_role_id: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
-          vault_secret_id: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-        - environment: hca
-          vault_role_id: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
-          vault_secret_id: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-        - environment: hca-prod
-          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
-          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
-        - environment: prod
-          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
-          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
-        - environment: v2f-prod
-          vault_role_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
-          vault_secret_id: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
+        - environment: [dev, hca]
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: [hca-prod, prod, v2f-prod]
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     env:
       terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
@@ -60,8 +51,8 @@ jobs:
           echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
           echo ::set-output name=vault_token::${VAULT_TOKEN}
         env:
-          ROLE_ID: ${{ matrix.vault_role_id }}
-          SECRET_ID: ${{ matrix.vault_secret_id }}
+          ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
+          SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
 
       - name: Terraform fmt
         id: fmt
