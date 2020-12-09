@@ -32,7 +32,7 @@ jobs:
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
         - environment: v2f-prod
-          vault_env: prod
+          vault_env: dev
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     env:
@@ -84,19 +84,22 @@ jobs:
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
         run: terraform init ${{ env.terraform_directory }}
-
-      - name: print providers for testing
-        run: terraform providers ${{ env.terraform_directory }}
+        env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
         run: terraform validate -no-color ${{ env.terraform_directory }}
         continue-on-error: true
+        env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
         run: terraform plan -input=false -no-color ${{ env.terraform_directory }}
         continue-on-error: true
+        env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: Outputs
         uses: actions/github-script@0.9.0
