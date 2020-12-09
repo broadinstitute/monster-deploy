@@ -34,7 +34,7 @@ jobs:
         with:
           terraform_version: ${{ env.terraform_version }}
 
-      - name: "${{ matrix.environment }} set VAULT_TOKEN"
+      - name: "${{ matrix.environment }} set dev VAULT_TOKEN"
         id: token
         run: |
           VAULT_TOKEN=$(curl \
@@ -47,6 +47,22 @@ jobs:
         env:
           ROLE_ID: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           SECRET_ID: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+        if: "contains(['dev', 'hca'], matrix.environment)"
+
+      - name: "${{ matrix.environment }} set prod VAULT_TOKEN"
+        id: token
+        run: |
+          VAULT_TOKEN=$(curl \
+            --request POST \
+            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+          echo ::add-mask::${VAULT_TOKEN}
+          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+          echo ::set-output name=vault_token::${VAULT_TOKEN}
+        env:
+          ROLE_ID: ${{ secrets.MONSTER_PROD_AUTH_ROLE_ID }}
+          SECRET_ID: ${{ secrets.MONSTER_PROD_AUTH_ROLE_SECRET }}
+        if: "contains(['hca-prod', 'prod', 'v2f-prod'], matrix.environment)"
 
       - name: "${{ matrix.environment }} consul-template render templates for terraform"
         uses: broadinstitute/github-action-consul-template@master
