@@ -25,12 +25,12 @@ jobs:
           vault_env: dev
           vault_role_id_secret: MONSTER_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-          lock: 1607627373520617
+          lock: "1607627373520617"
         - environment: hca-prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-          lock: 1607627374555235
+          lock: "1607627374555235"
         - environment: prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
@@ -102,9 +102,10 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Unlock"
         id: unlock
-        run: terraform force-unlock  ${{ matrix.lock }}
+        run: terraform force-unlock ${{ matrix.lock }} --force
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+        working-directory: ${{ env.terraform_directory }}
         if: ${{ matrix.lock }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
