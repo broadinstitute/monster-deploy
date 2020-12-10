@@ -20,27 +20,22 @@ jobs:
           vault_env: dev
           vault_role_id_secret: MONSTER_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-          lock: null
         - environment: hca
           vault_env: dev
           vault_role_id_secret: MONSTER_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-          lock: "1607627373520617"
         - environment: hca-prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-          lock: "1607627374555235"
         - environment: prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-          lock: null
         - environment: v2f-prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-          lock: null
     env:
       terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
@@ -99,13 +94,6 @@ jobs:
         continue-on-error: true
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-
-      - name: "${{ matrix.environment }} - Terraform Unlock"
-        id: unlock
-        run: terraform force-unlock -force ${{ matrix.lock }} ${{ env.terraform_directory }}
-        env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-        if: ${{ matrix.lock }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
