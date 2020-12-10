@@ -102,10 +102,9 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Unlock"
         id: unlock
-        run: terraform force-unlock ${{ matrix.lock }} --force
+        run: terraform force-unlock ${{ matrix.lock }} ${{ env.terraform_directory }} -force
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-        working-directory: ${{ env.terraform_directory }}
         if: ${{ matrix.lock }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
