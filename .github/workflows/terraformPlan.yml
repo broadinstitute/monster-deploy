@@ -13,6 +13,7 @@ jobs:
   terraform_plan:
     timeout-minutes: 30
     strategy:
+      fail-fast: false
       matrix:
         include:
         - environment: dev
@@ -100,7 +101,6 @@ jobs:
         continue-on-error: true
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-      # Steve.
 
       - name: Outputs
         uses: actions/github-script@0.9.0
