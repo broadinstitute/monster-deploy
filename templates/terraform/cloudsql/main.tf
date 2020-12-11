@@ -9,30 +9,30 @@ resource random_id cloudsql_random_id {
 # NOTE: We might need multiple instances in prod, if it turns out there's too
 # much resource contention sharing a single instance.
 resource google_sql_database_instance postgres {
-  provider = google.target
+  provider   = google.target
   depends_on = [var.dependencies]
 
-  name = "${var.name_prefix}-postgres-${random_id.cloudsql_random_id.hex}"
+  name             = "${var.name_prefix}-postgres-${random_id.cloudsql_random_id.hex}"
   database_version = var.postgres_version
 
   settings {
     activation_policy = "ALWAYS"
-    pricing_plan = "PER_USE"
-    replication_type = "SYNCHRONOUS"
-    tier = "db-custom-${var.cpu}-${var.ram}"
-    user_labels = var.labels
+    pricing_plan      = "PER_USE"
+    replication_type  = "SYNCHRONOUS"
+    tier              = "db-custom-${var.cpu}-${var.ram}"
+    user_labels       = var.labels
 
     backup_configuration {
       binary_log_enabled = false
-      enabled = true
-      start_time = "06:00"
+      enabled            = true
+      start_time         = "06:00"
     }
 
     ip_configuration {
       ipv4_enabled = true
-      require_ssl = true
+      require_ssl  = true
       authorized_networks {
-        name = "Broad"
+        name  = "Broad"
         value = "69.173.64.0/18"
       }
     }
@@ -49,7 +49,7 @@ resource google_sql_user db_user {
   for_each = toset(var.user_names)
 
   provider = google.target
-  name = each.value
+  name     = each.value
   password = random_id.db_password[each.value].hex
   instance = google_sql_database_instance.postgres.name
 }
@@ -57,8 +57,8 @@ resource google_sql_user db_user {
 resource vault_generic_secret postgres_user {
   for_each = toset(var.user_names)
 
-  provider = vault.target
-  path = "${var.vault_prefix}/cloudsql/users/${each.value}"
+  provider  = vault.target
+  path      = "${var.vault_prefix}/cloudsql/users/${each.value}"
   data_json = <<EOT
 {
   "password": "${random_id.db_password[each.value].hex}"
@@ -69,26 +69,26 @@ EOT
 resource google_sql_database db {
   for_each = toset(var.db_names)
 
-  provider = google.target
-  name = each.value
-  instance = google_sql_database_instance.postgres.name
-  charset = "UTF8"
-  collation = "en_US.UTF8"
+  provider   = google.target
+  name       = each.value
+  instance   = google_sql_database_instance.postgres.name
+  charset    = "UTF8"
+  collation  = "en_US.UTF8"
   depends_on = [google_sql_user.db_user]
 }
 
 # Create a service account for accessing the instance.
 module proxy_sa {
-  source = "/templates/google-sa"
+  source = "../google-sa"
   providers = {
     google.target = google.target,
-    vault.target = vault.target
+    vault.target  = vault.target
   }
 
-  account_id = "${var.name_prefix}-proxy-runner"
+  account_id   = "${var.name_prefix}-proxy-runner"
   display_name = "CloudSQL proxy account"
-  vault_path = "${var.vault_prefix}/service-accounts/${var.name_prefix}-proxy-runner"
-  roles = ["cloudsql.client"]
+  vault_path   = "${var.vault_prefix}/service-accounts/${var.name_prefix}-proxy-runner"
+  roles        = ["cloudsql.client"]
   dependencies = var.dependencies
 }
 
@@ -96,7 +96,7 @@ module proxy_sa {
 resource vault_generic_secret postgres_connection_name {
   provider = vault.target
 
-  path = "${var.vault_prefix}/cloudsql/instance"
+  path      = "${var.vault_prefix}/cloudsql/instance"
   data_json = <<EOT
 {
   "name": "${google_sql_database_instance.postgres.name}",

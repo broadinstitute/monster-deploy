@@ -38,10 +38,10 @@ function main () {
     -e VAULT_ADDR=${VAULT_ADDR}
     -v ${HOME}/.vault-token:/root/.vault-token
     # Terraform template paths
-    -v ${TF_TEMPLATES_PATH}:/templates
+    -v ${TF_TEMPLATES_PATH}:/${TF_TEMPLATES_PATH}
     # Terraform source paths
-    -v ${env_dir}:/env
-    -w /env/terraform
+    -v ${env_dir}:${env_dir}
+    -w ${env_dir}/terraform
     ${TERRAFORM}
   )
 

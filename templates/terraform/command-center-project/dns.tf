@@ -6,18 +6,18 @@
 ###
 resource google_dns_managed_zone dns_zone {
   provider = google.target
-  name = local.dns_zone_name
+  name     = local.dns_zone_name
   dns_name = "${local.dns_zone_name}.broadinstitute.org."
 }
 
 module dns_names {
-  source = "/templates/dns"
+  source = "../dns"
   providers = {
-    google.ip = google.target,
+    google.ip  = google.target,
     google.dns = google.target
   }
-  dependencies = [module.enable_services]
+  dependencies  = [module.enable_services]
   zone_gcp_name = google_dns_managed_zone.dns_zone.name
   zone_dns_name = google_dns_managed_zone.dns_zone.dns_name
-  dns_names = ["argo","grafana"]
+  dns_names     = ["argo", "grafana"]
 }

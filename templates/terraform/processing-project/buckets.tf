@@ -1,7 +1,7 @@
 # Bucket for temp files used by processing programs.
 resource google_storage_bucket temp_bucket {
   provider = google.target
-  name = "${var.project_name}-temp-storage"
+  name     = "${var.project_name}-temp-storage"
   location = "US"
 
   lifecycle_rule {
@@ -18,19 +18,19 @@ resource google_storage_bucket temp_bucket {
 
 resource google_storage_bucket_iam_member temp_bucket_runner_iam {
   provider = google.target
-  bucket = google_storage_bucket.temp_bucket.name
+  bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
-  member = "serviceAccount:${module.dataflow_runner_account.email}"
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.dataflow_runner_account.email}"
   depends_on = [module.dataflow_runner_account.delay]
 }
 
 # Bucket for temporary data storage.
 resource google_storage_bucket staging_storage {
   provider = google.target
-  name = "${var.project_name}-staging-storage"
+  name     = "${var.project_name}-staging-storage"
   location = "US"
 
   dynamic "lifecycle_rule" {
@@ -48,74 +48,74 @@ resource google_storage_bucket staging_storage {
 
 resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   provider = google.target
-  bucket = google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
-  member = "serviceAccount:${module.dataflow_runner_account.email}"
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.dataflow_runner_account.email}"
   depends_on = [module.dataflow_runner_account.delay]
 }
 
 resource google_storage_bucket_iam_member command_center_argo_staging_bucket_iam {
   provider = google.target
-  bucket =  google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
 }
 
 resource google_storage_bucket_iam_member command_center_argo_temp_bucket_iam {
   provider = google.target
-  bucket =  google_storage_bucket.temp_bucket.name
+  bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
 }
 
 resource google_storage_bucket_iam_member staging_account_iam_reader {
   provider = google.target
-  bucket = google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
-  role = "roles/storage.objectViewer"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${var.jade_repo_email}"
 }
 
 # Bucket for long term Argo logs storage, currently want no "delete after N days" rule.
 resource google_storage_bucket argo_archive {
   provider = google.target
-  name = "${var.project_name}-argo-archive"
+  name     = "${var.project_name}-argo-archive"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member command_center_argo_logs_bucket_iam {
   provider = google.target
-  bucket =  google_storage_bucket.argo_archive.name
+  bucket   = google_storage_bucket.argo_archive.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
 }
 
 resource google_storage_bucket results_storage {
   provider = google.target
-  count = var.create_results_bucket ? 1 : 0
+  count    = var.create_results_bucket ? 1 : 0
 
-  name = "${var.project_name}-ingest-results"
+  name     = "${var.project_name}-ingest-results"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member results_writer {
   provider = google.target
-  count = var.create_results_bucket ? 1 : 0
+  count    = var.create_results_bucket ? 1 : 0
 
   bucket = google_storage_bucket.results_storage[0].name
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${var.command_center_argo_account_email}"
 }
 
@@ -124,8 +124,8 @@ resource google_storage_bucket_iam_member results_external_readers {
   for_each = toset(var.create_results_bucket ? var.result_reader_groups : [])
 
   provider = google.target
-  bucket = google_storage_bucket.results_storage[0].name
+  bucket   = google_storage_bucket.results_storage[0].name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
-  role = "roles/storage.objectViewer"
+  role   = "roles/storage.objectViewer"
   member = "group:${each.value}"
 }

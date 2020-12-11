@@ -1,0 +1,8 @@
+{{with $project := "monster" }}
+{{with $environment := env "ENVIRONMENT"}}
+{{$keyname := (printf "secret/devops/terraform/%s/%s/terraform-service-account.json" $environment $project)}}
+{{with secret $keyname}}
+{{.Data | toJSONPretty}}
+{{end}}
+{{end}}
+{{end}}

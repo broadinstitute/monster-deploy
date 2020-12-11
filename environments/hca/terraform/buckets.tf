@@ -1,7 +1,7 @@
 # temp bucket for dataflow temporary files
 resource google_storage_bucket temp_bucket {
   provider = google-beta.target
-  name = "${local.dev_project_name}-temp-storage"
+  name     = "${local.dev_project_name}-temp-storage"
   location = "US"
 
   lifecycle_rule {
@@ -18,114 +18,114 @@ resource google_storage_bucket temp_bucket {
 
 resource google_storage_bucket_iam_member temp_bucket_runner_iam {
   provider = google-beta.target
-  bucket = google_storage_bucket.temp_bucket.name
+  bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
-  member = "serviceAccount:${module.hca_dataflow_account.email}"
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.hca_dataflow_account.email}"
   depends_on = [module.hca_dataflow_account.delay]
 }
 
 resource google_storage_bucket_iam_member temp_bucket_test_iam {
   provider = google-beta.target
-  bucket = google_storage_bucket.temp_bucket.name
+  bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
-  member = "serviceAccount:${module.hca_test_account.email}"
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.hca_test_account.email}"
   depends_on = [module.hca_test_account.delay]
 }
 
 resource google_storage_bucket_iam_member hca_argo_temp_bucket_iam {
   provider = google-beta.target
-  bucket =  google_storage_bucket.temp_bucket.name
+  bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${module.hca_argo_runner_account.email}"
 }
 
 # staging bucket
 resource google_storage_bucket staging_storage {
   provider = google-beta.target
-  name = "${local.dev_project_name}-staging-storage"
+  name     = "${local.dev_project_name}-staging-storage"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   provider = google-beta.target
-  bucket = google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
-  member = "serviceAccount:${module.hca_dataflow_account.email}"
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.hca_dataflow_account.email}"
   depends_on = [module.hca_dataflow_account.delay]
 }
 
 resource google_storage_bucket_iam_member hca_argo_staging_bucket_iam {
   provider = google-beta.target
-  bucket =  google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${module.hca_argo_runner_account.email}"
 }
 
 resource google_storage_bucket_iam_member staging_account_iam_reader {
   provider = google-beta.target
-  bucket = google_storage_bucket.staging_storage.name
+  bucket   = google_storage_bucket.staging_storage.name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
-  role = "roles/storage.objectViewer"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${local.dev_repo_email}"
 }
 
 # Bucket for long term Argo logs storage, currently want no "delete after N days" rule.
 resource google_storage_bucket hca_argo_archive {
   provider = google-beta.target
-  name = "${local.dev_project_name}-argo-archive"
+  name     = "${local.dev_project_name}-argo-archive"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member hca_argo_logs_bucket_iam {
   provider = google-beta.target
-  bucket =  google_storage_bucket.hca_argo_archive.name
+  bucket   = google_storage_bucket.hca_argo_archive.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  role = "roles/storage.admin"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${module.hca_argo_runner_account.email}"
 }
 # Service accounts that use these buckets
 # sa w/permissions to use dataflow & bigquery
 module hca_dataflow_account {
-  source = "/templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
-    vault.target = vault.target
+    vault.target  = vault.target
   }
 
-  account_id = "hca-dataflow-runner"
+  account_id   = "hca-dataflow-runner"
   display_name = "Service account to run HCA dataflow jobs"
-  vault_path = "${local.dev_vault_prefix}/service-accounts/hca-dataflow-runner"
-  roles = ["dataflow.worker"]
+  vault_path   = "${local.dev_vault_prefix}/service-accounts/hca-dataflow-runner"
+  roles        = ["dataflow.worker"]
 }
 
 module hca_argo_runner_account {
-  source = "/templates/google-sa"
+  source = "../../../templates/terraform/google-sa"
   providers = {
     google.target = google-beta.target,
-    vault.target = vault.target
+    vault.target  = vault.target
   }
 
-  account_id = "hca-argo-runner"
+  account_id   = "hca-argo-runner"
   display_name = "Service account to run HCA's Argo workflow."
-  vault_path = "${local.dev_vault_prefix}/service-accounts/hca-argo-runner"
-  roles = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
+  vault_path   = "${local.dev_vault_prefix}/service-accounts/hca-argo-runner"
+  roles        = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
 }
 
 data google_project current_project {
@@ -136,14 +136,14 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
   provider = google-beta.target
 
   service_account_id = module.hca_argo_runner_account.id
-  role = "roles/iam.workloadIdentityUser"
-  members = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[hca-mvp/argo-runner]"]
+  role               = "roles/iam.workloadIdentityUser"
+  members            = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[hca-mvp/argo-runner]"]
 }
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
   provider = google-beta.target
 
   service_account_id = module.hca_dataflow_account.id
-  role = "roles/iam.serviceAccountUser"
-  members = ["serviceAccount:${module.hca_argo_runner_account.email}"]
+  role               = "roles/iam.serviceAccountUser"
+  members            = ["serviceAccount:${module.hca_argo_runner_account.email}"]
 }
