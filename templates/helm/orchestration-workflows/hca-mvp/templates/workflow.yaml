@@ -22,6 +22,12 @@ spec:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/dev/ingest/hca/service-accounts/hca-argo-runner
             vaultKey: key
+      - secretName: slack-oauth-token
+        nameSpace: hca-mvp
+        vals:
+          - kubeSecretKey: oauth-token
+            path: secret/dsde/monster/dev/ingest/hca/slack-notifier
+            vaultKey: oauth-token
 ---
 
 apiVersion: helm.fluxcd.io/v1
@@ -56,7 +62,7 @@ spec:
     notification:
       onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
       oauthToken:
-        secretName: slack-notifier
+        secretName: slack-oauth-token
         secretKey: oauth-token
     bigquery:
       stagingData:
