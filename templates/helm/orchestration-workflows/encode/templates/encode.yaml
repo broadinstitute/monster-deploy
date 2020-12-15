@@ -34,14 +34,12 @@ spec:
           - kubeSecretKey: AWS_SECRET_ACCESS_KEY
             path: {{ $path }}
             vaultKey: secret_access_key
-      {{- if $smokeTest }}
-      - secretName: smoke-test-secrets
+      - secretName: slack-oauth-token
         nameSpace: encode
         vals:
-          - kubeSecretKey: slack-url
-            path: secret/dsde/monster/{{ .Values.env }}/slack-notifier
-            vaultKey: monster-ci-url
-      {{- end }}
+          - kubeSecretKey: oauth-token
+            path: secret/dsde/monster/{{ .Values.env }}/encode/slack-notifier
+            vaultKey: oauth-token
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -91,13 +89,10 @@ spec:
         dataset: {{ printf "datarepo_%s" .Values.repo.datasetName }}
     aws:
       credentialsSecretName: {{ $awsSecretName }}
-    smokeTest:
-      enable: {{ $smokeTest }}
-      {{- if $smokeTest }}
-      slackUrl:
-        secretName: smoke-test-secrets
-        secretKey: slack-url
-      {{- end }}
+    notification:
+      oauthToken:
+        secretName: slack-oauth-token
+        secretKey: oauth-token
     repo:
       {{- with .Values.repo }}
       url: {{ .url }}
