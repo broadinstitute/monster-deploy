@@ -23,6 +23,12 @@ spec:
           - kubeSecretKey: {{ $keyName }}
             path: secret/dsde/monster/prod/ingest/hca/service-accounts/hca-argo-runner
             vaultKey: key
+      - secretName: slack-oauth-token
+        nameSpace: hca
+        vals:
+          - kubeSecretKey: oauth-token
+            path: secret/dsde/monster/prod/ingest/hca/slack-notifier
+            vaultKey: oauth-token
 ---
 
 apiVersion: helm.fluxcd.io/v1
@@ -54,6 +60,11 @@ spec:
       subnetName: hca-network
       workerAccount: hca-dataflow-runner@{{ $projectId }}.iam.gserviceaccount.com
       useFlexRS: {{ eq .Values.env "prod" }}
+    notification:
+      onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
+      oauthToken:
+        secretName: slack-oauth-token
+        secretKey: oauth-token
     bigquery:
       stagingData:
         project: {{ $projectId }}
