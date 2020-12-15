@@ -1,5 +1,5 @@
 enable: true
-schedule: '0 8 * * 1'
+schedule: '0 8 * * 0'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
