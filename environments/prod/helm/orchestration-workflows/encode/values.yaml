@@ -12,5 +12,5 @@ repo:
   dataProject: broad-datarepo-terra-prod-encd
   url: https://jade-terra.datarepo-prod.broadinstitute.org
 chart:
-  git: false
-  ref: 1.0.0-M2
+  git: true
+  ref: master
