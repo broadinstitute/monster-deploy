@@ -79,7 +79,7 @@ spec:
       # TODO: Switch on environment
       url: https://jade.datarepo-dev.broadinstitute.org
       datasetId: 958c271f-097b-4523-ad59-5070a757a8d2
-      profileId: b94944a9-df3d-4b35-b573-c7d9b249ea52
+      profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}

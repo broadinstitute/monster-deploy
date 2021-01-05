@@ -13,7 +13,7 @@ repo:
   dataProject: broad-jade-dev-data
   datasetName: monster_clinvar
   datasetId: 9952ebf2-65d9-44b7-b5a8-b500bc458909
-  profileId: b94944a9-df3d-4b35-b573-c7d9b249ea52
+  profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
 notification:
   onlyOnFailure: false
   vaultSecret:
