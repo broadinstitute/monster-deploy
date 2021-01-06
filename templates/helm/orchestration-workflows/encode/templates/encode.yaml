@@ -89,6 +89,8 @@ spec:
         dataset: {{ printf "datarepo_%s" .Values.repo.datasetName }}
     aws:
       credentialsSecretName: {{ $awsSecretName }}
+    smokeTest:
+      enable: {{ $smokeTest }}
     notification:
       oauthToken:
         secretName: slack-oauth-token
