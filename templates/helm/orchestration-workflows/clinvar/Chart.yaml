@@ -4,6 +4,6 @@ description: Argo workflow for regular ingest of ClinVar archives.
 version: 0.0.0
 dependencies:
   - name: argo-controller
-    version: 0.0.0
+    version: 0.0.1
     repository: file:///charts/argo-controller
     alias: argo
