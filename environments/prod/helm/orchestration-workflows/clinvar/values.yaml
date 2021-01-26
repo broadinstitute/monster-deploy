@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.2.5
+  ref: 1.2.8
 repo:
   url: https://jade-terra.datarepo-prod.broadinstitute.org
   dataProject: broad-datarepo-terra-prod-cgen
