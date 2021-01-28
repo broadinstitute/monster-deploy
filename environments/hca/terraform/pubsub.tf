@@ -5,7 +5,15 @@ module ebi_staging_notification_pubsub_topic {
   topic      = "broad-dsp-monster-hca-dev.staging-transfer-notifications.ebi"
   pull_subscriptions = [
     {
-      name = "ebi"
+      name = "ebi-writer"
     }
   ]
+}
+
+# EBI can consume from the EBI transfer notifications pull subscription
+resource google_pubsub_subscription_iam_member ebi_writer_iam {
+  provider = google-beta.target
+  subscription = "broad-dsp-monster-hca-dev.staging-transfer-notifications.ebi.ebi-writer"
+  role = "roles/pubsub.subscriber"
+  member = "serviceAccount:${module.ebi_writer_account.email}"
 }
