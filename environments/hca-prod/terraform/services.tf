@@ -22,6 +22,7 @@ module enable_services {
     "storage-api.googleapis.com",
     "storage-component.googleapis.com",
     "dataflow.googleapis.com",
-    "storagetransfer.googleapis.com"
+    "storagetransfer.googleapis.com",
+    "pubsub.googleapis.com"
   ]
 }
