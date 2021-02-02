@@ -16,26 +16,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#        - environment: dev
-#          vault_env: dev
-#          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
-#          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-#        - environment: hca
-#          vault_env: dev
-#          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
-#          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: dev
+          vault_env: dev
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: hca
+          vault_env: dev
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
         - environment: hca-prod
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-#        - environment: prod
-#          vault_env: prod
-#          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
-#          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-#        - environment: v2f-prod
-#          vault_env: prod
-#          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
-#          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: prod
+          vault_env: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: v2f-prod
+          vault_env: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     env:
       terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
