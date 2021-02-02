@@ -80,7 +80,7 @@ jobs:
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check -recursive -diff=true
-        continue-on-error: true
+        if: always()
 
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
@@ -91,14 +91,14 @@ jobs:
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
         run: terraform validate -no-color ${{ env.terraform_directory }}
-        continue-on-error: true
+        if: always()
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
         run: terraform plan -input=false -no-color ${{ env.terraform_directory }}
-        continue-on-error: true
+        if: always()
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
