@@ -1,7 +1,7 @@
 module ebi_staging_notification_pubsub_topic {
   source     = "terraform-google-modules/pubsub/google"
   version    = "~>1.8"
-  project_id = local.prod_project_name
+  project_id = local.prod_project_id
   topic      = "staging-transfer-notifications.ebi"
   pull_subscriptions = [
     {
