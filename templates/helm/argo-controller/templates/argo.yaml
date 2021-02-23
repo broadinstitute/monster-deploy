@@ -34,7 +34,7 @@ spec:
   chart:
     repository: https://broadinstitute.github.io/monster-helm
     name: argo-controller
-    version: 0.7.5
+    version: 0.7.6
   values:
     logs:
       bucket: {{ .Values.artifactBucket }}
