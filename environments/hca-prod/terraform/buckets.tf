@@ -224,6 +224,19 @@ module hca_argo_runner_account {
   roles        = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
 }
 
+module hca_dagster_runner_account {
+  source = "../../../templates/terraform/google-sa"
+  providers = {
+    google.target = google-beta.target,
+    vault.target  = vault.target
+  }
+
+  account_id   = "hca-dagster-runner"
+  display_name = "Service account to run HCA's Dagster pipelines."
+  vault_path   = "${local.prod_vault_prefix}/service-accounts/hca-dagster-runner"
+  roles        = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
+}
+
 data google_project current_project {
   provider = google-beta.target
 }
@@ -234,7 +247,14 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
   service_account_id = module.hca_argo_runner_account.id
   role               = "roles/iam.workloadIdentityUser"
   members            = ["serviceAccount:${local.prod_project_id}.svc.id.goog[hca/argo-runner]"]
-  depends_on         = [module.hca_argo_runner_account]
+}
+
+resource google_service_account_iam_binding hca_dagster_workload_identity_binding {
+  provider = google-beta.target
+
+  service_account_id = module.hca_dagster_runner_account.id
+  role               = "roles/iam.workloadIdentityUser"
+  members            = ["serviceAccount:${data.google_project.current_project.name}.svc.id.goog[dagster/monster-dagster]"]
 }
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
