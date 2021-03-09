@@ -49,6 +49,9 @@ function main () {
   local -r center_config=${config_dir}/command-center
   get_command_center_config ${env} ${center_config}
   install_orchestration_workflow ${center_config} ${env} ${wf} ${helm_dir}
+  fire_slack_deployment_notification ${wf} ${env}
+
+  echo "Deployment complete"
 }
 
 main ${@}
