@@ -140,7 +140,7 @@ function fire_slack_deployment_notification () {
     --header "Authorization: Bearer ${token}" \
     --header "Content-Type: application/json" \
     --data-raw "{
-        'channel': 'arh_testing_ingest',
+        'channel': 'monster-deploy',
         'text': 'Deployment',
         'blocks': [
             {
