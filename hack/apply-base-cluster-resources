@@ -88,6 +88,7 @@ function main () {
   apply_namespaces ${center_config} ${BASE_NAMESPACES[@]}
   apply_urls ${center_config} ${CRDS[@]}
   install_base_operators ${center_config} ${env} ${helm_dir}
+  fire_slack_deployment_notification "base cluster resources" "${env}"
 }
 
 main ${@}
