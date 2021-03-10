@@ -50,6 +50,8 @@ function main () {
 
   ${terraform[@]} init
   ${terraform[@]} apply
+
+  fire_slack_deployment_notification "terraform" "$1"
 }
 
 main ${@}

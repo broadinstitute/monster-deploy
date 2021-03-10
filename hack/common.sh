@@ -126,3 +126,46 @@ function apply_urls () {
     ${kubectl[@]} apply -f ${url}
   done
 }
+
+
+#####
+## Fires a deployment notification to the monster deployment channel
+####
+function fire_slack_deployment_notification () {
+  local -r workflow=$1 environment=$2
+  local -r user=$(git config user.email)
+  local -r token=$(vault read -field=oauth-token secret/dsde/monster/dev/slack-notifier)
+  curl --silent --output /dev/null \
+    --location --request POST 'https://slack.com/api/chat.postMessage' \
+    --header "Authorization: Bearer ${token}" \
+    --header "Content-Type: application/json" \
+    --data-raw "{
+        'channel': 'monster-deploy',
+        'text': 'Deployment',
+        'blocks': [
+            {
+                'type': 'section',
+                'text': {
+                    'type': 'mrkdwn',
+                    'text': '*Deployment Complete*'
+                }
+            },
+            {
+                'type': 'divider'
+            },
+            {
+                'type': 'section',
+                'fields': [
+                    {
+                        'type': 'mrkdwn',
+                        'text': '*Artifact*\n*Environment*\n*User*'
+                    },
+                    {
+                        'type': 'mrkdwn',
+                        'text': '${workflow}\n${environment}\n${user}'
+                    }
+                ]
+            }
+        ]
+    }"
+}

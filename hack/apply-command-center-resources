@@ -117,6 +117,7 @@ function main () {
   apply_namespaces ${center_config} ${COMMAND_CENTER_NAMESPACES[@]}
   apply_urls ${center_config} ${CRDS[@]}
   install_command_center_services ${center_config} ${env} ${helm_dir}
+  fire_slack_deployment_notification "command center" ${env}
 }
 
 main ${@}
