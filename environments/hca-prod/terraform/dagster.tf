@@ -25,9 +25,13 @@ module hca_dagster_runner_account {
     "dataflow.developer",
     "compute.viewer",
     "bigquery.jobUser",
-    "bigquery.dataOwner",
-    google_project_iam_custom_role.argo_access.id,
+    "bigquery.dataOwner"
   ]
+}
+
+resource "google_project_iam_member" "argo_access_member" {
+  role   = google_project_iam_custom_role.argo_access.id
+  member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
 
 resource "google_service_account_iam_binding" "kubernetes_role_binding" {
