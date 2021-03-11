@@ -31,7 +31,7 @@ module hca_dagster_runner_account {
 }
 
 resource "google_service_account_iam_binding" "kubernetes_role_binding" {
-  service_account_id = hca_dagster_runner_account.name
+  service_account_id = module.hca_dagster_runner_account.name
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
