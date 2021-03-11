@@ -21,7 +21,7 @@ module hca_dagster_runner_account {
   account_id   = "hca-dagster-runner"
   display_name = "Service account to run HCA's Dagster pipelines."
   vault_path   = "${local.dev_vault_prefix}/service-accounts/hca-dagster-runner"
-  roles        = [
+  roles = [
     "dataflow.developer",
     "compute.viewer",
     "bigquery.jobUser",
@@ -32,7 +32,7 @@ module hca_dagster_runner_account {
 
 resource "google_service_account_iam_binding" "kubernetes_role_binding" {
   service_account_id = hca_dagster_runner_account.name
-  role = "roles/iam.workloadIdentityUser"
+  role               = "roles/iam.workloadIdentityUser"
 
   members = [
     "serviceAccount:${local.prod_project_id}.svc.id.goog[dagster/monster-dagster]"
