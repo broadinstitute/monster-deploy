@@ -20,7 +20,7 @@ module hca_dagster_runner_account {
 
   account_id   = "hca-dagster-runner"
   display_name = "Service account to run HCA's Dagster pipelines."
-  vault_path   = "${local.dev_vault_prefix}/service-accounts/hca-dagster-runner"
+  vault_path   = "${local.prod_vault_prefix}/service-accounts/hca-dagster-runner"
   roles = [
     "dataflow.developer",
     "compute.viewer",
