@@ -1,3 +1,16 @@
+resource "google_project_iam_custom_role" "argo_access" {
+  role_id     = "argoworkflows.user"
+  title       = "Argo Workflows API User"
+  description = "Ability to interact with the REST API exposed by a Kubernetes cluster running Argo Workflows UI."
+  permissions = [
+    "container.thirdPartyObjects.create",
+    "container.thirdPartyObjects.delete",
+    "container.thirdPartyObjects.get",
+    "container.thirdPartyObjects.list",
+    "container.thirdPartyObjects.update",
+  ]
+}
+
 module hca_dagster_runner_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
@@ -14,19 +27,6 @@ module hca_dagster_runner_account {
     "bigquery.jobUser",
     "bigquery.dataOwner",
     google_project_iam_custom_role.argo_access.id,
-  ]
-}
-
-resource "google_project_iam_custom_role" "argo_access" {
-  role_id     = "argoworkflows.user"
-  title       = "Argo Workflows API User"
-  description = "Ability to interact with the REST API exposed by a Kubernetes cluster running Argo Workflows UI."
-  permissions = [
-    "container.thirdPartyObjects.create",
-    "container.thirdPartyObjects.delete",
-    "container.thirdPartyObjects.get",
-    "container.thirdPartyObjects.list",
-    "container.thirdPartyObjects.update",
   ]
 }
 
