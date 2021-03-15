@@ -223,19 +223,6 @@ module hca_argo_runner_account {
   roles        = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
 }
 
-module hca_dagster_runner_account {
-  source = "../../../templates/terraform/google-sa"
-  providers = {
-    google.target = google-beta.target,
-    vault.target  = vault.target
-  }
-
-  account_id   = "hca-dagster-runner"
-  display_name = "Service account to run HCA's Dagster pipelines."
-  vault_path   = "${local.prod_vault_prefix}/service-accounts/hca-dagster-runner"
-  roles        = ["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"]
-}
-
 data google_project current_project {
   provider = google-beta.target
 }
