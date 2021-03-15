@@ -11,10 +11,9 @@ resource google_storage_bucket_iam_member ebi_bucket_iam {
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  for_each = toset(["enrique@ebi.ac.uk", "rolando@ebi.ac.uk"])
 
   role   = "roles/storage.admin"
-  member = "user:${each.value}"
+  member = "group:ait-hca@ebi.ac.uk"
 }
 
 resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
@@ -83,16 +82,28 @@ resource google_storage_bucket ucsc_bucket {
   location = "US"
 }
 
-resource google_storage_bucket_iam_member ucsc_bucket_iam {
+resource google_storage_bucket_iam_member ucsc_bucket_reader_iam {
   provider = google-beta.target
   bucket   = google_storage_bucket.ucsc_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  for_each = toset(["hannes@ucsc.edu", "dsotirho@ucsc.edu"])
+  for_each = toset(["platform-hca-dev-read@ucsc.edu", "platform-hca-prod-read@ucsc.edu"])
 
   role   = "roles/storage.admin"
-  member = "user:${each.value}"
+  member = "group:${each.value}"
+}
+
+resource google_storage_bucket_iam_member ucsc_bucket_writer_iam {
+  provider = google-beta.target
+  bucket   = google_storage_bucket.ucsc_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  for_each = toset(["platform-hca-dev-write@ucsc.edu", "platform-hca-prod-write@ucsc.edu"])
+
+  role   = "roles/storage.objectAdmin"
+  member = "group:${each.value}"
 }
 
 # Both TDRs and our Dataflow SA can read from the bucket.
