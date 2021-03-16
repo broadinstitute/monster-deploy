@@ -43,6 +43,9 @@ way to do that right now is to make it a TDR steward. You can do this by:
    * Dev: "JadeStewards-dev"
    * Prod: "Stewards"
 4. Add the SA to the group using its email address
+5. Grant access to relevant datasets by calling the Jade `addDatasetPolicyMember` with `policyName` = `steward` for the SA 
+   in either [Dev](https://jade.datarepo-dev.broadinstitute.org/swagger-ui.html#/repository/addDatasetPolicyMember)
+   or [Prod](https://jade-terra.datarepo-prod.broadinstitute.org/swagger-ui.html#/repository/addDatasetPolicyMember)
 
 ### Creating Resource Profiles
 Resource profiles connect Google Billing Accounts to the repository's machinery. You
