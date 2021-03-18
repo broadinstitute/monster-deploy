@@ -36,7 +36,7 @@ resource google_storage_bucket_iam_member ebi_user_bucket_iam {
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
 
   role   = "roles/storage.admin"
-  member = "group:ait-hca@ebi.ac.uk"
+  member = "group:ingest-team@data.humancellatlas.org"
 }
 
 # Both TDRs and our Dataflow SA can read from the bucket.
