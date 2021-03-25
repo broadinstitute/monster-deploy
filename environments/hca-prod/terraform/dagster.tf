@@ -41,7 +41,7 @@ resource google_project_iam_member argo_access_member {
 resource google_service_account_iam_binding kubernetes_role_binding {
   provider = google-beta.target
 
-  service_account_id = module.hca_dagster_runner_account.name
+  service_account_id = module.hca_dagster_runner_account.id
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
