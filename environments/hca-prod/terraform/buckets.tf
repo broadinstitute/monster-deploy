@@ -247,14 +247,6 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
   members            = ["serviceAccount:${local.prod_project_id}.svc.id.goog[hca/argo-runner]"]
 }
 
-resource google_service_account_iam_binding hca_dagster_workload_identity_binding {
-  provider = google-beta.target
-
-  service_account_id = module.hca_dagster_runner_account.id
-  role               = "roles/iam.workloadIdentityUser"
-  members            = ["serviceAccount:${local.prod_project_id}.svc.id.goog[dagster/monster-dagster]"]
-}
-
 resource google_service_account_iam_binding dataflow_runner_user_binding {
   provider = google-beta.target
 
