@@ -32,26 +32,49 @@ jobs:
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     name: "${{ matrix.environment }} Terraform Apply"
     runs-on: ubuntu-latest
+    env:
+      terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
+      VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: "${{ matrix.environment }} Set up Terraform"
-        id: set-up
-        uses: ./.github/actions/set_up_terraform
+      - name: "${{ matrix.environment }} set VAULT_TOKEN"
+        id: token
+        run: |
+          VAULT_TOKEN=$(curl \
+            --request POST \
+            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+          echo ::add-mask::${VAULT_TOKEN}
+          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+          echo ::set-output name=vault_token::${VAULT_TOKEN}
+        env:
+          ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
+          SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+
+
+      - name: "${{ matrix.environment }} consul-template render templates for terraform"
+        uses: broadinstitute/github-action-consul-template@master
         with:
-          environment: "${{ matrix.environment }}"
-          vault_env: "${{ matrix.vault_env }}"
-          vault_role_id_secret: "${{ matrix.vault_role_id_secret }}"
-          vault_secret_id_secret: "${{ matrix.vault_secret_id_secret }}"
+          vault-address: ${{ secrets.VAULT_ADDR }}
+          vault-token: ${{ steps.token.outputs.vault_token }}
+          environment: ${{ matrix.vault_env }}
+          env_path: "environments"
+
+      - name: "${{ matrix.environment }} - Terraform Init"
+        id: init
+        run: terraform init ${{ env.terraform_directory }}
+        env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Apply"
         id: apply
-        run: TF_LOG=debug terraform apply -input=false -no-color ${{ steps.set-up.outputs.terraform_directory }}
+        run: TF_LOG=debug terraform apply -input=false -no-color ${{ env.terraform_directory }}
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-          GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
