@@ -1,10 +1,11 @@
 name: 'Apply Master Changes'
 env:
   terraform_version: "0.12.24"
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
+on: [push]
 jobs:
   terraform_apply:
     timeout-minutes: 30
@@ -76,6 +77,6 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Apply"
         id: apply
-        run: TF_LOG=debug terraform apply -input=false -no-color ${{ env.terraform_directory }}
+        run: echo "TF_LOG=debug terraform apply -input=false -no-color ${{ env.terraform_directory }}"
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
