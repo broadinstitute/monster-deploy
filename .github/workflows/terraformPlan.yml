@@ -37,7 +37,6 @@ jobs:
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
     env:
-      terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
       GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
       AWS_REGION: us-east-1
@@ -47,60 +46,35 @@ jobs:
     name: "${{ matrix.environment }} Terraform Plan"
     runs-on: ubuntu-latest
     steps:
-      - name: "${{ matrix.environment }} Checkout"
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: install terraform
-        uses: hashicorp/setup-terraform@v1.2.1
+      - name: "${{ matrix.environment }} Set up Terraform"
+        id: set-up
+        uses: ./.github/actions/set_up_terraform
         with:
-          terraform_version: ${{ env.terraform_version }}
-
-      - name: "${{ matrix.environment }} set VAULT_TOKEN"
-        id: token
-        run: |
-          VAULT_TOKEN=$(curl \
-            --request POST \
-            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
-            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-          echo ::add-mask::${VAULT_TOKEN}
-          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
-          echo ::set-output name=vault_token::${VAULT_TOKEN}
-        env:
-          ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
-          SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
-
-      - name: "${{ matrix.environment }} consul-template render templates for terraform"
-        uses: broadinstitute/github-action-consul-template@master
-        with:
-          vault-address: ${{ secrets.VAULT_ADDR }}
-          vault-token: ${{ steps.token.outputs.vault_token }}
-          environment: ${{ matrix.vault_env }}
-          env_path: "environments"
+          environment: "${{ matrix.environment }}"
+          vault_env: "${{ matrix.vault_env }}"
+          vault_role_id_secret: "${{ matrix.vault_role_id_secret }}"
+          vault_secret_id_secret: "${{ matrix.vault_secret_id_secret }}"
 
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check -recursive -diff=true
-        if: always()
-
-      - name: "${{ matrix.environment }} - Terraform Init"
-        id: init
-        run: terraform init ${{ env.terraform_directory }}
-        env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Validate"
         id: validate
-        run: terraform validate -no-color ${{ env.terraform_directory }}
+        run: terraform validate -no-color ${{ steps.set-up.outputs.terraform_directory }}
         if: always()
         env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+          VAULT_TOKEN: ${{ steps.set-up.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
-        run: TF_LOG=debug terraform plan -input=false -no-color ${{ env.terraform_directory }}
+        run: TF_LOG=debug terraform plan -input=false -no-color ${{ steps.set-up.outputs.terraform_directory }}
         if: always()
         env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+          VAULT_TOKEN: ${{ steps.set-up.outputs.vault_token }}
 
       - name: Outputs
         uses: actions/github-script@0.9.0
@@ -121,7 +95,7 @@ jobs:
 
             </details>
 
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ steps.set-up.outputs.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
             github.issues.createComment({
               issue_number: context.issue.number,

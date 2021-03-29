@@ -1,0 +1,57 @@
+name: 'Apply Master Changes'
+env:
+  terraform_version: "0.12.24"
+on:
+  push:
+    - master
+jobs:
+  terraform_apply:
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        include:
+        - environment: dev
+          vault_env: dev
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: hca
+          vault_env: dev
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: hca-prod
+          vault_env: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: prod
+          vault_env: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+        - environment: v2f-prod
+          vault_env: prod
+          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+    name: "${{ matrix.environment }} Terraform Apply"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: "${{ matrix.environment }} Set up Terraform"
+        id: set-up
+        uses: ./.github/actions/set_up_terraform
+        with:
+          environment: "${{ matrix.environment }}"
+          vault_env: "${{ matrix.vault_env }}"
+          vault_role_id_secret: "${{ matrix.vault_role_id_secret }}"
+          vault_secret_id_secret: "${{ matrix.vault_secret_id_secret }}"
+
+      - name: "${{ matrix.environment }} - Terraform Apply"
+        id: apply
+        run: TF_LOG=debug terraform apply -input=false -no-color ${{ steps.set-up.outputs.terraform_directory }}
+        env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
