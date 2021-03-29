@@ -3,7 +3,8 @@ env:
   terraform_version: "0.12.24"
 on:
   push:
-    - master
+    branches:
+      - master
 jobs:
   terraform_apply:
     timeout-minutes: 30
