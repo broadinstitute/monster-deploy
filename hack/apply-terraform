@@ -8,10 +8,14 @@ source ${SCRIPT_DIR}/common.sh
 
 declare -r TF_TEMPLATES_PATH=${REPO_ROOT}/templates/terraform
 
+action=${2:-apply}
+
+argct="$#"
+
 function main () {
   # Check args.
-  if [ $# -ne 1 ]; then
-    1>&2 echo Usage: ${0} '<env>'
+  if (( argct > 2 )) || (( argct == 0 )); then
+    1>&2 echo Usage: ${0} '<env> [<command> (default: apply)]'
     exit 1
   fi
 
@@ -49,9 +53,11 @@ function main () {
   rm -rf ${env_dir}/terraform/.terraform/modules
 
   ${terraform[@]} init
-  ${terraform[@]} apply
+  ${terraform[@]} "$action"
 
-  fire_slack_deployment_notification "terraform" "$1"
+  if [[ "$action" == "apply" ]]; then
+    fire_slack_deployment_notification "terraform" "$1"
+  fi
 }
 
 main ${@}
