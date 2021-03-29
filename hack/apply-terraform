@@ -12,13 +12,18 @@ action=${2:-apply}
 
 argct="$#"
 
-function main () {
   # Check args.
-  if (( argct > 2 )) || (( argct == 0 )); then
-    1>&2 echo Usage: ${0} '<env> [<command> (default: apply)]'
-    exit 1
-  fi
+if (( argct == 0 )); then
+  1>&2 echo Usage: ${0} '<env> [<command> (default: apply)]'
+  exit 1
+fi
 
+function main () {
+  if ((argct == 1 )); then
+    action=("apply")
+  else
+    action="${@:2}"
+  fi
   # Make sure config exists.
   local -r env_dir=${REPO_ROOT}/environments/$1
   if [ ! -d ${env_dir} ]; then
@@ -53,7 +58,7 @@ function main () {
   rm -rf ${env_dir}/terraform/.terraform/modules
 
   ${terraform[@]} init
-  ${terraform[@]} "$action"
+  ${terraform[@]} ${action[@]}
 
   if [[ "$action" == "apply" ]]; then
     fire_slack_deployment_notification "terraform" "$1"
