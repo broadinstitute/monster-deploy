@@ -77,10 +77,9 @@ jobs:
         id: init
         run: terraform init ${{ env.terraform_directory }}
         env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Apply"
         id: apply
-        run: echo "TF_LOG=debug terraform apply -input=false -no-color ${{ env.terraform_directory }}"
+        run: TF_LOG=debug terraform apply -input=false -no-color ${{ env.terraform_directory }}
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
