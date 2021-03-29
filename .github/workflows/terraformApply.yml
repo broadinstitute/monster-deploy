@@ -45,6 +45,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: install terraform
+        uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_version: ${{ env.terraform_version }}
+
       - name: "${{ matrix.environment }} set VAULT_TOKEN"
         id: token
         run: |
@@ -58,7 +63,6 @@ jobs:
         env:
           ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
           SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
 
 
       - name: "${{ matrix.environment }} consul-template render templates for terraform"
