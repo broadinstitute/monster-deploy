@@ -77,6 +77,7 @@ jobs:
         id: init
         run: terraform init ${{ env.terraform_directory }}
         env:
+          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
       - name: "${{ matrix.environment }} - Terraform Apply"
         id: apply
