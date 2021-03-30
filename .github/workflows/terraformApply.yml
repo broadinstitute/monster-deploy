@@ -1,20 +1,14 @@
-name: 'Terraform Plan'
+name: 'Apply Master Changes'
 env:
   terraform_version: "0.12.24"
 on:
-  pull_request:
-    paths:
-      - '!hack/**'
-      - '!.github/**'
-      - '.github/workflows/terraformPlan.yml'
-      - 'environments/*/terraform/**'
-      - 'templates/terraform/**'
-
+  push:
+    branches:
+      - master
 jobs:
-  terraform_plan:
+  terraform_apply:
     timeout-minutes: 30
     strategy:
-      fail-fast: false
       matrix:
         include:
         - environment: dev
@@ -37,6 +31,8 @@ jobs:
           vault_env: prod
           vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
           vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+    name: "${{ matrix.environment }} Terraform Apply"
+    runs-on: ubuntu-latest
     env:
       terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
@@ -44,11 +40,8 @@ jobs:
       AWS_REGION: us-east-1
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    if: "!contains( github.event.pull_request.labels.*.name, 'skip-ci')"
-    name: "${{ matrix.environment }} Terraform Plan"
-    runs-on: ubuntu-latest
     steps:
-      - name: "${{ matrix.environment }} Checkout"
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: install terraform
@@ -70,6 +63,7 @@ jobs:
           ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
           SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
 
+
       - name: "${{ matrix.environment }} consul-template render templates for terraform"
         uses: broadinstitute/github-action-consul-template@master
         with:
@@ -78,55 +72,14 @@ jobs:
           environment: ${{ matrix.vault_env }}
           env_path: "environments"
 
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check -recursive -diff=true
-        if: always()
-
       - name: "${{ matrix.environment }} - Terraform Init"
         id: init
         run: terraform init ${{ env.terraform_directory }}
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
 
-      - name: "${{ matrix.environment }} - Terraform Validate"
-        id: validate
-        run: terraform validate -no-color ${{ env.terraform_directory }}
-        if: always()
+      - name: "${{ matrix.environment }} - Terraform Apply"
+        id: apply
+        run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-
-      - name: "${{ matrix.environment }} - Terraform Plan"
-        id: plan
-        run: TF_LOG=debug terraform plan -input=false -no-color ${{ env.terraform_directory }}
-        if: always()
-        env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-
-      - name: Outputs
-        uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### ${{ matrix.environment }} - Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### ${{ matrix.environment }} - Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
-            #### ${{ matrix.environment }} - Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-            <details><summary>${{ matrix.environment }} - Show Plan</summary>
-
-            \`\`\`${process.env.PLAN}\`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.terraform_directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
-
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
