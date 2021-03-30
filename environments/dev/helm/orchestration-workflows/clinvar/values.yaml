@@ -6,8 +6,8 @@ argo:
   namespace: clinvar
   artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
 chart:
-  git: true
-  ref: master
+  git: false
+  ref: 1.3.2
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: broad-jade-dev-data
