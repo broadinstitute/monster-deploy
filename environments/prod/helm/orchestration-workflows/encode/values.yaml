@@ -10,7 +10,7 @@ repo:
   datasetId: 5943e25f-c7e9-4dbd-b4b1-2a350ce3f9b3
   datasetName: broad_dsp_encode
   dataProject: broad-datarepo-terra-prod-encd
-  url: https://jade-terra.datarepo-prod.broadinstitute.org
+  url: https://data.terra.bio
 chart:
   git: true
   ref: master
