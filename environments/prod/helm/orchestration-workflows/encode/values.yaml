@@ -9,7 +9,7 @@ repo:
   profileId: 0e6dd763-e8ef-4aad-bc99-f0fc7bbf2a76
   datasetId: 5943e25f-c7e9-4dbd-b4b1-2a350ce3f9b3
   datasetName: broad_dsp_encode
-  dataProject: broad-datarepo-terra-prod-encd
+  dataProject: tdr-prod-encode
   url: https://data.terra.bio
 chart:
   git: true
