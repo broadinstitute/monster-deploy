@@ -6,11 +6,11 @@ argo:
   namespace: encode
   artifactBucket: broad-dsp-monster-encode-prod-argo-archive
 repo:
-  profileId: afc84cc8-e1ba-48d6-8153-dbc1d3f52c37
-  datasetId: 409b4c5e-564f-48fc-b590-cb4763234115
+  profileId: 0e6dd763-e8ef-4aad-bc99-f0fc7bbf2a76
+  datasetId: 5943e25f-c7e9-4dbd-b4b1-2a350ce3f9b3
   datasetName: broad_dsp_encode
-  dataProject: broad-datarepo-terra-prod-encd
-  url: https://jade-terra.datarepo-prod.broadinstitute.org
+  dataProject: tdr-prod-encode
+  url: https://data.terra.bio
 chart:
   git: true
   ref: master
