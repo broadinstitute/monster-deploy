@@ -95,7 +95,7 @@ jobs:
           method: approle
           roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
           exportEnv: false
       - name: Send Slack notification
         id: notification
@@ -132,7 +132,7 @@ jobs:
           method: approle
           roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
           exportEnv: false
       - name: Send Slack notification
         uses: voxmedia/github-action-slack-notify-build@v1
@@ -161,7 +161,7 @@ jobs:
           method: approle
           roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
           exportEnv: false
       - name: Send Slack notification
         uses: voxmedia/github-action-slack-notify-build@v1
