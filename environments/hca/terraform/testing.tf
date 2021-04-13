@@ -27,5 +27,5 @@ module hca_test_account {
   account_id   = "hca-test-runner"
   display_name = "Service account to run HCA tests"
   vault_path   = "${local.dev_vault_prefix}/service-accounts/hca-test-runner"
-  roles        = ["dataflow.worker", "dataflow.admin"]
+  roles        = ["dataflow.worker", "dataflow.admin", "bigquery.jobUser", "bigquery.dataOwner"]
 }
