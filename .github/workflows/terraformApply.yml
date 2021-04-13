@@ -95,10 +95,10 @@ jobs:
           method: approle
           roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
           exportEnv: false
     outputs:
-      slack_token: ${{ steps.vault-lookup.outputs.slack_token }}
+      slack_token: ${{ steps.vault-lookup.outputs.slackToken }}
   notify_deploy_start:
     name: Announce deployments starting
     needs: get_slack_token
