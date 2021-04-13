@@ -83,8 +83,8 @@ jobs:
   #       run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
   #       env:
   #         VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-  notify_deploy_start:
-    name: Announce deployments starting
+  get_slack_token:
+    name: Get Slack token
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Slack token
@@ -95,40 +95,70 @@ jobs:
           method: approle
           roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
           secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
           exportEnv: false
+    outputs:
+      slack_token: ${{ steps.vault-lookup.outputs.slack_token }}
+  notify_deploy_start:
+    name: Announce deployments starting
+    needs: get_slack_token
+    runs-on: ubuntu-latest
       - name: Send Slack notification
         id: notification
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
           channel_id: C01QNFFKAG2  # monster-deploy
-          status: TESTING NOTIFICATION Deploying to dev, hca, hca-prod, prod, v2f-prod
+          status: |
+            DEPLOYING
+            (dev, hca, hca-prod, prod, v2f-prod)
           color: warning
         env:
-          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slackToken }}
+          SLACK_BOT_TOKEN: ${{ needs.get_slack_token.outputs.slack_token }}
     outputs:
       message_id: ${{ steps.notification.outputs.message_id }}
-  notify_deploy_finish:
-    name: Announce deployments finishing
+  oh_no_i_broke:
+    name: Test job that always fails
     runs-on: ubuntu-latest
     needs: notify_deploy_start
     steps:
-      - name: Fetch Slack token
-        id: vault-lookup
-        uses: hashicorp/vault-action@v2.1.2
-        with:
-          url: ${{ secrets.VAULT_ADDR }}
-          method: approle
-          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
-          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
-          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
-          exportEnv: false
+      - name: blow up
+        run: aaaaaaaaaaa
+  notify_deploy_finish:
+    name: Announce deployments finishing
+    runs-on: ubuntu-latest
+    needs:
+      - get_slack_token
+      - notify_deploy_start
+      - oh_no_i_broke
+    steps:
       - name: Send Slack notification
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
           channel_id: C01QNFFKAG2  # monster-deploy
-          status: TESTING NOTIFICATION Deployment to dev, hca, hca-prod, prod, v2f-prod COMPLETE
+          status: |
+            DEPLOYMENT COMPLETE
+            (dev, hca, hca-prod, prod, v2f-prod)
           color: success
           message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
         env:
-          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slackToken }}
+          SLACK_BOT_TOKEN: ${{ needs.get_slack_token.outputs.slack_token }}
+  notify_deploy_failure:
+    name: Announce deployments failed
+    runs-on: ubuntu-latest
+    if: "failure()&&(needs.get_slack_token.result=='success')&&(needs.notify_deploy_start.result=='success')"
+    needs:
+      - get_slack_token
+      - notify_deploy_start
+      - oh_no_i_broke
+    steps:
+      - name: Send Slack notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: C01QNFFKAG2  # monster-deploy
+          status: |
+            DEPLOYMENT FAILED
+            (dev, hca, hca-prod, prod, v2f-prod)
+          color: error
+          message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ needs.get_slack_token.outputs.slack_token }}
