@@ -101,7 +101,7 @@ jobs:
         id: notification
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
-          channel: monster-deploy
+          channel_id: C01QNFFKAG2  # monster-deploy
           status: TESTING NOTIFICATION Deploying to dev, hca, hca-prod, prod, v2f-prod
           color: warning
         env:
