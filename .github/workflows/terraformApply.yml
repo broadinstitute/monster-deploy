@@ -126,7 +126,7 @@ jobs:
       - name: Send Slack notification
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
-          channel: monster-deploy
+          channel_id: C01QNFFKAG2  # monster-deploy
           status: TESTING NOTIFICATION Deployment to dev, hca, hca-prod, prod, v2f-prod COMPLETE
           color: success
           message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
