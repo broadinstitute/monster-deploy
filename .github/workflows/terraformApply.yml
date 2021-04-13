@@ -83,8 +83,8 @@ jobs:
   #       run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
   #       env:
   #         VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-  slack_notification:
-    name: Announce deployments
+  notify_deploy_start:
+    name: Announce deployments starting
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Slack token
@@ -98,10 +98,37 @@ jobs:
           secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
           exportEnv: false
       - name: Send Slack notification
-        uses: rtCamp/action-slack-notify@v2
+        id: notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: monster-deploy
+          status: TESTING NOTIFICATION Deploying to dev, hca, hca-prod, prod, v2f-prod
+          color: warning
         env:
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_CHANNEL: '#monster-deploy'
-          SLACK_TITLE: '[TESTING NOTIFICATION] Deployment for [dev, hca, hca-prod, prod, v2f-prod] status: ${{ job.status }}'
-          SLACK_USERNAME: "monster-deploy notifier"
-          SLACK_WEBHOOK: ${{ steps.vault-lookup.outputs.slackToken }}
+          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slackToken }}
+    outputs:
+      message_id: ${{ steps.notification.outputs.message_id }}
+  notify_deploy_finish:
+    name: Announce deployments finishing
+    runs-on: ubuntu-latest
+    needs: notify_deploy_start
+    steps:
+      - name: Fetch Slack token
+        id: vault-lookup
+        uses: hashicorp/vault-action@v2.1.2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          exportEnv: false
+      - name: Send Slack notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel: monster-deploy
+          status: TESTING NOTIFICATION Deployment to dev, hca, hca-prod, prod, v2f-prod COMPLETE
+          color: success
+          message_id: ${{ jobs.notify_deploy_start.outputs.message_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slackToken }}
