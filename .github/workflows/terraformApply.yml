@@ -103,6 +103,7 @@ jobs:
     name: Announce deployments starting
     needs: get_slack_token
     runs-on: ubuntu-latest
+    steps:
       - name: Send Slack notification
         id: notification
         uses: voxmedia/github-action-slack-notify-build@v1
