@@ -129,6 +129,6 @@ jobs:
           channel: monster-deploy
           status: TESTING NOTIFICATION Deployment to dev, hca, hca-prod, prod, v2f-prod COMPLETE
           color: success
-          message_id: ${{ jobs.notify_deploy_start.outputs.message_id }}
+          message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
         env:
           SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slackToken }}
