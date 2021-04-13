@@ -1,85 +1,107 @@
 name: 'Apply Master Changes'
 env:
   terraform_version: "0.12.24"
-on:
-  push:
-    branches:
-      - master
+on: [push]
+  # push:
+  #   branches:
+  #     - master
 jobs:
-  terraform_apply:
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        include:
-        - environment: dev
-          vault_env: dev
-          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
-          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-        - environment: hca
-          vault_env: dev
-          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
-          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
-        - environment: hca-prod
-          vault_env: prod
-          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
-          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-        - environment: prod
-          vault_env: prod
-          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
-          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-        - environment: v2f-prod
-          vault_env: prod
-          vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
-          vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
-    name: "${{ matrix.environment }} Terraform Apply"
+  # terraform_apply:
+  #   timeout-minutes: 30
+  #   strategy:
+  #     matrix:
+  #       include:
+  #       - environment: dev
+  #         vault_env: dev
+  #         vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+  #         vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+  #       - environment: hca
+  #         vault_env: dev
+  #         vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+  #         vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+  #       - environment: hca-prod
+  #         vault_env: prod
+  #         vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+  #         vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+  #       - environment: prod
+  #         vault_env: prod
+  #         vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+  #         vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+  #       - environment: v2f-prod
+  #         vault_env: prod
+  #         vault_role_id_secret: MONSTER_PROD_AUTH_ROLE_ID
+  #         vault_secret_id_secret: MONSTER_PROD_AUTH_ROLE_SECRET
+  #   name: "${{ matrix.environment }} Terraform Apply"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
+  #     VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+  #     GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
+  #     AWS_REGION: us-east-1
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+
+  #     - name: install terraform
+  #       uses: hashicorp/setup-terraform@v1.2.1
+  #       with:
+  #         terraform_version: ${{ env.terraform_version }}
+
+  #     - name: "${{ matrix.environment }} set VAULT_TOKEN"
+  #       id: token
+  #       run: |
+  #         VAULT_TOKEN=$(curl \
+  #           --request POST \
+  #           --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
+  #           ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
+  #         echo ::add-mask::${VAULT_TOKEN}
+  #         echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
+  #         echo ::set-output name=vault_token::${VAULT_TOKEN}
+  #       env:
+  #         ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
+  #         SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
+
+
+  #     - name: "${{ matrix.environment }} consul-template render templates for terraform"
+  #       uses: broadinstitute/github-action-consul-template@master
+  #       with:
+  #         vault-address: ${{ secrets.VAULT_ADDR }}
+  #         vault-token: ${{ steps.token.outputs.vault_token }}
+  #         environment: ${{ matrix.vault_env }}
+  #         env_path: "environments"
+
+  #     - name: "${{ matrix.environment }} - Terraform Init"
+  #       id: init
+  #       run: terraform init ${{ env.terraform_directory }}
+  #       env:
+  #         VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+
+  #     - name: "${{ matrix.environment }} - Terraform Apply"
+  #       id: apply
+  #       run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
+  #       env:
+  #         VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+  slack_notification:
+    name: Announce deployments
     runs-on: ubuntu-latest
-    env:
-      terraform_directory: "${{ github.workspace }}/environments/${{ matrix.environment }}/terraform"
-      VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-      GOOGLE_APPLICATION_CREDENTIALS: "${{ github.workspace }}/environments/gcs_sa_key.json"
-      AWS_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: install terraform
-        uses: hashicorp/setup-terraform@v1.2.1
+      - name: Fetch Slack token
+        id: vault-lookup
+        uses: hashicorp/vault-action@v2.1.2
         with:
-          terraform_version: ${{ env.terraform_version }}
-
-      - name: "${{ matrix.environment }} set VAULT_TOKEN"
-        id: token
-        run: |
-          VAULT_TOKEN=$(curl \
-            --request POST \
-            --data '{"role_id":"'"${ROLE_ID}"'","secret_id":"'"${SECRET_ID}"'"}' \
-            ${VAULT_ADDR}/v1/auth/approle/login | jq -r .auth.client_token)
-          echo ::add-mask::${VAULT_TOKEN}
-          echo "VAULT_TOKEN=$(echo ${VAULT_TOKEN})" >> $GITHUB_ENV
-          echo ::set-output name=vault_token::${VAULT_TOKEN}
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slackToken
+          exportEnv: false
+      - name: Send Slack notification
+        uses: rtCamp/action-slack-notify@v2
         env:
-          ROLE_ID: ${{ secrets[matrix.vault_role_id_secret] }}
-          SECRET_ID: ${{ secrets[matrix.vault_secret_id_secret] }}
-
-
-      - name: "${{ matrix.environment }} consul-template render templates for terraform"
-        uses: broadinstitute/github-action-consul-template@master
-        with:
-          vault-address: ${{ secrets.VAULT_ADDR }}
-          vault-token: ${{ steps.token.outputs.vault_token }}
-          environment: ${{ matrix.vault_env }}
-          env_path: "environments"
-
-      - name: "${{ matrix.environment }} - Terraform Init"
-        id: init
-        run: terraform init ${{ env.terraform_directory }}
-        env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
-
-      - name: "${{ matrix.environment }} - Terraform Apply"
-        id: apply
-        run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
-        env:
-          VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_CHANNEL: '#monster-deploy'
+          SLACK_TITLE: '[TESTING NOTIFICATION] Deployment for [dev, hca, hca-prod, prod, v2f-prod] status: ${{ job.status }}'
+          SLACK_USERNAME: "monster-deploy notifier"
+          SLACK_WEBHOOK: ${{ steps.vault-lookup.outputs.slackToken }}
