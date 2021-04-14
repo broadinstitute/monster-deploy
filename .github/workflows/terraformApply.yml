@@ -1,6 +1,9 @@
 name: 'Apply Master Changes'
 env:
   terraform_version: "0.12.24"
+  # this value should match the envs listed in the matrix of the terraform_apply job. used to
+  # list environments affected by a deploy in our slack notifications
+  envs_being_deployed: "dev, hca, hca-prod, prod, v2f-prod"
 on:
   push:
     branches:
@@ -8,6 +11,7 @@ on:
 jobs:
   terraform_apply:
     timeout-minutes: 30
+    needs: notify_deploy_start
     strategy:
       matrix:
         include:
@@ -83,3 +87,91 @@ jobs:
         run: "TF_LOG=info terraform apply -auto-approve -input=false ${{ env.terraform_directory }}"
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}
+  notify_deploy_start:
+    name: Announce deployments starting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Slack token
+        id: vault-lookup
+        uses: hashicorp/vault-action@v2.1.2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
+          exportEnv: false
+      - name: Send Slack notification
+        id: notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: C01QNFFKAG2  # monster-deploy
+          status: |
+            DEPLOYMENT IN PROGRESS
+            DEPLOY FOR ENVS:
+            ${{ env.envs_being_deployed }}
+          color: warning
+        env:
+          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slack_token }}
+    outputs:
+      message_id: ${{ steps.notification.outputs.message_id }}
+  notify_deploy_finish:
+    name: Announce deployments finishing
+    runs-on: ubuntu-latest
+    needs:
+      - notify_deploy_start
+      - terraform_apply
+    steps:
+      - name: Fetch Slack token
+        id: vault-lookup
+        uses: hashicorp/vault-action@v2.1.2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
+          exportEnv: false
+      - name: Send Slack notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: C01QNFFKAG2  # monster-deploy
+          status: |
+            DEPLOYMENT SUCCESSFUL
+            DEPLOY FOR ENVS:
+            ${{ env.envs_being_deployed }}
+          color: good
+          message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slack_token }}
+  notify_deploy_failure:
+    name: Announce deployments failed
+    runs-on: ubuntu-latest
+    if: "failure()&&(needs.notify_deploy_start.result=='success')"
+    needs:
+      - notify_deploy_start
+      - terraform_apply
+    steps:
+      - name: Fetch Slack token
+        id: vault-lookup
+        uses: hashicorp/vault-action@v2.1.2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.MONSTER_AUTH_ROLE_ID }}
+          secretId: ${{ secrets.MONSTER_AUTH_ROLE_SECRET }}
+          secrets: secret/dsde/monster/dev/slack-notifier oauth-token | slack_token
+          exportEnv: false
+      - name: Send Slack notification
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: C01QNFFKAG2  # monster-deploy
+          status: |
+            DEPLOYMENT FAILED
+            Click Workflow to list failed environments.
+            DEPLOY FOR ENVS:
+            ${{ env.envs_being_deployed }}
+          color: danger
+          message_id: ${{ needs.notify_deploy_start.outputs.message_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ steps.vault-lookup.outputs.slack_token }}
