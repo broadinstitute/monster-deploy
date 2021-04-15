@@ -13,7 +13,7 @@ provider google-beta {
 }
 
 provider google {
-  alias = "target"
+  alias   = "target"
   project = local.dev_project_name
   region  = "us-central1"
 }

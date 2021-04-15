@@ -1,5 +1,5 @@
 provider google {
-  alias = "target"
+  alias   = "target"
   project = var.project_name
 }
 
