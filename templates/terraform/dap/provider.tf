@@ -1,6 +1,6 @@
 provider google {
   alias = "target"
 
-  project = local.dev_project_name
+  project = var.project_name
   region  = "us-central1"
 }

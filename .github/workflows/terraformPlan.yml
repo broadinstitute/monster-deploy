@@ -80,7 +80,7 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
-        run: terraform fmt -check -recursive -diff=true
+        run: terraform fmt -check -recursive -diff=true -var env=${{ environment }}
         if: always()
 
       - name: "${{ matrix.environment }} - Terraform Init"
