@@ -2,9 +2,6 @@ name: 'Terraform Plan'
 env:
   terraform_version: "0.12.24"
 on:
-  push:
-    branches:
-      - arh-dspdc-1710-terraform-dap
     paths:
       - '!hack/**'
       - '!.github/**'
@@ -82,7 +79,7 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
-        run: terraform fmt -check -recursive -diff=true -var env=${{ environment }}
+        run: terraform fmt -check -recursive -diff=true -var env=${{ matrix.environment }}
         if: always()
 
       - name: "${{ matrix.environment }} - Terraform Init"
