@@ -89,6 +89,7 @@ spec:
       datasetId: {{ .datasetId }}
       profileId: {{ .profileId }}
       {{- end }}
+      environment: {{ .Values.env }}
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
