@@ -2,7 +2,9 @@ name: 'Terraform Plan'
 env:
   terraform_version: "0.12.24"
 on:
-  pull_request:
+  push:
+    branches:
+      - arh-dspdc-1710-terraform-dap
     paths:
       - '!hack/**'
       - '!.github/**'
