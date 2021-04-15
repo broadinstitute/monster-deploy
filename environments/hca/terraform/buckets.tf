@@ -145,5 +145,19 @@ resource google_service_account_iam_binding dataflow_runner_user_binding {
 
   service_account_id = module.hca_dataflow_account.id
   role               = "roles/iam.serviceAccountUser"
-  members            = ["serviceAccount:${module.hca_argo_runner_account.email}"]
+  members            = [
+    "serviceAccount:${module.hca_argo_runner_account.email}",
+    "serviceAccount:${module.hca_dagster_runner_account.email}"
+  ]
+}
+
+
+module lattice-staging-storage {
+  source = "../../../templates/terraform/staging-storage"
+  area_name = "lattice"
+  project_name = local.dev_project_name
+  external_writer_sa_account_name = "lattice-staging-writer"
+  dev_vault_prefix = local.dev_vault_prefix
+  tdr_repo_email = local.dev_repo_email
+  hca_dataflow_email = module.hca_dataflow_account.email
 }
