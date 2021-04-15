@@ -2,6 +2,7 @@ name: 'Terraform Plan'
 env:
   terraform_version: "0.12.24"
 on:
+  pull_request: 
     paths:
       - '!hack/**'
       - '!.github/**'
