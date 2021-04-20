@@ -17,6 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+        - environment: dap/dap-dev
+          vault_env: dap-dev
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
+        - environment: dap/dap-prod
+          vault_env: dap-prod
+          vault_role_id_secret: MONSTER_AUTH_ROLE_ID
+          vault_secret_id_secret: MONSTER_AUTH_ROLE_SECRET
         - environment: dev
           vault_env: dev
           vault_role_id_secret: MONSTER_AUTH_ROLE_ID

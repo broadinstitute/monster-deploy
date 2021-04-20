@@ -1,10 +1,10 @@
 variable service_ids {
-  type = list(string)
+  type        = list(string)
   description = "IDs of Google APIs to enable in the target project."
 }
 
 output standard_service_ids {
-  value =  [
+  value = [
     "compute.googleapis.com",
     "container.googleapis.com",
     "containerregistry.googleapis.com",
