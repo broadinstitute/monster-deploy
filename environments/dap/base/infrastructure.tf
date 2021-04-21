@@ -18,7 +18,6 @@ provider google {
   region  = "us-central1"
 }
 
-
 module enable_services {
   source = "../../../templates/terraform/api-services"
   providers = {
@@ -26,7 +25,6 @@ module enable_services {
   }
   service_ids = module.enable_services.standard_service_ids
 }
-
 
 resource google_storage_bucket storage_bucket {
   location = "us-central1"
