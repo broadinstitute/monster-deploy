@@ -1,6 +1,6 @@
 # bucket for EBI
 resource google_storage_bucket ebi_bucket {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.prod_project_name}-ebi-storage"
   location = "US"
 }
