@@ -10,6 +10,12 @@ provider google-beta {
   region  = "us-central1"
 }
 
+provider google {
+  alias   = "target"
+  project = local.prod_project_id
+  region  = "us-central1"
+}
+
 provider vault {
   alias = "target"
 }

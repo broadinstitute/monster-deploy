@@ -6,7 +6,7 @@ resource google_storage_bucket ebi_bucket {
 }
 
 resource google_storage_bucket_iam_member ebi_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ebi_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -17,7 +17,7 @@ resource google_storage_bucket_iam_member ebi_bucket_iam {
 }
 
 resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ebi_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -32,7 +32,7 @@ resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
 module ebi_writer_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
@@ -44,7 +44,7 @@ module ebi_writer_account {
 
 # EBI is an admin on their bucket.
 resource google_storage_bucket_iam_member ebi_writer_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ebi_bucket.name
   role     = "roles/storage.objectAdmin"
   member   = "serviceAccount:${module.ebi_writer_account.email}"
@@ -52,7 +52,7 @@ resource google_storage_bucket_iam_member ebi_writer_iam {
 
 # Both TDRs and our Dataflow SA can read from the bucket.
 resource google_storage_bucket_iam_member tdr_ebi_reader_iam {
-  provider = google-beta.target
+  provider = google.target
   for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
 
   bucket = google_storage_bucket.ebi_bucket.name
@@ -62,11 +62,11 @@ resource google_storage_bucket_iam_member tdr_ebi_reader_iam {
 
 # Google's Storage Transfer Service can interact with the bucket.
 data google_storage_transfer_project_service_account sts_account {
-  provider = google-beta.target
+  provider = google.target
 }
 
 resource google_storage_bucket_iam_member sts_iam {
-  provider = google-beta.target
+  provider = google.target
   for_each = toset(["storage.legacyBucketReader", "storage.objectViewer", "storage.legacyBucketWriter"])
 
   bucket = google_storage_bucket.ebi_bucket.name
@@ -77,13 +77,13 @@ resource google_storage_bucket_iam_member sts_iam {
 
 # bucket for UCSC
 resource google_storage_bucket ucsc_bucket {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.prod_project_name}-ucsc-storage"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member ucsc_bucket_reader_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ucsc_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -95,7 +95,7 @@ resource google_storage_bucket_iam_member ucsc_bucket_reader_iam {
 }
 
 resource google_storage_bucket_iam_member ucsc_bucket_writer_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ucsc_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -108,7 +108,7 @@ resource google_storage_bucket_iam_member ucsc_bucket_writer_iam {
 
 # Both TDRs and our Dataflow SA can read from the bucket.
 resource google_storage_bucket_iam_member tdr_ucsc_reader_iam {
-  provider = google-beta.target
+  provider = google.target
   for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
 
   bucket = google_storage_bucket.ucsc_bucket.name
@@ -118,7 +118,7 @@ resource google_storage_bucket_iam_member tdr_ucsc_reader_iam {
 
 # temp bucket for dataflow temporary files
 resource google_storage_bucket temp_bucket {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.prod_project_name}-temp-storage"
   location = "US"
 
@@ -135,7 +135,7 @@ resource google_storage_bucket temp_bucket {
 }
 
 resource google_storage_bucket_iam_member temp_bucket_runner_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -146,7 +146,7 @@ resource google_storage_bucket_iam_member temp_bucket_runner_iam {
 }
 
 resource google_storage_bucket_iam_member hca_argo_temp_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -157,13 +157,13 @@ resource google_storage_bucket_iam_member hca_argo_temp_bucket_iam {
 
 # staging bucket
 resource google_storage_bucket staging_storage {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.prod_project_name}-staging-storage"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member staging_bucket_runner_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -174,7 +174,7 @@ resource google_storage_bucket_iam_member staging_bucket_runner_iam {
 }
 
 resource google_storage_bucket_iam_member hca_argo_staging_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -184,7 +184,7 @@ resource google_storage_bucket_iam_member hca_argo_staging_bucket_iam {
 }
 
 resource google_storage_bucket_iam_member staging_account_iam_reader {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
   role   = "roles/storage.objectViewer"
@@ -193,13 +193,13 @@ resource google_storage_bucket_iam_member staging_account_iam_reader {
 
 # Bucket for long term Argo logs storage, currently want no "delete after N days" rule.
 resource google_storage_bucket hca_argo_archive {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.prod_project_name}-argo-archive"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member hca_argo_logs_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.hca_argo_archive.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -212,7 +212,7 @@ resource google_storage_bucket_iam_member hca_argo_logs_bucket_iam {
 module hca_dataflow_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
@@ -225,7 +225,7 @@ module hca_dataflow_account {
 module hca_argo_runner_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
@@ -236,11 +236,11 @@ module hca_argo_runner_account {
 }
 
 data google_project current_project {
-  provider = google-beta.target
+  provider = google.target
 }
 
 resource google_service_account_iam_binding hca_workload_identity_binding {
-  provider = google-beta.target
+  provider = google.target
 
   service_account_id = module.hca_argo_runner_account.id
   role               = "roles/iam.workloadIdentityUser"
@@ -248,7 +248,7 @@ resource google_service_account_iam_binding hca_workload_identity_binding {
 }
 
 resource google_service_account_iam_binding dataflow_runner_user_binding {
-  provider = google-beta.target
+  provider = google.target
 
   service_account_id = module.hca_dataflow_account.id
   role               = "roles/iam.serviceAccountUser"
