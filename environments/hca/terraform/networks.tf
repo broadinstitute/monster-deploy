@@ -1,7 +1,7 @@
 module k8s_network {
   source = "../../../templates/terraform/compute-network"
   providers = {
-    google.target = google-beta.target
+    google.target = google.target
   }
   dependencies = [module.enable_services]
 
