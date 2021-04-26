@@ -69,11 +69,3 @@ resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
 
-resource google_service_account_iam_binding dataflow_runner_dagster_user_binding {
-  provider = google-beta.target
-
-  service_account_id = module.hca_dataflow_account.id
-  role               = "roles/iam.serviceAccountUser"
-  members            = ["serviceAccount:${module.hca_dagster_runner_account.email}"]
-}
-
