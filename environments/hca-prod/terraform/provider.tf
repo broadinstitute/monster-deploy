@@ -4,7 +4,8 @@ provider google-beta {
   project = local.prod_project_id
   region  = "us-central1"
 }
-provider google{
+
+provider google {
   alias   = "prod-core"
   project = "broad-dsp-monster-prod"
   region  = "us-central1"
