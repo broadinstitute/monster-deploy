@@ -3,7 +3,7 @@
 module master {
   source = "../../../templates/terraform/k8s-master"
   providers = {
-    google.target = google-beta.target
+    google.target = google.target
   }
   dependencies = [module.enable_services, module.k8s_network]
 
@@ -21,7 +21,7 @@ module master {
 module node_pool {
   source = "../../../templates/terraform/k8s-node-pool"
   providers = {
-    google.target = google-beta.target
+    google.target = google.target
   }
   dependencies = [module.enable_services, module.master]
 
@@ -42,7 +42,7 @@ module node_pool {
 module hca_gke_runner_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
