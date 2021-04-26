@@ -252,5 +252,7 @@ resource google_service_account_iam_binding dataflow_runner_user_binding {
 
   service_account_id = module.hca_dataflow_account.id
   role               = "roles/iam.serviceAccountUser"
-  members            = ["serviceAccount:${module.hca_argo_runner_account.email}", "serviceAccount:${module.hca_dagster_runner_account.email}"]
-}
+  members = [
+    "serviceAccount:${module.hca_argo_runner_account.email}",
+    "serviceAccount:${module.hca_dagster_runner_account.email}"
+  ]}
