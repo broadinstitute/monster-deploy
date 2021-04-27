@@ -1,7 +1,7 @@
 module cloudsql {
   source = "../../../templates/terraform/cloudsql"
   providers = {
-    google.target = google-beta.target
+    google.target = google.target
     vault.target  = vault.target
   }
 

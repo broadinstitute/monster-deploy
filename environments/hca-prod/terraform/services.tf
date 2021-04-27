@@ -1,7 +1,7 @@
 module enable_services {
   source = "../../../templates/terraform/api-services"
   providers = {
-    google.target = google-beta.target
+    google.target = google.target
   }
   service_ids = [
     "compute.googleapis.com",

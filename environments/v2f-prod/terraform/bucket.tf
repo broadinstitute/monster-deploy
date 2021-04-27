@@ -1,10 +1,10 @@
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-v2f-prod"
   region  = "us-central1"
   alias   = "v2f"
 }
 
-provider google-beta {
+provider google {
   project = "broad-dsp-monster-dev"
   region  = "us-central1"
   alias   = "command-center"
@@ -15,7 +15,7 @@ provider vault {
 }
 
 resource google_storage_bucket v2f_results_bucket {
-  provider = google-beta.v2f
+  provider = google.v2f
   name     = "variant-to-function-result-sets"
   location = "US"
 }
@@ -23,7 +23,7 @@ resource google_storage_bucket v2f_results_bucket {
 module v2f_writer {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.command-center,
+    google.target = google.command-center,
     vault.target  = vault.v2f
   }
 
@@ -34,11 +34,11 @@ module v2f_writer {
 }
 
 data google_project command_center {
-  provider = google-beta.command-center
+  provider = google.command-center
 }
 
 resource google_storage_bucket_iam_member v2f_iam {
-  provider   = google-beta.v2f
+  provider   = google.v2f
   bucket     = google_storage_bucket.v2f_results_bucket.name
   role       = "roles/storage.objectAdmin"
   member     = "serviceAccount:${module.v2f_writer.email}"
@@ -46,7 +46,7 @@ resource google_storage_bucket_iam_member v2f_iam {
 }
 
 resource google_service_account_iam_binding v2f_binding_iam {
-  provider           = google-beta.command-center
+  provider           = google.command-center
   service_account_id = module.v2f_writer.id
   role               = "roles/iam.workloadIdentityUser"
 
@@ -54,14 +54,14 @@ resource google_service_account_iam_binding v2f_binding_iam {
 }
 
 resource google_storage_bucket_iam_member v2f_reader_iam {
-  provider = google-beta.v2f
+  provider = google.v2f
   bucket   = google_storage_bucket.v2f_results_bucket.name
   role     = "roles/storage.objectViewer"
   member   = "group:v2fcir@broadinstitute.org"
 }
 
 resource google_storage_bucket_iam_member v2f_admin_iam {
-  provider = google-beta.v2f
+  provider = google.v2f
   bucket   = google_storage_bucket.v2f_results_bucket.name
   role     = "roles/storage.objectAdmin"
   member   = "user:schaluva@broadinstitute.org"

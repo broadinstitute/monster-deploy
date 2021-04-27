@@ -1,12 +1,12 @@
 // create test bucket
 resource google_storage_bucket test_bucket {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.dev_project_name}-test-storage"
   location = "US"
 }
 
 resource google_storage_bucket_iam_member test_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.test_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -20,7 +20,7 @@ resource google_storage_bucket_iam_member test_bucket_iam {
 module hca_test_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
