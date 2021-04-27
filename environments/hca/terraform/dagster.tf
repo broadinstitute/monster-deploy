@@ -1,5 +1,5 @@
 resource google_project_iam_custom_role argo_access {
-  provider = google-beta.target
+  provider = google.target
 
   role_id     = "argoworkflows.user"
   title       = "Argo Workflows API User"
@@ -16,7 +16,7 @@ resource google_project_iam_custom_role argo_access {
 module hca_dagster_runner_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
@@ -32,14 +32,14 @@ module hca_dagster_runner_account {
 }
 
 resource google_project_iam_member argo_access_member {
-  provider = google-beta.target
+  provider = google.target
 
   role   = google_project_iam_custom_role.argo_access.id
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
 
 resource google_service_account_iam_binding kubernetes_role_binding {
-  provider = google-beta.target
+  provider = google.target
 
   service_account_id = module.hca_dagster_runner_account.id
   role               = "roles/iam.workloadIdentityUser"
@@ -50,7 +50,7 @@ resource google_service_account_iam_binding kubernetes_role_binding {
 }
 
 resource google_storage_bucket_iam_member hca_dagster_staging_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -60,7 +60,7 @@ resource google_storage_bucket_iam_member hca_dagster_staging_bucket_iam {
 }
 
 resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -68,4 +68,3 @@ resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
   role   = "roles/storage.admin"
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
-

@@ -1,6 +1,6 @@
 # Staging bucket for EBI.
 resource google_storage_bucket ebi_staging_bucket {
-  provider = google-beta.target
+  provider = google.target
   name     = "${local.dev_project_name}-ebi-staging"
   location = "US"
 }
@@ -9,7 +9,7 @@ resource google_storage_bucket ebi_staging_bucket {
 module ebi_writer_account {
   source = "../../../templates/terraform/google-sa"
   providers = {
-    google.target = google-beta.target,
+    google.target = google.target,
     vault.target  = vault.target
   }
 
@@ -21,7 +21,7 @@ module ebi_writer_account {
 
 # EBI is an admin on their bucket.
 resource google_storage_bucket_iam_member ebi_writer_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ebi_staging_bucket.name
   role     = "roles/storage.objectAdmin"
   member   = "serviceAccount:${module.ebi_writer_account.email}"
@@ -29,7 +29,7 @@ resource google_storage_bucket_iam_member ebi_writer_iam {
 
 # Rolando and Enrique are admin on their bucket
 resource google_storage_bucket_iam_member ebi_user_bucket_iam {
-  provider = google-beta.target
+  provider = google.target
   bucket   = google_storage_bucket.ebi_staging_bucket.name
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
@@ -41,7 +41,7 @@ resource google_storage_bucket_iam_member ebi_user_bucket_iam {
 
 # Both TDRs and our Dataflow SA can read from the bucket.
 resource google_storage_bucket_iam_member tdr_reader_iam {
-  provider = google-beta.target
+  provider = google.target
   for_each = toset([local.dev_repo_email, local.prod_repo_email, module.hca_dataflow_account.email])
 
   bucket = google_storage_bucket.ebi_staging_bucket.name
@@ -51,11 +51,11 @@ resource google_storage_bucket_iam_member tdr_reader_iam {
 
 # Google's Storage Transfer Service can interact with the bucket.
 data google_storage_transfer_project_service_account sts_account {
-  provider = google-beta.target
+  provider = google.target
 }
 
 resource google_storage_bucket_iam_member sts_iam {
-  provider = google-beta.target
+  provider = google.target
   for_each = toset(["storage.legacyBucketReader", "storage.objectViewer", "storage.legacyBucketWriter"])
 
   bucket = google_storage_bucket.ebi_staging_bucket.name
