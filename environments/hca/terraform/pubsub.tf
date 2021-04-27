@@ -16,13 +16,16 @@ resource google_pubsub_subscription_iam_member ebi_writer_iam {
   subscription = "projects/broad-dsp-monster-hca-dev/subscriptions/ebi-writer"
   role         = "roles/pubsub.subscriber"
   member       = "serviceAccount:${module.ebi_writer_account.email}"
+  depends_on   = [module.ebi_staging_notification_pubsub_topic]
+
 }
 
 
 # EBI can publish to the EBI transfer notifications topic (needed for testing on their end)
 resource google_pubsub_topic_iam_member ebi_writer_iam {
-  provider = google.target
-  topic    = "broad-dsp-monster-hca-dev.staging-transfer-notifications.ebi"
-  role     = "roles/pubsub.publisher"
-  member   = "serviceAccount:${module.ebi_writer_account.email}"
+  provider   = google.target
+  topic      = "broad-dsp-monster-hca-dev.staging-transfer-notifications.ebi"
+  role       = "roles/pubsub.publisher"
+  member     = "serviceAccount:${module.ebi_writer_account.email}"
+  depends_on = [module.ebi_staging_notification_pubsub_topic]
 }
