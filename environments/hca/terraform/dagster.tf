@@ -49,6 +49,23 @@ resource google_service_account_iam_binding kubernetes_role_binding {
   ]
 }
 
+# Bucket for storing intermediate results from Dagster pipeline runs.
+resource google_storage_bucket hca_dagster_storage {
+  provider = google-beta.target
+  name     = "${local.dev_project_name}-dagster-storage"
+  location = "US"
+}
+
+resource google_storage_bucket_iam_member hca_dagster_run_bucket_iam {
+  provider = google.target
+  bucket   = google_storage_bucket.hca_dagster_storage.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${module.hca_dagster_runner_account.email}"
+}
+
 resource google_storage_bucket_iam_member hca_dagster_staging_bucket_iam {
   provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
