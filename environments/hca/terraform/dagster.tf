@@ -54,6 +54,17 @@ resource google_storage_bucket hca_dagster_storage {
   provider = google-beta.target
   name     = "${local.dev_project_name}-dagster-storage"
   location = "US"
+
+  # delete intermediate results after four weeks
+  lifecycle_rule {
+    condition {
+      age = 28
+    }
+
+    action {
+      type = "Delete"
+    }
+  }
 }
 
 resource google_storage_bucket_iam_member hca_dagster_run_bucket_iam {
