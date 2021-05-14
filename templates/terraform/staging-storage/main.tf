@@ -13,7 +13,7 @@ module external_writer_account {
 
   account_id   = var.external_writer_sa_account_name
   display_name = "Account used to interact the ${var.area_name} staging area"
-  vault_path   = "${var.dev_vault_prefix}/service-accounts/${var.external_writer_sa_account_name}"
+  vault_path   = "${var.vault_prefix}/service-accounts/${var.external_writer_sa_account_name}"
   roles        = ["storagetransfer.user", "storagetransfer.viewer"]
 }
 
@@ -59,7 +59,7 @@ resource google_storage_bucket_iam_member sts_iam {
 module staging_notification_pubsub_topic {
   source     = "terraform-google-modules/pubsub/google"
   version    = "~>1.8"
-  project_id = var.project_name
+  project_id = var.project_id
   topic      = "${var.project_name}.staging-transfer-notifications.${var.area_name}"
   pull_subscriptions = [
     {
