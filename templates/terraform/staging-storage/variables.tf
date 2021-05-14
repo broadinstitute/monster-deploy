@@ -5,7 +5,7 @@ variable "area_name" {
 }
 
 variable "project_id" {
-  type = string
+  type        = string
   description = "GCP project ID (may differ from project_name)"
 }
 

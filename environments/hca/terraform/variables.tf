@@ -1,6 +1,6 @@
 locals {
   dev_project_name = "broad-dsp-monster-hca-dev"
-  dev_project_id = "broad-dsp-monster-hca-dev"
+  dev_project_id   = "broad-dsp-monster-hca-dev"
   dev_vault_prefix = "secret/dsde/monster/dev/ingest/hca"
   dev_repo_email   = "jade-k8-sa@broad-jade-dev.iam.gserviceaccount.com"
 

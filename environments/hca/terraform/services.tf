@@ -3,26 +3,5 @@ module enable_services {
   providers = {
     google.target = google.target
   }
-  service_ids = [
-    "compute.googleapis.com",
-    "container.googleapis.com",
-    "containerregistry.googleapis.com",
-    "dns.googleapis.com",
-    "iam.googleapis.com",
-    "iamcredentials.googleapis.com",
-    "logging.googleapis.com",
-    "monitoring.googleapis.com",
-    "replicapool.googleapis.com",
-    "replicapoolupdater.googleapis.com",
-    "resourceviews.googleapis.com",
-    "runtimeconfig.googleapis.com",
-    "sqladmin.googleapis.com",
-    "sql-component.googleapis.com",
-    "stackdriver.googleapis.com",
-    "storage-api.googleapis.com",
-    "storage-component.googleapis.com",
-    "dataflow.googleapis.com",
-    "storagetransfer.googleapis.com",
-    "pubsub.googleapis.com"
-  ]
+  service_ids = module.enable_services.standard_service_ids
 }
