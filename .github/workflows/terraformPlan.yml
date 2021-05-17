@@ -106,7 +106,7 @@ jobs:
 
       - name: "${{ matrix.environment }} - Terraform Plan"
         id: plan
-        run: TF_LOG=info terraform plan -input=false -no-color ${{ env.terraform_directory }}
+        run: terraform plan -input=false -no-color ${{ env.terraform_directory }}
         if: always()
         env:
           VAULT_TOKEN: ${{ steps.token.outputs.vault_token }}

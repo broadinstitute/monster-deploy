@@ -70,7 +70,7 @@ module staging_notification_pubsub_topic {
 
 resource google_pubsub_subscription_iam_member staging_writer_iam {
   provider     = google.target
-  subscription = "projects/${var.project_name}/subscriptions/${var.area_name}-writer"
+  subscription = "projects/${var.project_id}/subscriptions/${var.area_name}-writer"
   role         = "roles/pubsub.subscriber"
   member       = "serviceAccount:${module.external_writer_account.email}"
 }
