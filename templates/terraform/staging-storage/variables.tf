@@ -4,6 +4,11 @@ variable "area_name" {
   description = "Name of the staging area"
 }
 
+variable "project_id" {
+  type        = string
+  description = "GCP project ID (may differ from project_name)"
+}
+
 variable "project_name" {
   type        = string
   description = "Name of the GCP project that will own this bucket"
@@ -14,7 +19,7 @@ variable "external_writer_sa_account_name" {
   description = "Name of the external SA that will deposit files into the bucket"
 }
 
-variable "dev_vault_prefix" {
+variable "vault_prefix" {
   type        = string
   description = "Path in vault to store the external SA credentials upon generation"
 }

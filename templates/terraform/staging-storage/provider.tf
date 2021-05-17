@@ -1,6 +1,6 @@
 provider google {
   alias   = "target"
-  project = var.project_name
+  project = var.project_id
 }
 
 provider vault {
