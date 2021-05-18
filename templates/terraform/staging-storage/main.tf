@@ -69,6 +69,7 @@ module staging_notification_pubsub_topic {
 }
 
 resource google_pubsub_subscription_iam_member staging_writer_iam {
+  depends_on   = [module.staging_notification_pubsub_topic]
   provider     = google.target
   subscription = "projects/${var.project_id}/subscriptions/${var.area_name}-writer"
   role         = "roles/pubsub.subscriber"
@@ -76,8 +77,9 @@ resource google_pubsub_subscription_iam_member staging_writer_iam {
 }
 
 resource google_pubsub_topic_iam_member staging_writer_iam {
-  provider = google.target
-  topic    = "${var.project_name}.staging-transfer-notifications.${var.area_name}"
-  role     = "roles/pubsub.publisher"
-  member   = "serviceAccount:${module.external_writer_account.email}"
+  depends_on = [module.staging_notification_pubsub_topic]
+  provider   = google.target
+  topic      = "${var.project_name}.staging-transfer-notifications.${var.area_name}"
+  role       = "roles/pubsub.publisher"
+  member     = "serviceAccount:${module.external_writer_account.email}"
 }
