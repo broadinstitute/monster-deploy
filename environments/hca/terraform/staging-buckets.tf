@@ -18,4 +18,5 @@ module lantern-staging-storage {
   vault_prefix                    = local.dev_vault_prefix
   tdr_repo_email                  = local.dev_repo_email
   hca_dataflow_email              = module.hca_dataflow_account.email
+  external_admin_group            = "lantern-hca-dev-staging-area@broadinstitute.org"
 }
