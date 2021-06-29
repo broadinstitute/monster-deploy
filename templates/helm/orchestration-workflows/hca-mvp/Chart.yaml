@@ -4,6 +4,6 @@ description: Argo workflow for regular ingest of HCA data.
 version: 0.0.0
 dependencies:
   - name: argo-controller
-    version: 0.0.1
+    version: 0.0.2
     repository: file:///charts/argo-controller
     alias: argo
