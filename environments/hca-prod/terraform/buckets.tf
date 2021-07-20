@@ -22,7 +22,7 @@ resource google_storage_bucket_iam_member ebi_sa_bucket_iam {
   # When the storage.admin role is applied to an individual bucket,
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-  for_each = toset(["ebi-staging-writer@broad-dsp-monster-hca-dev.iam.gserviceaccount.com"])
+  for_each = toset()
 
   role   = "roles/storage.admin"
   member = "serviceAccount:${each.value}"
