@@ -1,0 +1,76 @@
+---
+repositories:
+  - name: dagster
+    url: https://dagster-io.github.io/helm
+  - name: datarepo-helm
+    url: https://broadinstitute.github.io/datarepo-helm
+
+# helm releases to be deployed
+releases:
+  # sets up a pod security policy for the given service account
+  # (required by our org's broader security policy)
+  - name: monster-psp    # release name
+    namespace: dagster   # target namespace
+    chart: datarepo-helm/serviceaccount-psp   # chart name
+    missingFileHandler: Warn
+    values:
+      - serviceAccount:
+          name: monster-dagster
+  - name: monster-dagster-secrets
+    namespace: dagster
+    chart: datarepo-helm/create-secret-manager-secret
+    missingFileHandler: Warn
+    values:
+      - secrets:
+          - secretName: monster-dagster-secrets
+            nameSpace: dagster
+            vals:
+              # any secrets need to be registered here
+              #########
+              # DAP
+              #########
+              - kubeSecretKey: REDCAP_ENV_API_TOKEN
+                path: secret/dsde/monster/{{ requiredEnv "ENV" }}/dog-aging/redcap-tokens/env_automation
+                vaultKey: token
+              - kubeSecretKey: REDCAP_BASE_API_TOKEN
+                path: secret/dsde/monster/{{ requiredEnv "ENV" }}/dog-aging/redcap-tokens/automation
+                vaultKey: token
+  - name: monster    # release name
+    namespace: dagster   # target namespace
+    chart: dagster/dagster   # chart name
+    missingFileHandler: Warn
+    values:
+      # environment variables can be injected by placing an $ENV.yaml file in the environment/ directory
+      - environment/{{ requiredEnv "ENV" }}.yaml
+      - global:
+          serviceAccountName: monster-dagster
+      - rbacEnabled: true
+      - postgresql:
+          serviceAccount:
+            enabled: true
+            name: monster-dagster
+      - runLauncher:
+          config:
+            k8sRunLauncher:
+              envConfigMaps:
+                # the k8s run launcher doesn't allow us to directly set a list of env vars, so we just
+                # point it at the env config map the daemon generates as a workaround. this will be the
+                # same set of custom env vars as every other component of the system.
+                - name: monster-dagster-daemon-env
+              envSecrets:
+                - name: monster-dagster-secrets
+      - dagit:
+          workspace:
+            enabled: true
+            servers:
+              # any new workflow ingests need to have their user code server registered here
+              - host: "monster-dap-ingest"
+                port: 3030
+          envSecrets:
+            - name: monster-dagster-secrets
+      - dagster-user-deployments:
+          # set enableSubchart to false to let individual repos handle their own user code deployment
+          enableSubchart: false
+      - dagsterDaemon:
+          envSecrets:
+            - name: monster-dagster-secrets
