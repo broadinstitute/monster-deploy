@@ -5,7 +5,7 @@ module dagster_runner_service_account {
     vault.target  = vault.command-center
   }
 
-  account_id   = "monsteer-dagster-runner"
+  account_id   = "monster-dagster-runner"
   display_name = "Service account to run Dagster pipelines."
   vault_path   = "${local.vault_prefix}/service-accounts/dagster-runner"
   roles = [
