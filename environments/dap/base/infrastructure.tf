@@ -26,7 +26,7 @@ provider vault {
   alias = "target"
 }
 
-variable  dagster_runner_email {
+variable dagster_runner_email {
   type = string
 }
 
@@ -86,18 +86,6 @@ resource google_storage_bucket_iam_member temp_bucket_runner_iam {
   member     = "serviceAccount:${module.dap_dataflow_account.email}"
   depends_on = [module.dap_dataflow_account.delay]
 }
-//
-
-// FIX THIS ADD PERMS FOR THE DEV DAGSTER RUNNER
-//resource google_storage_bucket_iam_member dap_dagster_temp_bucket_iam {
-//  provider = google.target
-//  bucket   = google_storage_bucket.temp_bucket.name
-//  # When the storage.admin role is applied to an individual bucket,
-//  # the control applies only to the specified bucket and objects within
-//  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
-//  role   = "roles/storage.admin"
-//  member = "serviceAccount:${module.dap_dagster_account.email}"
-//}
 
 
 resource google_storage_bucket_iam_member staging_account_iam_reader {
