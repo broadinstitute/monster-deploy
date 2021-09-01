@@ -23,6 +23,6 @@ resource google_service_account_iam_binding kubernetes_role_binding {
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    "serviceAccount:${local.dev_project_name}.svc.id.goog[dagster/monster-dagster]"
+    "serviceAccount:${local.prod_project_name}.svc.id.goog[dagster/monster-dagster]"
   ]
 }
