@@ -8,6 +8,7 @@ on:
       - '!.github/**'
       - '.github/workflows/terraformPlan.yml'
       - 'environments/*/terraform/**'
+      - 'environments/dap/**'
       - 'templates/terraform/**'
 
 jobs:
