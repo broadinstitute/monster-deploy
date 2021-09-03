@@ -1,0 +1,12 @@
+env: &envConfig
+  # all of these key-value pairs get injected as environment variables into the containers running dagster,
+  # including the dagit ui server and any pipeline executors
+  EXAMPLE_ENV_VAR: ignoreprod
+
+  # this is needed for setting a mode for automatically triggered pipelines (i.e., via sensors)
+  ENV: prod
+
+dagit:
+  env: *envConfig
+dagsterDaemon:
+  env: *envConfig
