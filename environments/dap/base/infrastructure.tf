@@ -54,7 +54,7 @@ module dap_dataflow_account {
   account_id   = "dap-dataflow-runner"
   display_name = "Service account to run DAP dataflow jobs"
   vault_path   = "${var.vault_prefix}/service-accounts/dap-dataflow-runner"
-  roles        = ["dataflow.worker"]
+  roles        = ["dataflow.worker", "storage.objects.admin"]
 }
 
 
