@@ -87,11 +87,40 @@ resource google_storage_bucket_iam_member temp_bucket_runner_iam {
   depends_on = [module.dap_dataflow_account.delay]
 }
 
+resource google_storage_bucket_iam_member storage_bucket_dataflow_runner_iam {
+  provider = google.target
+  bucket   = google_storage_bucket.storage_bucket.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.dap_dataflow_account.email}"
+  depends_on = [module.dap_dataflow_account.delay]
+}
 
-resource google_storage_bucket_iam_member staging_account_iam_reader {
+
+resource google_storage_bucket_iam_member temp_bucket_dagster_runner {
   provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
-  role   = "roles/storage.objectViewer"
+  role   = "roles/storage.admin"
   member = "serviceAccount:${var.dagster_runner_email}"
+}
+
+# Allow the command-center account to run Dataflow jobs...
+resource google_project_iam_member command_center_dagster_sa {
+  provider = google.target
+  for_each = toset(["dataflow.developer", "compute.viewer", "bigquery.jobUser", "bigquery.dataOwner"])
+
+  role   = "roles/${each.value}"
+  member = "serviceAccount:${var.dagster_runner_email}"
+}
+
+# ... and allow it to do so as the dataflow-runner service account.
+resource google_service_account_iam_binding dataflow_runner_user_binding {
+  provider = google.target
+
+  service_account_id = module.dap_dataflow_account.id
+  role               = "roles/iam.serviceAccountUser"
+  members            = ["serviceAccount:${var.dagster_runner_email}"]
 }
