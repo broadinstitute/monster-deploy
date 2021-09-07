@@ -9,6 +9,9 @@ env:
   # list environments affected by a deploy in our slack notifications
   envs_being_deployed: "dev, hca, hca-prod, prod, v2f-prod"
 
+on:
+  workflow_dispatch:
+
 jobs:
   terraform_apply:
     timeout-minutes: 30
