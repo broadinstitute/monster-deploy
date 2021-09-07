@@ -1,3 +1,7 @@
+###
+# Apply these changes manually by firing the job in the Github UI
+##
+
 name: 'Apply Master Changes'
 env:
   terraform_version: "0.12.24"
