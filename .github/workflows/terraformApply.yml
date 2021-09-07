@@ -4,10 +4,7 @@ env:
   # this value should match the envs listed in the matrix of the terraform_apply job. used to
   # list environments affected by a deploy in our slack notifications
   envs_being_deployed: "dev, hca, hca-prod, prod, v2f-prod"
-on:
-  push:
-    branches:
-      - master
+
 jobs:
   terraform_apply:
     timeout-minutes: 30
