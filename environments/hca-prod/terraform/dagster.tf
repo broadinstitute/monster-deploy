@@ -96,3 +96,16 @@ resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
   role   = "roles/storage.admin"
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
+
+resource google_storage_bucket hca_dcp_release_bucket {
+  provider = google.target
+  name = "${local.prod_project_name}-dcp-releases"
+  location = "US"
+}
+
+resource google_storage_bucket_iam_member hca_dagster_dcp_release_bucket_iam {
+  provider = google.target
+  bucket = google_storage_bucket.hca_dcp_release_bucket.name
+  role = "roles/storage.admin"
+  member = "serviceAccount:${module.hca_dagster_runner_account.email}"
+}
