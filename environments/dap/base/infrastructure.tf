@@ -95,7 +95,7 @@ resource google_storage_bucket_iam_member storage_bucket_iam {
   # the control applies only to the specified bucket and objects within
   # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
   role       = "roles/storage.admin"
-  member     =  each.value
+  member     = each.value
   depends_on = [module.dap_dataflow_account.delay]
 }
 
