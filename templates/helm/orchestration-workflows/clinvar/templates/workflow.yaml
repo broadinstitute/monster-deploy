@@ -25,7 +25,7 @@ spec:
       - secretName: slack-info
         nameSpace: clinvar
         vals:
-          - kubeSecretKey: slack-url
+          - kubeSecretKey: oauth-token
             {{- with .Values.notification.vaultSecret }}
             path: {{ .path }}
             vaultKey: {{ .key }}
@@ -107,10 +107,11 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
     notification:
+      channelId: {{ .Values.notification.channelId }}
       onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
-      slackUrl:
+      oauthToken:
         secretName: slack-info
-        secretKey: slack-url
+        secretKey: oauth-token
     clingen:
       project: {{ $project }}
       gcsBucket: {{ $project }}-ingest-results
