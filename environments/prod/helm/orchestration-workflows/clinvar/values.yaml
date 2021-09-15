@@ -18,5 +18,5 @@ notification:
   channelId: clinvar-ingest
   onlyOnFailure: false
   vaultSecret:
-    path: secret/dsde/monster/prod/clingen/slack-notifier
-    key: oauth-token
+    path: secret/dsde/monster/prod/slack-notifier
+    key: oauth_token
