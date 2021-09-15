@@ -3,7 +3,7 @@ schedule: '0 13 * * *'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
-  namespace: clinvar
+  namespace: clinvar-real-prod
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
