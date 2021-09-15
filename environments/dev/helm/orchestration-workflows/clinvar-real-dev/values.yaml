@@ -1,0 +1,25 @@
+enable: true
+schedule: '0 13 * * *'
+argo:
+  env: dev
+  vaultPrefix: secret/dsde/monster/dev/command-center
+  namespace: clinvar-real-dev
+  artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
+chart:
+  git: false
+  ref: 1.4.9
+repo:
+  url: https://example.com
+  dataProject: FAKE
+  datasetName: FAKE
+  datasetId: FAKE
+  profileId: FAKE
+notification:
+  channelId: monster-ci
+  onlyOnFailure: false
+  vaultSecret:
+    path: secret/dsde/monster/dev/slack-notifier
+    key: oauth-token
+steps:
+  exportDiff:
+    enabled: true
