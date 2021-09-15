@@ -20,3 +20,6 @@ notification:
   vaultSecret:
     path: secret/dsde/monster/prod/clingen/slack-notifier
     key: oauth-token
+steps:
+  exportDiff:
+    enabled: false
