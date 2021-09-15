@@ -118,3 +118,6 @@ spec:
       kafka:
         topic: broad-dsp-clinvar
         secretName: kafka-login
+    steps:
+      exportDiff:
+        enabled: {{ .Values.steps.exportDiff.enabled }}

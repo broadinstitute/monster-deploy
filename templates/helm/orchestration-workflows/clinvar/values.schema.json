@@ -37,6 +37,17 @@
           "required": ["path", "key"]
         }
       },
+      "steps": {
+        "type": "object",
+        "properties": {
+          "exportDiff": {
+            "type": "object",
+            "properties": {
+              "enabled": { "type":  "boolean" }
+            }
+          }
+        }
+      },
       "required": ["onlyOnFailure", "vaultSecret"]
     }
   },

@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
 chart:
   git: false
-  ref: 1.4.7
+  ref: 1.4.9
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: broad-jade-dev-data
@@ -20,3 +20,6 @@ notification:
   vaultSecret:
     path: secret/dsde/monster/dev/slack-notifier
     key: oauth-token
+steps:
+  exportDiff:
+    enabled: true
