@@ -6,8 +6,10 @@ argo:
   namespace: clinvar
   artifactBucket: broad-dsp-monster-clingen-dev-argo-archive
 chart:
-  git: false
-  ref: 1.5.0
+  # no "pinned version" in dev to prevent execution of the export-diffs
+  # portion of the pipeline in that env
+  git: true
+  ref: master
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: broad-jade-dev-data
