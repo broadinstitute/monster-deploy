@@ -12,7 +12,7 @@ function install_orchestration_workflow () {
 
   apply_namespaces ${kubeconfig} ${wf}
   ${helm[@]} dependency update /charts/orchestration-workflows/${wf}
-  ${helm[@]} --debug upgrade ${wf}-ingest /charts/orchestration-workflows/${wf} \
+  ${helm[@]} upgrade ${wf}-ingest /charts/orchestration-workflows/${wf} \
     --namespace fluxcd \
     --install \
     --set "env=${env}" \
