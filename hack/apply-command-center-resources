@@ -9,12 +9,6 @@ declare -r PROMETHEUS_OPERATOR_VERSION=release-0.36
 
 declare -ra CRDS=(
   https://raw.githubusercontent.com/argoproj/argo/${ARGO_VERSION}/manifests/base/crds/workflow-crd.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
-  https://raw.githubusercontent.com/coreos/prometheus-operator/${PROMETHEUS_OPERATOR_VERSION}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
 )
 
 declare -ra COMMAND_CENTER_NAMESPACES=(
