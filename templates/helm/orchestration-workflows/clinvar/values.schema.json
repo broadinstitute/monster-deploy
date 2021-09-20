@@ -24,9 +24,22 @@
       },
       "required": ["url", "dataProject", "datasetName", "profileId", "datasetId"]
     },
+    "altRepo": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "dataProject": { "type": "string" },
+        "datasetName": { "type": "string" },
+        "profileId": { "type": "string" },
+        "datasetId": { "type": "string" }
+      },
+      "required": ["url", "dataProject", "datasetName", "profileId", "datasetId"]
+    },
     "notification": {
       "type": "object",
       "properties": {
+        "altChannelId": { "type":  "string" },
+        "channelId": { "type":  "string" },
         "onlyOnFailure": { "type": "boolean" },
         "vaultSecret": {
           "type": "object",
