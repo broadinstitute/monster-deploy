@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.5.0
+  ref: 1.5.3
 repo:
   url: https://jade-terra.datarepo-prod.broadinstitute.org
   dataProject: broad-datarepo-terra-prod-cgen
@@ -21,6 +21,7 @@ altRepo:
   datasetId: 29844445-5005-4672-a2f1-f238de23dc20
   profileId: 53cf7db4-1ac5-4a83-b204-95d2fea68ff1
 notification:
+  altChannelId: clinvar-migration-notifications
   channelId: clinvar-ingest
   onlyOnFailure: false
   vaultSecret:

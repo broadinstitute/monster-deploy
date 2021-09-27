@@ -87,6 +87,17 @@ resource google_storage_bucket_iam_member hca_dagster_staging_bucket_iam {
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
 
+resource google_storage_bucket_iam_member hca_dagster_staging_uc1_bucket_iam {
+  provider = google.target
+  bucket   = google_storage_bucket.staging_storage_uc1.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${module.hca_dagster_runner_account.email}"
+}
+
+
 resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
   provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name

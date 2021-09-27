@@ -55,6 +55,13 @@ resource google_storage_bucket staging_storage {
   location = "US"
 }
 
+# staging bucket (us-central1)
+resource google_storage_bucket staging_storage_uc1 {
+  provider = google.target
+  name     = "${local.dev_project_name}-staging-storage-uc1"
+  location = "us-central1"
+}
+
 resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
@@ -65,6 +72,18 @@ resource google_storage_bucket_iam_member staging_bucket_runner_iam {
   member     = "serviceAccount:${module.hca_dataflow_account.email}"
   depends_on = [module.hca_dataflow_account.delay]
 }
+
+resource google_storage_bucket_iam_member staging_uc1_bucket_runner_iam {
+  provider = google.target
+  bucket   = google_storage_bucket.staging_storage_uc1.name
+  # When the storage.admin role is applied to an individual bucket,
+  # the control applies only to the specified bucket and objects within
+  # the bucket: https://cloud.google.com/storage/docs/access-control/iam-roles
+  role       = "roles/storage.admin"
+  member     = "serviceAccount:${module.hca_dataflow_account.email}"
+  depends_on = [module.hca_dataflow_account.delay]
+}
+
 
 resource google_storage_bucket_iam_member hca_argo_staging_bucket_iam {
   provider = google.target
@@ -79,6 +98,14 @@ resource google_storage_bucket_iam_member hca_argo_staging_bucket_iam {
 resource google_storage_bucket_iam_member staging_account_iam_reader {
   provider = google.target
   bucket   = google_storage_bucket.staging_storage.name
+  # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${local.dev_repo_email}"
+}
+
+resource google_storage_bucket_iam_member staging_uc1_account_iam_reader {
+  provider = google.target
+  bucket   = google_storage_bucket.staging_storage_uc1.name
   # Object viewer gives both 'list' and 'get' permissions to all objects in the bucket.
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${local.dev_repo_email}"
