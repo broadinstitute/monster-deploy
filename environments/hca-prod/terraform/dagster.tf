@@ -97,15 +97,15 @@ resource google_storage_bucket_iam_member hca_dagster_temp_bucket_iam {
   member = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
 
-resource google_storage_bucket hca_dcp_release_bucket {
+resource google_storage_bucket hca_dcp_etl_partitions_bucket {
   provider = google.target
-  name     = "${local.prod_project_name}-dcp-releases"
+  name     = "${local.prod_project_name}-etl-partitions"
   location = "US"
 }
 
-resource google_storage_bucket_iam_member hca_dagster_dcp_release_bucket_iam {
+resource google_storage_bucket_iam_member hca_dagster_dcp_hca_dcp_etl_partitions_bucket_iam {
   provider = google.target
-  bucket   = google_storage_bucket.hca_dcp_release_bucket.name
+  bucket   = google_storage_bucket.hca_dcp_etl_partitions_bucket.name
   role     = "roles/storage.admin"
   member   = "serviceAccount:${module.hca_dagster_runner_account.email}"
 }
