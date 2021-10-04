@@ -133,6 +133,13 @@ resource google_storage_bucket_iam_member temp_bucket_runner_iam {
   depends_on = [module.hca_dataflow_account.delay]
 }
 
+resource google_storage_bucket_iam_member temp_bucket_real_prod_jade_iam {
+  provider = google.target
+  bucket   = google_storage_bucket.temp_bucket.name
+  role     = "roles/storage.objectViewer"
+  member   = "serviceAccount:${local.real_prod_repo_email}"
+}
+
 resource google_storage_bucket_iam_member hca_argo_temp_bucket_iam {
   provider = google.target
   bucket   = google_storage_bucket.temp_bucket.name
