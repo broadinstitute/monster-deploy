@@ -16,10 +16,9 @@
       "type": "object",
       "properties": {
         "zone": { "type": "string" },
-        "argo": { "type": "string" },
-        "grafana": { "type": "string" }
+        "argo": { "type": "string" }
       },
-      "required": ["zone", "argo", "grafana"]
+      "required": ["zone", "argo"]
     },
     "stackdriverProject": { "type": "string" },
     "debug": { "type": "boolean" }

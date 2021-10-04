@@ -71,7 +71,6 @@ function install_command_center_services () {
    --set "cloudsql.project=$(vault read -field=project ${sql_instance_secret})" \
    --set "cloudsql.region=$(vault read -field=region ${sql_instance_secret})" \
    --set "dns.argo=${ip_prefix}argo" \
-   --set "dns.grafana=${ip_prefix}grafana" \
    --set "dns.zone=${DNS_ZONES[${env}]}" \
    --set "stackdriverProject=${STACKDRIVER_PROJECTS[${env}]}" \
    --set "debug=${DEBUG[${env}]}"
