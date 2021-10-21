@@ -35,6 +35,10 @@ releases:
               - kubeSecretKey: REDCAP_BASE_API_TOKEN
                 path: secret/dsde/monster/{{ requiredEnv "ENV" }}/dog-aging/redcap-tokens/automation
                 vaultKey: token
+              - kubeSecretKey: SLACK_TOKEN
+                path: secret/dsde/monster/{{ requiredEnv "ENV" }}/dog-aging/dagster
+                vaultKey: slack-token
+
   - name: monster    # release name
     namespace: dagster   # target namespace
     chart: dagster/dagster   # chart name
