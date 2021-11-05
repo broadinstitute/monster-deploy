@@ -8,8 +8,8 @@ argo:
 chart:
   # no "pinned version" in dev to prevent execution of the export-diffs
   # portion of the pipeline in that env
-  git: true
-  ref: master
+  git: false
+  ref: 1.5.6
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: broad-jade-dev-data
