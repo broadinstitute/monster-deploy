@@ -93,18 +93,6 @@ spec:
       accessKey:
         secretName: {{ $secretName }}
         secretKey: {{ $keyName }}
-    altJade:
-      {{- with .Values.altRepo }}
-      url: {{ .url }}
-      dataProject: {{ .dataProject }}
-      datasetName: {{ .datasetName }}
-      datasetId: {{ .datasetId }}
-      profileId: {{ .profileId }}
-      {{- end }}
-      environment: {{ .Values.env }}
-      accessKey:
-        secretName: {{ $secretName }}
-        secretKey: {{ $keyName }}
     serviceAccount:
       k8sName: argo-runner
       googleName: clinvar-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
@@ -119,7 +107,6 @@ spec:
       subnetName: monster-processing-network
       workerAccount: dataflow-runner@{{ $project }}.iam.gserviceaccount.com
     notification:
-      altChannelId: {{ .Values.notification.altChannelId }}
       channelId: {{ .Values.notification.channelId }}
       onlyOnFailure: {{ .Values.notification.onlyOnFailure }}
       oauthToken:

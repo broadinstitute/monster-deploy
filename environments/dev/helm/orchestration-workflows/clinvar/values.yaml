@@ -12,18 +12,11 @@ chart:
   ref: 1.5.6
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
-  dataProject: broad-jade-dev-data
-  datasetName: monster_clinvar
-  datasetId: 9952ebf2-65d9-44b7-b5a8-b500bc458909
-  profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
-altRepo:
-  url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: datarepo-dev-9b9b37c6
   datasetName: clinvar_temp
   datasetId: ba8bcf4b-a266-4617-996e-f4c7e18bf30a
   profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
 notification:
-  altChannelId: monster-ci
   channelId: monster-ci
   onlyOnFailure: false
   vaultSecret:
