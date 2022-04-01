@@ -71,8 +71,8 @@ spec:
     {{- end}}
   {{- end}}
     volumes:
-      downloadSize: 2Gi
-      extractSize: 15Gi
+      downloadSize: 5Gi
+      extractSize: 40Gi
     staging:
       gcsBucket: {{ $project }}-staging-storage
       bigquery:
