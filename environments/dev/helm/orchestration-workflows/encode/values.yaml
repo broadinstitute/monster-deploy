@@ -6,8 +6,8 @@ argo:
   namespace: encode
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
 chart:
-  git: true
-  ref: ah-1966
+  git: false
+  ref: 1.0.5
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: datarepo-dev-bd86e152
