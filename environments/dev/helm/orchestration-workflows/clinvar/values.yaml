@@ -9,7 +9,7 @@ chart:
   # no "pinned version" in dev to prevent execution of the export-diffs
   # portion of the pipeline in that env
   git: false
-  ref: 1.6.41
+  ref: 1.6.45
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: datarepo-dev-9b9b37c6
