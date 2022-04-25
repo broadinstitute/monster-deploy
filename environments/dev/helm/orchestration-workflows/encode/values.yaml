@@ -10,7 +10,7 @@ chart:
   ref: 1.0.5
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
-  dataProject: datarepo-dev-bd86e152
-  datasetName: broad_dsp_encode_2022
-  datasetId: 8c2cd144-9833-4f63-9d37-9f9e88d396b2
+  dataProject: datarepo-dev-6ba96183
+  datasetName: encode_2022_us
+  datasetId: 3e8d5e37-90f4-43b7-8e2a-6c233b0032c4
   profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
