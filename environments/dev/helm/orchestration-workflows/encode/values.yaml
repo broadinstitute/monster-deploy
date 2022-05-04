@@ -1,5 +1,5 @@
 enable: true
-schedule: '0 12 * * *'
+schedule: '40 10 * * *'
 argo:
   env: dev
   vaultPrefix: secret/dsde/monster/dev/command-center
@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
 chart:
   git: false
-  ref: 1.0.6
+  ref: 1.0.7
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
   dataProject: datarepo-dev-6ba96183
