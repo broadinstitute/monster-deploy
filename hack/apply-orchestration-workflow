@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeo pipefail
+set -euo pipefail
 
 declare -r SCRIPT_DIR=$(cd $(dirname ${0}) >/dev/null 2>&1 && pwd)
 declare -r REPO_ROOT=$(cd $(dirname ${SCRIPT_DIR}) >/dev/null 2>&1 && pwd)
@@ -47,7 +47,7 @@ function main () {
 
   # Push releases to the command center.
   local -r center_config=${config_dir}/command-center
-  get_command_center_config VAULT_PREFIX_${env} ${center_config}
+  get_command_center_config ${env} ${center_config}
   install_orchestration_workflow ${center_config} ${env} ${wf} ${helm_dir}
   fire_slack_deployment_notification ${wf} ${env}
 }
