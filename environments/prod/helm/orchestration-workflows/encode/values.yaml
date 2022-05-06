@@ -1,5 +1,5 @@
 enable: true
-schedule: '55 13 * * 0'
+schedule: '05 18 * * 0'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
@@ -13,4 +13,4 @@ repo:
   url: https://data.terra.bio
 chart:
   git: false
-  ref: 1.0.16
+  ref: 1.0.17
