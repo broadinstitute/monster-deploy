@@ -7,10 +7,10 @@ argo:
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
 chart:
   git: false
-  ref: 1.0.17
+  ref: 1.0.54
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
-  dataProject: datarepo-dev-9baf4f19
-  datasetName: encode_dev_v2
-  datasetId: 4dcc3ec3-945f-4f3b-90f1-322ee49e79d4
+  dataProject: datarepo-dev-3448c385
+  datasetName: encode_v2_0622
+  datasetId: 1f473d9d-c6d5-4aac-88ca-c5fe530f7f10
   profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
