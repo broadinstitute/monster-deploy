@@ -63,7 +63,7 @@ spec:
   {{- end }}
   values:
     gcs:
-      bucketName: {{ $project }}-staging-storage
+      bucketName: {{ $project }}-staging-storage-central1
     serviceAccount:
       k8sName: argo-runner
       googleName: encode-argo-runner@broad-dsp-monster-{{ .Values.env }}.iam.gserviceaccount.com
