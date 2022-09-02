@@ -1,5 +1,5 @@
 enable: true
-schedule: '10 09 * * *'
+schedule: '44 12 * * *'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
@@ -7,10 +7,10 @@ argo:
   artifactBucket: broad-dsp-monster-encode-prod-argo-archive
 repo:
   profileId: 0e6dd763-e8ef-4aad-bc99-f0fc7bbf2a76
-  datasetId: e3a4bd98-50d8-4e5e-8d6b-e82a51f64737
-  datasetName: encode_in_anvil_v8
-  dataProject: datarepo-f8bc7c7e
+  datasetId: c3c5d8bc-c406-4f21-9c12-c90f8070f106
+  datasetName: encode_in_anvil_v9
+  dataProject: datarepo-7fd2c290
   url: https://data.terra.bio
 chart:
   git: false
-  ref: 1.0.121
+  ref: 1.0.122
