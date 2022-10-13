@@ -7,10 +7,10 @@ argo:
   artifactBucket: broad-dsp-monster-encode-prod-argo-archive
 repo:
   profileId: 0e6dd763-e8ef-4aad-bc99-f0fc7bbf2a76
-  datasetId: 93e5f1b6-6c00-48ba-9d6c-3a1c19fdbb3d
-  datasetName: encode_in_anvil_v7
-  dataProject: datarepo-cb82f8e0
+  datasetId: c3c5d8bc-c406-4f21-9c12-c90f8070f106
+  datasetName: encode_in_anvil_v9
+  dataProject: datarepo-7fd2c290
   url: https://data.terra.bio
 chart:
   git: false
-  ref: 1.0.120
+  ref: 1.0.122
