@@ -1,16 +1,16 @@
 enable: true
-schedule: '30 11 * * *'
+schedule: '0 8 * * *'
 argo:
   env: dev
   vaultPrefix: secret/dsde/monster/dev/command-center
   namespace: encode
   artifactBucket: broad-dsp-monster-encode-dev-argo-archive
 chart:
-  git: false
-  ref: 1.0.54
+  git: true
+  ref: master
 repo:
   url: https://jade.datarepo-dev.broadinstitute.org
-  dataProject: datarepo-dev-3448c385
-  datasetName: encode_v2_0622
-  datasetId: 1f473d9d-c6d5-4aac-88ca-c5fe530f7f10
+  dataProject: datarepo-dev-2d5ec201
+  datasetName: broad_dsp_encode_20211005
+  datasetId: 561bc8ff-e0fe-40b3-afb6-57d086337734
   profileId: 390e7a85-d47f-4531-b612-165fc977d3bd
