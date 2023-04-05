@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.6.57
+  ref: 1.6.58
 repo:
   url: https://data.terra.bio
   dataProject: datarepo-4c7e3eea
