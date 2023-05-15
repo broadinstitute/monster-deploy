@@ -1,5 +1,5 @@
 enable: true
-schedule: '0 20 * * *'
+schedule: '0 08,20 * * *'
 argo:
   env: prod
   vaultPrefix: secret/dsde/monster/prod/command-center
@@ -7,7 +7,7 @@ argo:
   artifactBucket: broad-dsp-monster-clingen-prod-argo-archive
 chart:
   git: false
-  ref: 1.6.58
+  ref: 1.6.60
 repo:
   url: https://data.terra.bio
   dataProject: datarepo-4c7e3eea
