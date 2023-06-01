@@ -1,6 +1,8 @@
 # Monster Deploy
 Infrastructure-as-code for deploying Monster team's environments.
 
+_Note_ - if you are using this to deploy HCA you need to [Setup Git Secrets](https://dsp-security.broadinstitute.org/platform-security-categories/git/setup-git-secrets)
+
 ## Technologies used
 We use [Terraform](https://www.terraform.io/docs/index.html) and
 [Helm](https://helm.sh/docs/) to manage our deployments.
