@@ -23,11 +23,11 @@ jobs:
       - name: Commit tfsec results
         run: |
           git config --local user.email "
-            git config --local user.name "
-            git add .
-            git commit -m "Add tfsec results"
+          git config --local user.name "
+          git add .
+          git commit -m "Add tfsec results"
       - name: Push changes
-        uses: ad-m/github-push-action@master¬
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
