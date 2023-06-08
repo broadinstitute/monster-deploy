@@ -16,4 +16,6 @@ jobs:
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.2.0
         with:
+          tfsec_args: --concise-output --no-code --soft-fail --no-color --minimum-severity=HIGH --format=csv
+          tfsec_formats: csv
           github_token: ${{ github.token }}
