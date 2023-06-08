@@ -22,8 +22,8 @@ jobs:
 
       - name: Commit tfsec results
         run: |
-          git config --local user.email "
-          git config --local user.name "
+          git config --local user.email "security@broad.io"
+          git config --local user.name "Security Bot"
           git add .
           git commit -m "Add tfsec results"
       - name: Push changes
