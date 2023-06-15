@@ -3,6 +3,13 @@ Infrastructure-as-code for deploying Monster team's environments.
 
 _Note_ - if you are using this to deploy HCA you need to [Setup Git Secrets](https://dsp-security.broadinstitute.org/platform-security-categories/git/setup-git-secrets)
 
+## Before Contributing
+1. Install [Terraform Security Check](https://aquasecurity.github.io/tfsec/v1.28.1/guides/installation/) `brew install tfsec`
+2. Install [Github Pre-Commit Hooks](https://pre-commit.com/#install) `brew install pre-commit`
+3. Run `pre-commit install` to install the pre-commit hooks
+4. You can always run `pre-commit run --all-files` to run the pre-commit hooks manually
+5. NB: You can also use `git commit -m "Skipped pre-commit hooks" --no-verify` to skip the pre-commit hooks
+
 ## Technologies used
 We use [Terraform](https://www.terraform.io/docs/index.html) and
 [Helm](https://helm.sh/docs/) to manage our deployments.
