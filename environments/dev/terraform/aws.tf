@@ -16,20 +16,12 @@ provider aws {
 ## code doesn't break when using the non-default region.
 ###
 resource aws_s3_bucket s3_east_bucket {
-  bucket                  = "monster-s3-us-east-1"
-  block_public_acls       = true
-  block_public_policy     = true # This is the default, but we want to be explicit
-  provider                = aws.us-east-1
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  provider = aws.us-east-1
+  bucket   = "monster-s3-us-east-1"
 }
 resource aws_s3_bucket s3_west_bucket {
-  bucket                  = "monster-s3-us-west-2"
-  block_public_acls       = true
-  block_public_policy     = true # This is the default, but we want to be explicit
-  provider                = aws.us-west-2
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  provider = aws.us-west-2
+  bucket   = "monster-s3-us-west-2"
 }
 
 ###
@@ -48,7 +40,7 @@ module test_transfer_user {
     {
       subject_id = "ListObjects",
       actions    = ["s3:ListBucket"],
-      resources  = [
+      resources = [
         aws_s3_bucket.s3_east_bucket.arn,
         aws_s3_bucket.s3_west_bucket.arn
       ]
@@ -56,7 +48,7 @@ module test_transfer_user {
     {
       subject_id = "ObjectActions",
       actions    = ["s3:*Object"]
-      resources  = [
+      resources = [
         "${aws_s3_bucket.s3_east_bucket.arn}/*",
         "${aws_s3_bucket.s3_west_bucket.arn}/*"
       ]
