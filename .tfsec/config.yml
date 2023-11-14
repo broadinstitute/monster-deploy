@@ -1,0 +1,17 @@
+---
+minimum_severity: HIGH
+severity_overrides:
+  aws-s3-enable-bucket-encryption: LOW  # This is deprecated and enabled by default
+  aws-s3-encryption-customer-key: LOW  # We don't use customer keys for encryption, it's handled by AWS
+  restrict_public_buckets: LOW  # We don't use public buckets
+  aws-s3-block-public-policy: LOW  # We don't use public buckets
+  aws-s3-block-public-acls: LOW  # We don't use public buckets
+  aws-s3-ignore-public-acls: LOW  # We don't use public buckets
+  aws-s3-no-public-buckets: LOW  # We don't use public buckets
+
+exclude:
+  - google-iam-no-privileged-service-accounts:2023-12-31  # This is a false positive for the service account. Permission is granted to the service account, not the user
+
+# Ignore the following rules
+ignore-paths:
+  .templates
