@@ -1,4 +1,6 @@
+.DS_Store
 .terraform
+.terraform.lock.hcl
 .helm
 .kubeconfig
 .idea
