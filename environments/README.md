@@ -35,7 +35,8 @@ from that project.
 
 ### HCA
 Our HCA environment currently spans both "dev" and "prod" infrastructure. It will likely
-need to split in two once we move past the MVP stage of the project.
+need to split in two once we move past the MVP stage of the project.\
+(note that this appears to have been split into hca & hca-prod)
 
 ## Deploying an environment
 Environments are set up in stages.
@@ -48,6 +49,11 @@ Environments are set up in stages.
 4. Run `hack/apply-orchestration-workflow <env> <workflow-name>` to install services and Argo
    resources into a command-center cluster. The `workflow-name` used in this case must be a
    directory nested under `environments/<env>/helm/orchestration-workflows/`.
+
+NOTE:\
+These helm charts and terraform files have not been actively used or maintained since they were first used to set up these environments. You may find running `terraform plan --refresh-only` and/or a tool like [terraformer](https://github.com/GoogleCloudPlatform/terraformer) useful in determining drift. \
+
+_for HCA specifically see the [Dev Playbook](https://docs.google.com/document/d/1b03-YphH6Uac5huBopLYTYjzgDAlwS6qf-orMqaph64/edit)_
 
 ## Destroying an environment
 DON'T DO THIS. Some pieces of our environment require manual intervention from external
